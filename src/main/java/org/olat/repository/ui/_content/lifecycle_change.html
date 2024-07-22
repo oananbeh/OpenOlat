@@ -1,0 +1,22 @@
+<fieldset>
+	<legend>
+		$r.contextHelpWithWrapper("manual_user/learningresources/General_Information/#end_course")
+		$r.translate("details.lifecycle.change")
+	</legend>
+#if ($r.available("delete"))
+	<div class="o_error">
+		<p>$r.translate("details.delete.soft.desc")</p>
+		<ul>
+			<li>$r.translate("details.delete.soft.desc.1")</li>
+			<li>$r.translate("details.delete.soft.desc.2")</li>
+			<li>$r.translate("details.delete.soft.desc.3")</li>
+		</ul>
+		#if($r.isNotNull($autoDeleteDate))
+			<p>$r.translate("details.delete.soft.auto.desc", $autoDeleteDate)</p>
+		#end
+		<div class="o_button_group o_block_large_top">
+			$r.render("delete")
+		</div>
+	</div>
+#end
+</fieldset>

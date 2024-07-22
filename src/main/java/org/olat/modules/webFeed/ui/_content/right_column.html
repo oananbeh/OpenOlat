@@ -1,0 +1,11 @@
+#if($r.available("navi"))
+	<div class="o_box">
+		$r.render("navi")
+	</div>
+	#if($r.available("sidebarTags"))
+		<div class="o_feed_tags">
+			<h5>Tags</h5>
+			$r.render("sidebarTags")
+		</div>
+	#end
+#end

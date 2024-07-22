@@ -1,0 +1,23 @@
+ <div class="o_im_send">
+	#if($r.visible("msg"))
+	 <div class="o_im_input_send #if($f.hasError("msg")) has-feedback has-error #end">
+		$r.render("msg")
+		$r.render("subm")
+	</div>
+	#end
+	#if($f.hasError("msg"))
+		$r.render("msg","error")
+	#end
+	#if($r.visible("start.meeting"))
+		$r.render("start.meeting")
+	#end
+	#if($r.visible("close.chat"))
+		$r.render("close.chat")
+	#end
+	#if($r.visible("close.chat.close"))
+		$r.render("close.chat.close")
+	#end
+	#if($r.visible("reactivate.chat"))
+		$r.render("reactivate.chat")
+	#end
+</div>

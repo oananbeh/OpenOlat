@@ -1,0 +1,10 @@
+$r.render("regwizard")
+<h4>$r.translate("step1.reg.title")</h4>
+<p>$text</p>
+#if ($disclaimer)
+	<p>$disclaimer</p>
+#end
+#if ($yourdata)
+	<p>$yourdata</p>
+#end
+<p>$r.render("regarea")</p>

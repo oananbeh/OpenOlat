@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xsi:schemaLocation="
+  http://www.springframework.org/schema/beans 
+  http://www.springframework.org/schema/beans/spring-beans.xsd 
+  http://www.springframework.org/schema/context 
+  http://www.springframework.org/schema/context/spring-context.xsd">
+  
+<context:component-scan base-package="org.olat.upgrade" />
+
+ 	<bean id="olatUpgradeManager.enabled" class="org.olat.upgrade.UpgradeManagerImpl" lazy-init="true"  init-method="init" depends-on="folderModule">
+		<property name="upgradesDefinitions" ref="olatupgrades"/>
+	</bean>
+	<bean id="olatUpgradeManager.disabled" class="org.olat.upgrade.UpgradeManagerDummy"  init-method="init" lazy-init="true"/>
+	
+	<bean class="org.olat.upgrade.UpgradeManagerRunner">
+		<constructor-arg ref="olatUpgradeManager.${cluster.singleton.services}" /> <!-- just reference either version somewhere to get it started -->
+	</bean>
+  
+	<bean id="olatupgrades" class="org.olat.upgrade.UpgradesDefinitions" >
+		<property name="upgrades">
+			<list>
+				<!-- add upgrade bean here -->
+				<bean id="upgrade_15_5_4" class="org.olat.upgrade.OLATUpgrade_15_5_4"/>
+				<bean id="upgrade_16_0_0" class="org.olat.upgrade.OLATUpgrade_16_0_0"/>
+				<bean id="upgrade_16_1_0" class="org.olat.upgrade.OLATUpgrade_16_1_0"/>
+				<bean id="upgrade_16_1_2" class="org.olat.upgrade.OLATUpgrade_16_1_2"/>
+				<bean id="upgrade_16_1_3" class="org.olat.upgrade.OLATUpgrade_16_1_3"/>
+				<bean id="upgrade_16_1_7" class="org.olat.upgrade.OLATUpgrade_16_1_7"/>
+				<bean id="upgrade_16_2_0" class="org.olat.upgrade.OLATUpgrade_16_2_0"/>
+				<bean id="upgrade_16_2_2" class="org.olat.upgrade.OLATUpgrade_16_2_2"/>
+				<bean id="upgrade_16_2_3" class="org.olat.upgrade.OLATUpgrade_16_2_3"/>
+				<bean id="upgrade_17_0_0" class="org.olat.upgrade.OLATUpgrade_17_0_0"/>
+				<bean id="upgrade_17_1_0" class="org.olat.upgrade.OLATUpgrade_17_1_0"/>
+				<bean id="upgrade_17_1_3" class="org.olat.upgrade.OLATUpgrade_17_1_3"/>
+				<bean id="upgrade_17_2_0" class="org.olat.upgrade.OLATUpgrade_17_2_0"/>
+				<bean id="upgrade_17_2_2" class="org.olat.upgrade.OLATUpgrade_17_2_2"/>
+				<bean id="upgrade_17_2_4" class="org.olat.upgrade.OLATUpgrade_17_2_4"/>
+				<bean id="upgrade_17_2_9" class="org.olat.upgrade.OLATUpgrade_17_2_9"/>
+				<bean id="upgrade_17_2_19" class="org.olat.upgrade.OLATUpgrade_17_2_19"/>
+				<bean id="upgrade_18_0_0" class="org.olat.upgrade.OLATUpgrade_18_0_0"/>
+				<bean id="upgrade_18_0_3" class="org.olat.upgrade.OLATUpgrade_18_0_3"/>
+				<bean id="upgrade_18_0_4" class="org.olat.upgrade.OLATUpgrade_18_0_4"/>
+				<bean id="upgrade_18_0_7" class="org.olat.upgrade.OLATUpgrade_18_0_7"/>
+				<bean id="upgrade_18_1_0" class="org.olat.upgrade.OLATUpgrade_18_1_0"/>
+				<bean id="upgrade_18_1_3" class="org.olat.upgrade.OLATUpgrade_18_1_3"/>
+				<bean id="upgrade_18_2_0" class="org.olat.upgrade.OLATUpgrade_18_2_0"/>
+				<bean id="upgrade_18_2_2" class="org.olat.upgrade.OLATUpgrade_18_2_2"/>
+				<bean id="upgrade_19_0_0" class="org.olat.upgrade.OLATUpgrade_19_0_0"/>
+				<bean id="upgrade_19_0_1" class="org.olat.upgrade.OLATUpgrade_19_0_1"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

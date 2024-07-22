@@ -1,0 +1,99 @@
+#if($showEnd)
+	#set($colLabelButtons = "col-xs-12 col-ms-12 col-md-2 col-md-push-10")
+	#set($colLabelLabel = "col-xs-12 col-ms-12 col-md-3 col-md-pull-2")
+	#set($colLabelSpace = "hidden")
+	#set($colLabelValue = "col-xs-12 col-ms-12 col-md-4 col-md-pull-2")
+	#set($colSliderStart = "col-md-3")
+	#set($colSliderPreview = "col-md-4")
+	#set($colSliderEnd = "col-md-3")
+	#set($colSliderButtons = "col-md-2")
+#else
+	#set($colLabelButtons = "col-xs-12 col-ms-12 col-md-2 col-md-push-10")
+	#set($colLabelLabel = "col-xs-12 col-ms-12 col-md-3 col-md-pull-2")
+	#set($colLabelSpace = "col-xs-12 col-ms-12 col-md-2 col-sm-hidden col-md-pull-2")
+	#set($colLabelValue = "col-xs-12 col-ms-12 col-md-5 col-md-pull-2")
+	#set($colSliderStart = "col-md-5")
+	#set($colSliderPreview = "col-md-5")
+	#set($colSliderEnd = "hidden")
+	#set($colSliderButtons = "col-md-2")
+#end
+<div class="o_evaluation_editor_form $blockLayoutClass">
+	$r.render("settings")
+	
+	<div class="row">
+		<div class="$colLabelButtons">
+			<div class="pull-right">
+				#if($showEnd)
+					#if($r.available("hide.end") && $r.visible("hide.end"))
+						$r.render("hide.end")
+					#end
+				#else
+					#if($r.available("show.end") && $r.visible("show.end"))
+						$r.render("show.end")
+					#end
+				#end
+			</div>
+		</div>
+		
+		#if($r.isNotEmpty($stepLabels))
+			<div class="form-horizontal">
+				<label class="control-label $colLabelLabel o_evaluation_step_label">$r.translate("rubric.column.label")</label>
+			</div>
+			
+			<div class="$colLabelSpace"></div>
+			
+			<div class="$colLabelValue"><div class="form-inline">
+				#foreach($stepLabel in $stepLabels)
+					<div class="o_evaluation_step_labels" style="width:${stepInPercent}%;">
+						$r.render($stepLabel.stepLabelEl, "minimal")
+						
+					</div>
+				#end
+			</div> </div>
+		#end
+	</div>
+
+	#foreach($slider in $sliders)
+	<div class="row o_slider_editor">
+		<div class="$colSliderStart">$r.render($slider.startLabelEl)</div>
+		<div class="$colSliderPreview $slider.sliderCss o_slider_top">$r.render($slider.sliderEl)</div>
+		<div class="$colSliderEnd">$r.render($slider.endLabelEl)</div>
+		<div class="$colSliderButtons o_slider_buttons">
+			<div class="pull-right">
+				<div class="help-block o_evaluation_example o_weight_example">
+					<div>$r.render($slider.weightEl, "example")</div>
+					$r.render($slider.weightEl)
+					<div>
+						<div class='btn-group o_updown'>$r.render($slider.upButton)$r.render($slider.downButton)</div>
+						#if($r.isNotNull($slider.deleteButton) && $r.visible($slider.deleteButton))
+							$r.render($slider.deleteButton)
+						#end
+					</div>
+				</div>
+			</div>
+		</div>
+	#if($slider.startLabelEl.hasError())
+		<div class="$colSliderStart o_table_wrapper o_table_flexi">
+			$r.render($slider.startLabelEl, "error")
+		</div>
+	#elseif($slider.weightEl.hasError())
+		<div class="col-md-10">
+		</div>
+		<div class="col-md-2 o_table_wrapper o_table_flexi">
+			$r.render($slider.weightEl, "error")
+		</div>
+	#end
+	</div>
+	#end
+	#if($noSliderError)
+		<div class="o_error">
+			$r.translate("error.no.sliders")
+		</div>
+	#end
+	<div class="o_button_group">
+		$r.render("save_${postfix}")
+		#if($r.available("add.slider.${postfix}"))
+			$r.render("add.slider.${postfix}")
+		#end
+	</div>
+</div>

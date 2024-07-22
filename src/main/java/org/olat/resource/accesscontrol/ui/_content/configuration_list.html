@@ -1,0 +1,22 @@
+#if($r.isTrue($overlappingErrorConfigs))
+	<div class="o_block"><div class="o_error" role="alert"><i class="o_icon o_icon_important"> </i> $r.translate("accesscontrol.overlap.error")</div></div>
+#elseif($r.isTrue($overlappingConfigs))
+	<div class="o_block"><div class="o_warning"><i class="o_icon o_icon_important"> </i> $r.translate("accesscontrol.overlap.found")</div></div>
+#end
+
+#if ($offers && $offers.size() > 0)
+	#foreach($offer in $offers)
+		$r.render($offer.iconPanel)
+	#end
+#else
+	$r.render("empty")
+	#if($addOfferLinks && $addOfferLinks.size() > 0)
+		<div class="o_button_group o_sel_ac_add_first_methods">
+			#foreach($addOfferLink in $addOfferLinks)
+				#if($r.visible($addOfferLink.component.componentName))
+					$r.render($addOfferLink.component.componentName)
+				#end
+			#end
+		</div>
+	#end
+#end

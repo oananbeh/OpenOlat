@@ -1,0 +1,12 @@
+<div class="o_portfolio_trash">
+	$r.contextHelpWithWrapper("manual_user/area_modules/Components_of_the_portfolio/")		
+	<h2>$r.translate("deleted.entries")</h2>
+	<div class="clearfix">
+		$r.render("segments")	
+		#if($r.available("segmentCmp"))
+		<div class="o_segments_content">
+			$r.render("segmentCmp")
+		</div>
+		#end
+	</div>
+</div>

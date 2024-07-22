@@ -1,0 +1,81 @@
+#if($r.available("back"))
+	$r.render("back")
+#end
+<div class="o_lectures_rollcall">
+	<h3><i class="o_icon o_icon-fw o_icon_lecture"> </i> $lectureBlockTitle
+		#if($r.isNotEmpty(lectureBlockExternalId))
+		<small class="text-muted">
+			$lectureBlockExternalId
+		</small>
+		#end</h3>
+	
+	#if($r.available("attendance.list"))
+	<div class=" pull-right">
+		$r.render("attendance.list")
+	</div>
+	#end
+	<div class="o_lectures_rollcall_meta o_block_bottom">
+		<div class="o_teachers text-muted">$teachers</div>
+		<div class="o_date text-muted">
+			<i class="o_icon o_icon-fw o_icon_calendar"> </i> $dateAndTime
+		</div>
+		<div class="o_date text-muted">
+			<i class="o_icon o_icon-fw o_icon_lecture"> </i> $numOfLectures
+		</div>
+		#if($r.isNotEmpty($lectureBlockLocation))
+		<div class="o_date text-muted">
+			<i class="o_icon o_icon-fw o_icon_location"> </i> $lectureBlockLocation
+		</div>
+		#end
+		#if($lectureBlockOptional)
+		<div class="o_optional text-warning">
+			<i class="o_icon o_icon-fw o_icon_warn"> </i> $r.translate("info.lecture.block.optional")
+		</div>
+		#end
+	</div>
+	
+	#if($r.isNotEmpty($lectureBlockDescription) || $r.isNotEmpty($lectureBlockPreparation)) 
+	<div class="">
+		#if($r.isNotEmpty($lectureBlockDescription)) 
+		<div class="#if($r.isFalse($expandedDescription)) hidden #else show #end">
+			<h5>$r.translate("lecture.descr")</h5>
+			$lectureBlockDescription
+		</div>
+		#end
+		#if($r.isNotEmpty($lectureBlockPreparation))
+		<div class="#if($r.isFalse($expandedDescription)) hidden #else show #end">
+			<h5>$r.translate("lecture.preparation")</h5>
+			$lectureBlockPreparation
+		</div>
+		#end
+		<div class="o_expand o_button_group">
+			$r.render("expandButton")
+		</div>
+	</div>
+	#end
+	
+<fieldset>
+	<legend>$r.translate("rollcall.do")</legend>
+	
+	<div class="o_note o_lectures_rollcall_coach_hint">$lecturesInfos</div>
+
+	<div class="o_rollcall_table o_block_top">
+		$r.render("table")
+	</div>
+	<div class="o_button_group">
+		$r.render("cancel")
+		#if($r.available("save"))
+			$r.render("save")
+		#end
+		#if($r.available("cancel.lecture.blocks"))
+			$r.render("cancel.lecture.blocks")
+		#end
+		#if($r.available("close.lecture.blocks"))
+			$r.render("close.lecture.blocks")
+		#end
+		#if($r.available("reopen.lecture.blocks"))
+			$r.render("reopen.lecture.blocks")
+		#end
+	</div>
+</fieldset>
+</div>

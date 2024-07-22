@@ -1,0 +1,38 @@
+#if($row.getRangeLinkName())
+	<div class="o_proj_timeline_range_deco"></div>
+	<div class="o_proj_timeline_range">
+		$r.render("$row.getRangeLinkName()")
+	</div>
+	<div class="o_proj_timeline_range_deco"></div>
+#elseif($row.getShowLaterLinkName())
+	#if($r.visible("$row.getShowLaterLinkName()"))
+		<div class="o_proj_timeline_button_row">
+			$r.render("$row.getShowLaterLinkName()")
+		</div>
+	#end
+#elseif($row.getRangeEmpty())
+	<div class="o_proj_timeline_range_empty">
+		$row.getRangeEmpty()
+	</div>
+#else
+	<div class="o_proj_timeline_icon">
+		#if($row.getIconItemName())
+			$r.render("$row.getIconItemName()")
+		#end
+	</div>
+	<div>
+		<div class="o_proj_timeline_message">
+			#if($row.getMessageItemName())
+				$r.render("$row.getMessageItemName()")
+			#end
+		</div>
+		<div class="o_proj_timeline_doer">
+			#if($row.doerDisplyName)
+				$row.doerDisplyName
+			#end
+		</div>
+	</div>
+	<div class="o_proj_timeline_date">
+		$row.formattedDate
+	</div>
+#end

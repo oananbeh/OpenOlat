@@ -1,0 +1,165 @@
+.o_tag {
+	padding: 1px 0.5em;
+	margin-right: 2px;
+	margin-bottom: 2px;
+	font-weight: 450;
+	font-size: 12px;
+	text-align: center;
+	white-space: nowrap;
+	border-radius: 1em;
+	border-width: 1px;
+	border-style: solid;
+	border-color: $o-tag-background-color;
+	color: $o-tag-font-color;
+	background-color: $o-tag-background-color;
+	
+	&:hover {
+		text-decoration: none;
+		color: $o-tag-font-color;
+	}
+	
+	&.o_tag_clickable {
+		&:hover {
+			text-decoration: none;
+			background-color: darken($o-tag-background-color, 10%);
+			border-color: darken($o-tag-background-color, 10%);
+		}
+		
+		&:active {
+			background-color: darken($o-tag-background-color, 15%);
+			border-color: darken($o-tag-background-color, 15%);
+		}
+	}
+	
+	&.o_tag_selected {
+		background-color: $o-tag-selected-background-color;
+		border-color: $o-tag-selected-border-color;
+		
+		&.o_tag_clickable {
+			&:hover {
+				text-decoration: none;
+				background-color: darken($o-tag-selected-background-color, 10%);
+				border-color: darken($o-tag-selected-border-color, 10%);
+			}
+			
+			&:active {
+				background-color: darken($o-tag-selected-background-color, 15%);
+				border-color: darken($o-tag-selected-border-color, 15%);
+			}
+		}
+	}
+
+	&.o_tag_selected_remove {
+		background-color: $o-tag-selected-background-color;
+		border-color: $o-tag-selected-border-color;
+
+		&.o_tag_clickable {
+			&:hover {
+				text-decoration: none;
+				background-color: darken($o-tag-selected-background-color, 10%);
+				border-color: darken($o-tag-selected-border-color, 10%);
+			}
+
+			&:active {
+				background-color: darken($o-tag-selected-background-color, 15%);
+				border-color: darken($o-tag-selected-border-color, 15%);
+			}
+		}
+	}
+}
+	
+.o_tags_with_icon {
+	width: 100%;
+	display: inline-flex;
+	align-items: center;
+}
+
+.o_textbox_dropdown_info {
+	font-size: 75%;
+	font-weight: normal;
+}
+
+
+/** Tag selection element **/
+.o_tag_selection_button_tags {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.o_tag_selection_search {
+	margin-bottom: 10px;
+}
+
+.o_tag_selection_results {
+	.o_tag_selection_create {
+		line-height: 2em;
+	}
+}
+.o_tag_selection_tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px;
+	.o_tag {
+		@extend %o_nowrap;
+		margin: 0;
+	}
+}
+.o_tag.o_selection_tag {
+	border-color: $o-tag-selection-border-color;
+	background-color: $o-tag-selection-background-color;
+	color: $o-tag-selection-font-color;
+	.o_tag_count {
+		font-size: 85%;
+	}
+	
+	&.o_tag_clickable {
+		&:hover {
+			text-decoration: none;
+			background-color: darken($o-tag-selection-background-color, 10%);
+			border-color: darken($o-tag-selection-border-color, 12%);
+		}
+		
+		&:active {
+			background-color: darken($o-tag-selection-background-color, 15%);
+			border-color: darken($o-tag-selection-background-color, 15%);
+		}
+	}
+	
+	&.o_tag_selected {
+		border-color: $o-tag-selection-selected-border-color;
+		background-color: $o-tag-selection-selected-background-color;
+		color: $o-tag-selection-selected-font-color;
+		
+		&.o_tag_clickable {
+			&:hover {
+				text-decoration: none;
+				background-color: darken($o-tag-selection-selected-background-color, 10%);
+				border-color: darken($o-tag-selection-selected-border-color, 10%);
+			}
+			
+			&:active {
+				background-color: darken($o-tag-selection-selected-background-color, 15%);
+				border-color: darken($o-tag-selection-selected-border-color, 15%);
+			}
+		}
+	}
+
+	&.o_tag_selected_remove {
+		border-color: $o-tag-selection-remove-selected-border-color;
+		background-color: $o-tag-selection-remove-selected-background-color;
+		color: $o-tag-selection-remove-selected-font-color;
+
+		&.o_tag_clickable {
+			&:hover {
+				text-decoration: none;
+				background-color: darken($o-tag-selection-remove-selected-background-color, 10%);
+				border-color: darken($o-tag-selection-remove-selected-border-color, 10%);
+			}
+
+			&:active {
+				background-color: darken($o-tag-selection-remove-selected-background-color, 15%);
+				border-color: darken($o-tag-selection-remove-selected-border-color, 15%);
+			}
+		}
+	}
+}

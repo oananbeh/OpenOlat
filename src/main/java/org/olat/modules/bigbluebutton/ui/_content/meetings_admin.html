@@ -1,0 +1,11 @@
+<div class="o_sel_bbb_edit_meetings_list">
+#if($r.available("add.meeting"))
+	<div class="o_button_group o_button_group_right">
+		$r.render("add.meeting")
+		$r.contextHelpWithWrapper("manual_user/learningresources/Course_Element_BigBlueButton/")
+	</div>
+#else
+	<div class="clearfix">$r.contextHelpWithWrapper("manual_user/learningresources/Course_Element_BigBlueButton/")</div>
+#end
+$r.render("meetings")
+</div>

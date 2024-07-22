@@ -1,0 +1,29 @@
+<div class="o_flex_first_grow">
+<div>
+#if($title)
+<h3>$r.escapeHtml($title)</h3>
+#end
+</div>
+#if($r.available("actions"))
+<div class="o_button_group o_button_group_right">
+	$r.render("actions")
+</div>
+#end
+</div>
+<div class="o_form form-horizontal o_taxonomy_level_overview clearfix">
+	<div>
+		<label class="control-label col-sm-3" for="tax_level_key">$r.translate("taxonomy.level.key")</label>
+	</div>
+	<div class='col-sm-9'><p class='form-control-static'>$r.escapeHtml($id)</p></div>
+	#if($r.isNotEmpty($externalId))
+	<div>
+		<label class="control-label col-sm-3" for="tax_level_key">$r.translate("taxonomy.level.external.id")</label>
+	</div>
+	<div class='col-sm-9'><p class='form-control-static'>$r.escapeHtml($externalId)</p></div>
+	#end
+	<div>
+		<label class="control-label col-sm-3" for="tax_level_key">$r.translate("taxonomy.level.path")</label>
+	</div>
+	<div class='col-sm-9'><p class='form-control-static'>$r.escapeHtml($path)</p></div>
+</div>
+<div class="clearfix">$r.render("tabs")</div>

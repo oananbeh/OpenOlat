@@ -1,0 +1,53 @@
+<fieldset id="$r.getCId()" class="o_form form #if ($off_css_class) $off_css_class #end $f.getContainerCssClass()">
+	#if ($off_desc) <div class="o_desc">$off_desc</div> #end
+	#if ($off_error) <div class="o_error">$off_error</div> #end
+
+	#if($r.isNotEmpty($error))
+	<div class="o_error_with_icon o_login_error">$error</div>
+	#end
+	
+#foreach ($item in $formitemnames)
+	$r.render(${item}, "vertical", "form")
+#end
+#if($r.isTrue($credentialRequest) || $r.isTrue($credentialCreate))
+	<div class="o_login_wait o_block_with_icon_left"><i class="o_icon o_icon_wait o_icon-spin"> </i> $r.translate("passkey.wait.device")</div>
+#end
+#if($r.isTrue($credentialRequest))
+	<script>
+"use strict";
+(function () {
+	var publicKeyCredentialRequestOptions = {
+		challenge: base64urlToBuffer("$challenge"),
+		timeout: $timeout,
+		rpId: "$rpId",
+		allowCredentials: [#foreach($credential in $allowCredentials)	
+			#if($foreach.count > 1), #end
+			{
+				transports: [ #foreach($transport in ${credential.transports()})
+					#if($foreach.count > 1), #end
+					"$transport"
+				#end ],
+				type: "public-key",
+				id: base64urlToBuffer("${credential.credentialIdToString()}")
+			} 
+		#end],
+		attestation: "$attestation",
+		userVerification: "$userVerification",
+		extensions: {  }
+	};
+
+	var credentialRequestOptions = {
+		publicKey: publicKeyCredentialRequestOptions
+	};
+
+	navigator.credentials.get(credentialRequestOptions).then((publicKeyCredential) => {
+		const response = publicKeyCredential.response;
+		$f.openFfXHREvent(false, false, true), 'type', 'request', 'credential-type', publicKeyCredential.type, 'id', publicKeyCredential.id, 'rawId', bufferToBase64url(publicKeyCredential.rawId), 'authenticator', bufferToBase64url(response.authenticatorData), 'clientDataJSON', bufferToBase64url(response.clientDataJSON), 'signature', bufferToBase64url(response.signature), 'userHandle', bufferToBase64url(response.userHandle));
+	}).catch((err) => {
+		$f.openFfXHREvent(false, false, true), 'type', 'request-error','error-message',err.message);
+	});
+	
+} ());
+	</script>
+#end
+</fieldset>

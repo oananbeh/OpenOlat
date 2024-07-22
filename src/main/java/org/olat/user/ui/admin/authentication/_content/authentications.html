@@ -1,0 +1,15 @@
+<fieldset>
+	<legend>$r.translate("change.username.title") $r.contextHelpWithWrapper("manual_admin/usermanagement/Configure_User/")</legend>
+	$r.render("username", "3_9")
+	$r.render("edit", "3_9")
+</fieldset>
+<fieldset>
+	<legend>$r.translate("authentications.title")</legend>
+	<div class="o_buttoon_group o_button_group_right">
+		<div class="btn-group">
+			$r.render("add.authentication")
+			$r.render("add.more")
+		</div>
+	</div>
+	$r.render("table")
+</fieldset>

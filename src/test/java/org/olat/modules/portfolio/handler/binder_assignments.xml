@@ -1,0 +1,230 @@
+<binder>
+  <title>New template v2 (2)</title>
+  <summary></summary>
+  <imagePath>portfolio/posters/binders/b9/Hi There.png</imagePath>
+  <sections>
+    <section>
+      <title>Section (1)</title>
+      <description>&lt;p&gt;This is the first section&apos;s description&lt;/p&gt;</description>
+      <beginDate class="sql-timestamp">2017-03-05 23:00:00</beginDate>
+      <endDate class="sql-timestamp">2017-03-30 22:00:00</endDate>
+      <assignments>
+        <assignment>
+          <status>template</status>
+          <type>form</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Ceci est un test</title>
+          <summary>&lt;p&gt;Bla bla&lt;/p&gt;</summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+      </assignments>
+    </section>
+    <section>
+      <title>Section (2)</title>
+      <description>&lt;p&gt;This is a whole new section&lt;/p&gt;</description>
+      <beginDate class="sql-timestamp">2017-05-09 22:00:00</beginDate>
+      <assignments>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 1.</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 2.</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 3.</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 4.</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+      </assignments>
+    </section>
+    <section>
+      <title>Section (3)</title>
+      <description></description>
+      <beginDate class="sql-timestamp">2016-08-01 22:00:00</beginDate>
+      <endDate class="sql-timestamp">2016-08-30 22:00:00</endDate>
+      <assignments>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 1.</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 2</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 2</title>
+          <summary></summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Travail 4</title>
+          <summary>&lt;p&gt;project list&lt;/p&gt;</summary>
+          <content>&lt;p&gt;Work with a project list&lt;/p&gt;</content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+      </assignments>
+    </section>
+    <section>
+      <title>Section (4)</title>
+      <description>&lt;p&gt;Et encore beaucoup de texte &amp;agrave; &amp;eacute;crire&lt;/p&gt;</description>
+      <beginDate class="sql-timestamp">2017-06-23 22:00:00</beginDate>
+      <endDate class="sql-timestamp">2017-07-28 22:00:00</endDate>
+      <assignments>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Upload a document</title>
+          <summary>&lt;p&gt;Upload a &lt;em&gt;document&lt;/em&gt; with &lt;strong&gt;some&lt;/strong&gt; formatting&lt;/p&gt;</summary>
+          <content>&lt;p&gt;Upload a document&lt;/p&gt;</content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>true</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Essay</title>
+          <summary>Write an essay</summary>
+          <content>&lt;p&gt;Write an essay&lt;/p&gt;</content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>true</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Essay</title>
+          <summary>&lt;p&gt;An essay&lt;/p&gt;</summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Little test</title>
+          <summary>&lt;p&gt;Writing sample&lt;/p&gt;</summary>
+          <content>&lt;p&gt;Updated assignment&lt;/p&gt;</content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+      </assignments>
+    </section>
+    <section>
+      <title>Section (5) evaluation</title>
+      <description>&lt;p&gt;The final evaluation&lt;/p&gt;</description>
+      <assignments>
+        <assignment>
+          <status>template</status>
+          <type>form</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Evaluation and external evaluation (not visible)</title>
+          <summary>&lt;p&gt;Evaluation and external evaluation (not visible)&lt;/p&gt;</summary>
+          <content></content>
+          <onlyAutoEvaluation>false</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>true</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+      </assignments>
+    </section>
+    <section>
+      <title>Section (6) documents</title>
+      <description></description>
+      <assignments>
+        <assignment>
+          <status>template</status>
+          <type>essay</type>
+          <version>0</version>
+          <template>false</template>
+          <title>Documents</title>
+          <summary>&lt;p&gt;Documents&lt;/p&gt;</summary>
+          <content></content>
+          <onlyAutoEvaluation>true</onlyAutoEvaluation>
+          <reviewerSeeAutoEvaluation>false</reviewerSeeAutoEvaluation>
+          <anonymousExternalEvaluation>false</anonymousExternalEvaluation>
+        </assignment>
+      </assignments>
+    </section>
+  </sections>
+</binder>

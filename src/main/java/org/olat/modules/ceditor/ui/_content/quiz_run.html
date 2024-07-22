@@ -1,0 +1,47 @@
+<div id="$r.getCId()" class="o_page_run_quiz $blockLayoutClass" role="application" title="$r.translate('add.quiz')">
+  #if($state == "intro")
+	#if($r.available("image"))
+	<div class="o_background_image_wrapper">
+		$r.render("image")
+	#else
+	<div class="o_background_placeholder">
+		<img src='$r.staticLink("/images/media/transparent_16_9.png")' alt="$r.translate('background.image')"/>
+	#end
+		<div class="o_quiz_panel">
+			<div class="o_quiz_title">$r.escapeHtml($title)</div>
+			<div class="o_quiz_description">$r.escapeHtml($description)</div>
+			<div class="o_quiz_button">$r.render("quiz.start")</div>
+		</div>
+	</div>
+  #end
+
+  #if($state == "quiz")
+    <div class="o_quiz $quizOutcomeClass">
+		<div class="o_quiz_progress_label">
+			$r.translate("quiz.question.header", $questionNumber, $numberOfQuestions)
+		</div>
+		<div class="o_quiz_progress">
+			$r.render("progressBar")
+		</div>
+		<div class="o_quiz_question">
+			$r.render("question")
+		</div>
+	</div>
+  #end
+
+  #if($state == "result")
+	#if($r.available("image"))
+	<div class="o_background_image_wrapper">
+		$r.render("image")
+	#else
+	<div class="o_background_placeholder">
+		<img src='$r.staticLink("/images/media/transparent_16_9.png")' />
+	#end
+		<div class="o_quiz_panel">
+			<div class="o_quiz_title">$r.escapeHtml($title)</div>
+			$r.render("quiz.figures")
+			<div class="o_quiz_button">$r.render("quiz.retry")</div>
+		</div>
+	</div>
+  #end
+</div>

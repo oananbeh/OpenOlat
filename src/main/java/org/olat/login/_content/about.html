@@ -1,0 +1,198 @@
+<p class="clearfix o_large">
+	<a href="https://www.openolat.org" title="$r.translate("about.title")" target="_blank" rel="noopener noreferrer">
+		<img border="0" class="pull-left"  src="$r.staticLink("images/openolat/openolat_logo_claim_rgb.png")" alt=""/>
+	</a>
+</p>
+
+#if($r.translate("about.custom.title") != "")
+<div id="o_about_custom">
+	<h1>
+		$r.translate("about.custom.title")
+	</h1>
+	<p>
+		$r.translate("about.custom")
+	</p>
+</div>
+#end
+
+<div id="o_about_lms">
+	<h2>
+		LMS OpenOlat
+	</h2>
+	<p>
+		<a href="https://www.openolat.org" target="_blank" class="o_link_extern" rel="noopener noreferrer">www.openolat.org</a> · 
+		<a href="https://docs.openolat.org" target="_blank" class="o_link_extern" rel="noopener noreferrer">docs.openolat.org</a>
+		<br />
+		<span class="text-muted">
+			$r.translate("about.version") $r.getVersion()
+		</span>
+	</p>
+	<p>
+		$r.translate("about.history")
+	</p>
+	<p class="o_block_large">
+		<a href="https://www.openolat.com/testbericht-openolat-2020-sehr-gut/" target="_blank" title="The OpenOlat LMS got a high score in the e-learning journal ranking" rel="noopener noreferrer">
+			<img border="0" src="$r.staticLink("images/openolat/openolat-test-sehr-gut_large.png")" alt="" style="display: inline-block; padding-left: 2em; padding-bottom: 2em; max-width: 40%; max-height: 200px;" />
+		</a>
+		<a href="https://www.comenius-award.de" target="_blank" title="The OpenOlat LMS wins a comenius edu media award" rel="noopener noreferrer">
+			<img border="0" src="$r.staticLink("images/openolat/openolat_comeniusedumed_2017.png")" alt="" style="display: inline-block; padding-left: 2em; padding-bottom: 2em; max-width: 40%; max-height: 200px;" />
+		</a>
+		<a href="https://www.frentix.com/wp-uploads/2019/06/eLearning-Jahrbuch-2019_OpenOlat_Pruefungsserver_Award.pdf" target="_blank" title="The OpenOlat LMS wins the e-learning award in the category e-testing" rel="noopener noreferrer">
+			<img border="0" src="$r.staticLink("images/openolat/openolat-award-etesting.png")" alt="" style="display: inline-block; padding-left: 2em; padding-bottom: 2em; max-width: 40%; max-height: 200px;" />
+		</a>
+	</p>
+	<p>
+		$r.translate("about.elearningjournal.test.2015")
+	</p>
+	<p>
+		<a href="https://www.frentix.com/wp-uploads/2020/04/eLJ12020_TEST_Frentix.pdf" target="_blank" class="o_link_extern" rel="noopener noreferrer">
+			<i class="o_icon o_filetype_pdf"> </i> 
+			Testbericht OpenOlat 15
+		</a>
+ 		&nbsp;&nbsp;|&nbsp;&nbsp;  
+		<a href="https://www.elearning-journal.com/index.php?id=12" target="_blank" class="text-muted o_link_extern" rel="noopener noreferrer">
+			<i class="o_icon o_icon_external_link"> </i>
+			eLearning Journal
+		</a>		
+ 		&nbsp;&nbsp;|&nbsp;&nbsp;  
+		<a href="https://www.frentix.com/wp-uploads/2019/06/eLearning-Jahrbuch-2019_OpenOlat_Pruefungsserver_Award.pdf" target="_blank" class="text-muted o_link_extern" rel="noopener noreferrer">
+			<i class="o_icon o_filetype_pdf"> </i>
+			eLearning Journal eTesting Award 2019 
+		</a>		
+		
+	</p>
+	
+	<h2>
+		Social
+	</h2>
+	<p>
+		$r.translate("about.social")
+	</p>
+	<p>
+		<a href="https://mastodon.social/@OpenOlat" title="OpenOlat on Mastodon" target="_blank" rel="noopener noreferrer">
+			<svg viewBox="0 0 32 32" width="32" height="32" class="icon_mastodon">
+				<path transform="scale(2)" d="M 15.659 9.592 C 15.424 10.72 13.553 11.956 11.404 12.195 C 10.283 12.32 9.18 12.434 8.003 12.384 C 6.079 12.302 4.56 11.956 4.56 11.956 C 4.56 12.13 4.572 12.297 4.595 12.452 C 4.845 14.224 6.478 14.33 8.025 14.379 C 9.586 14.429 10.976 14.02 10.976 14.02 L 11.04 15.337 C 11.04 15.337 9.948 15.884 8.003 15.984 C 6.93 16.039 5.598 15.959 4.047 15.576 C 0.683 14.746 0.104 11.4 0.015 8.006 C -0.012 6.998 0.005 6.048 0.005 5.253 C 0.005 1.782 2.443 0.765 2.443 0.765 C 3.672 0.238 5.782 0.017 7.975 0 L 8.029 0 C 10.221 0.017 12.332 0.238 13.561 0.765 C 13.561 0.765 15.999 1.782 15.999 5.253 C 15.999 5.253 16.03 7.814 15.659 9.592 Z M 13.124 5.522 L 13.124 9.725 L 11.339 9.725 L 11.339 5.646 C 11.339 4.786 10.951 4.35 10.175 4.35 C 9.317 4.35 8.887 4.867 8.887 5.891 L 8.887 8.124 L 7.113 8.124 L 7.113 5.891 C 7.113 4.867 6.683 4.35 5.825 4.35 C 5.049 4.35 4.661 4.786 4.661 5.646 L 4.661 9.725 L 2.876 9.725 L 2.876 5.522 C 2.876 4.663 3.111 3.981 3.582 3.476 C 4.067 2.971 4.703 2.712 5.493 2.712 C 6.406 2.712 7.098 3.039 7.555 3.695 L 8 4.39 L 8.445 3.695 C 8.902 3.039 9.594 2.712 10.507 2.712 C 11.297 2.712 11.933 2.971 12.418 3.476 C 12.889 3.981 13.124 4.663 13.124 5.522 Z" style="stroke:none;stroke-miterlimit:10;fill-rule:evenodd;"/>
+			</svg>
+		</a>
+		<a href="https://www.linkedin.com/groups/1473557/" title="OpenOlat on LinkedIn" target="_blank" rel="noopener noreferrer"><i class="o_icon o_icon_linkedin o_icon-3x"> </i></a>
+		<a href="https://www.youtube.com/channel/UCM8o2nsnXMRF7bMj82l-hKw" title="OpenOlat videos in YouTube" target="_blank" rel="noopener noreferrer"><i class="o_icon o_icon_youtube o_icon-3x"> </i></a>
+	</p>
+</div>
+
+<div id="o_about_financing">
+	<h2 style="clear:both;">
+		$r.translate("about.financing")
+	</h2>
+	<p>
+		$r.translate("about.financing.intro")
+	<p>
+	<center>
+		<a href="https://www.paypal.com/donate/?hosted_button_id=6ZRA9VGRJXENC" target="_blank" alt="Donate for OpenOlat Project" class="btn btn-default btn-primary">
+			$r.translate("about.financing.donate")
+		</a> 
+	</center>
+</div>
+
+<div class="o_about_partner">
+	<h2 >
+		$r.translate("about.partner")
+	</h2>
+	<p>
+		$r.translate("about.partner.intro")
+	<p>
+	<table class="table table-striped table-condensed ">
+	<thead>
+		<tr>
+			<th>Level</th>
+			<th>Institution</th>
+		</tr>
+	</thead>	
+	<tbody>
+		<tr>
+			<td>Gold</td>
+			<td><a href="https://www.uibk.ac.at" target="_blank" class="o_extern" rel="noopener noreferrer">Universität Innsbruck</a></td>
+		</tr>
+		<tr>
+			<td>Gold</td>
+			<td><a href="https://www.vcrp.de" target="_blank" class="o_extern" rel="noopener noreferrer">Virtueller Campus Rheinland-Pfalz, VCRP</a></td>
+		</tr>
+		<tr>
+			<td>Gold</td>
+			<td><a href="https://www.uzh.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Universität Zürich, UZH</a></td>
+		</tr>
+		<tr>
+			<td>Silver</td>
+			<td><a href="https://www.hs-furtwangen.de" target="_blank" class="o_extern" rel="noopener noreferrer">Hochschule Furtwangen, HFU</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.bzgbs.ch" target="_blank" class="o_extern" rel="noopener noreferrer">BZG Bildungszentrum Gesundheit Basel-Stadt</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.hfgs.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Höheren Fachschule Gesundheit und Soziales, HFGS</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.uni-kiel.de" target="_blank" class="o_extern" rel="noopener noreferrer">Christian-Albrechts-Universität zu Kiel, CAU</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.bbw.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Berufsbildungsschule Winterthur BBW</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.uni-hamburg.de" target="_blank" class="o_extern" rel="noopener noreferrer">Universität Hamburg, UHH</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.ibw.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Höhere Fachschule Südostschweiz, ibW</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.zag.zh.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Zentrum für Ausbildung im Gesundheitswesen Kanton Zürich, ZAG</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://juventus.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Juventus Schulen</a></td>
+		</tr>
+		<tr>
+			<td>Bronze</td>
+			<td><a href="https://www.kalaidos.ch" target="_blank" class="o_extern" rel="noopener noreferrer">Kalaidos Bildungsgruppe Schweiz</a></td>
+		</tr>
+	</tbody>
+	</table>
+</div>
+
+<p>
+	<br />
+	$r.translate("about.linktext")
+</p>
+<p class="text-right">
+	<br />Zürich, 13.10.2023
+</p>
+
+<div class="o_about_copyright">
+	<h2>
+		$r.translate("about.copyright")
+	</h2>
+	<pre class="small">
+$licenses
+	</pre>
+</div>
+
+<div class="o_about_translations">
+	<h3>
+		$r.translate("about.translate")
+	</h3>
+	<ul class="list-unstyled">
+	#set($langInfos = $r.getLanguages())
+	#foreach ($lang in $langInfos.enabledKeys) 
+		<li><i class="o_flag o_flag_${lang}"> </i> $langInfos.langNames.get("$lang") : $langInfos.langTranslators.get("$lang")</li>
+	#end
+	</ul>
+</div>
+
+<div class="o_button_group">
+	$r.render("close")
+</div>

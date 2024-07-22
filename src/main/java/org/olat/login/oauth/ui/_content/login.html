@@ -1,0 +1,18 @@
+<div class="o_login_form o_login_social">
+	<fieldset class="o_form form ">
+		<legend>		
+			$r.translate("login.form")
+		</legend> 
+		<div class="o_desc">
+			$r.translate("login.intro")
+		</div> 
+		<ul class="list-unstyled">
+		#foreach ($loginButton in $loginButtons)
+			#if ($f.isVisible(${loginButton.button().getComponent().getComponentName()}))
+				<li>#if($r.isNotEmpty(${loginButton.beforeMsg()}))${loginButton.beforeMsg()}#end $r.render(${loginButton.button().getComponent().getComponentName()}) #if($r.isNotEmpty(${loginButton.afterMsg()}))${loginButton.afterMsg()}#end</li>
+			#end
+		#end
+		</ul>
+		$r.translate("login.customfootermsg")
+	</fieldset>
+</div>

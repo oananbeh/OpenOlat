@@ -1,0 +1,33 @@
+#if($noMap)
+	<div class="o_warning">$r.translate("no.map")</div>
+#else
+	<fieldset class="o_block_top o_start_info_box">
+		<div class="o_note">
+			#if ($r.isNotEmpty($infoCoach))
+			<div class="o_course_run_disclaimer">
+				<h4>$r.translate("title.infocoach")</h4>
+				$r.xssScan($infoCoach)
+			</div>
+			#end
+			<h4>$r.translate("map.template")</h4>
+			<div class="o_portfolio_cn_preview o_rendertype_custom">
+				<div class="panel panel-default o_portfolio_assignments panel-imagebg o_portfolio_entry" style="background-image:url('$image/$imageName');">
+					<div class="panel-heading">
+						<h4 class="panel-title">$templateTitle</h4>
+					</div>
+					<div class="panel-body">
+						<ul>
+							<li><span>$r.translate("map.copyDate"): $copyDate</span></li>
+							<!-- TODO: OO-7482: temporarily removed, because not being used properly
+							<li><span>$r.translate("map.returnDate"): $returnDate</span></li>
+							-->
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	<div class="clearfix">
+		$r.render("assessment")
+	</div>
+#end

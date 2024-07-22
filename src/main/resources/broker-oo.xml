@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration xmlns="urn:activemq" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:activemq /schema/artemis-configuration.xsd">
+	<core xmlns="urn:activemq:core">
+	
+		<journal-type>NIO</journal-type>
+		<journal-min-files>2</journal-min-files>
+		<journal-pool-files>25</journal-pool-files>
+		<journal-file-size>25Mb</journal-file-size>
+		
+		<!-- //TODO jee add security -->
+		<security-enabled>false</security-enabled>
+		<persistence-enabled>true</persistence-enabled>
+		<graceful-shutdown-enabled>true</graceful-shutdown-enabled>
+		<graceful-shutdown-timeout>10</graceful-shutdown-timeout>
+		<message-expiry-scan-period>-1</message-expiry-scan-period>
+
+		<!-- Don't scan configuration, packed in the WAR file -->
+		<configuration-file-refresh-period>604800000</configuration-file-refresh-period>
+		<!-- Don't scan disk usage oft (every week) -->
+		<disk-scan-period>604800000</disk-scan-period>
+		<max-disk-usage>100</max-disk-usage>
+		
+		<!-- Directories for paging and others are defined on startup -->
+		
+		<acceptors>
+			<acceptor name="in-vm">vm://0</acceptor>
+		</acceptors>
+		
+		<address-settings>
+			<address-setting match="#">
+				<auto-create-queues>true</auto-create-queues>
+				<dead-letter-address>DLQ</dead-letter-address>
+				<expiry-address>ExpiryQueue</expiry-address>
+				<redelivery-delay>0</redelivery-delay>
+				<max-size-bytes>10Mb</max-size-bytes>
+				<message-counter-history-day-limit>10</message-counter-history-day-limit>
+				<address-full-policy>PAGE</address-full-policy>
+			</address-setting>
+		</address-settings>
+	</core>
+</configuration>

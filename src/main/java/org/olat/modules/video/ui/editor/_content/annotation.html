@@ -1,0 +1,100 @@
+<div class="form-group clearfix">
+
+	<div class="o_video_annotation_details">
+		<div class="o_video_annotation_se_label">$r.render("start", "label")</div>
+
+		<div class="o_video_annotation_start btn-group">
+			<div class="btn-group o_video_apply_position_timestamp">$r.render("start")</div>
+			<div class="btn-group o_video_apply_position_button">$r.render("startApplyPosition")</div>
+		</div>
+
+		#if ($f.hasError("start"))
+		<div class="o_video_annotation_error_start">$r.render("start", "error")</div>
+		#end
+
+		<div class="o_video_annotation_dash" style="display: inline-block; text-align: center; line-height: 32px;">-</div>
+
+		<div class="o_video_annotation_end btn-group">
+			<div class="btn-group o_video_apply_position_timestamp">$r.render("end")</div>
+			<div class="btn-group o_video_apply_position_button">$r.render("endApplyPosition")</div>
+		</div>
+
+		#if ($f.hasError("end"))
+		<div class="o_video_annotation_error_end">$r.render("end", "error")</div>
+		#end
+
+		<div class="o_video_annotation_duration_label">$r.render("duration", "label")</div>
+
+		<div class="o_video_annotation_duration">$r.render("duration")</div>
+
+		#if ($f.hasError("duration"))
+		<div class="o_video_annotation_error_duration">$r.render("duration", "error")</div>
+		#else
+		<div class="o_video_annotation_error_duration o_form_example help-block">$r.render("duration", "example")</div>
+		#end
+
+		<div class="o_video_annotation_text_label">$r.render("text", "label")</div>
+		<div class="o_video_annotation_text">$r.render("text")</div>
+
+		<div class="o_video_annotation_color_label">$r.render("color", "label")</div>
+		<div class="o_video_annotation_color_dropdown">$r.render("color")</div>
+
+		<div class="o_video_annotation_position_size_label">$r.render("positionSize", "label")</div>
+		<div class="o_video_annotation_position_size">
+			<div style="display: inline-block">$r.render("positionSize")</div>
+			<div style="display: inline-block">$r.render("editPositionSize")</div>
+		</div>
+
+		<div class="o_video_annotation_buttons">$r.render("save") $r.render("cancel")</div>
+	</div>
+</div>
+
+<script>
+	jQuery(() => {
+		const start = jQuery('.o_video_annotation_start input');
+		const end = jQuery('.o_video_annotation_end input');
+		const duration = jQuery('.o_video_annotation_duration input');
+		const minDuration = 1;
+
+		const parseTimeToSeconds = (timeString) => {
+			const parts = timeString.split(':');
+			return (+parts[0]) * 3600 + (+parts[1]) * 60 + (+parts[2]);
+		}
+
+		const formatTime = (timeInSec, defaultTimeString) => {
+			if (timeInSec <= 0) {
+				return defaultTimeString;
+			}
+			return new Date(timeInSec * 1000).toISOString().substring(11, 19);
+		}
+
+		const updateDuration = () => {
+			const startInSec = parseTimeToSeconds(start.val());
+			let endInSec = parseTimeToSeconds(end.val());
+			let durationInSec = endInSec - startInSec;
+			const durationDeficit = Math.max(0, minDuration - (endInSec - startInSec));
+			if (durationDeficit > 0) {
+				durationInSec += durationDeficit;
+			}
+			duration.val(durationInSec);
+			return true;
+		};
+
+		const updateEnd = () => {
+			const startInSec = parseTimeToSeconds(start.val());
+			let durationInSec = parseInt(duration.val());
+			let endInSec = startInSec + durationInSec;
+			const overlap = Math.max(0, endInSec - ${videoDurationInSeconds});
+			if (overlap > 0) {
+				durationInSec -= overlap;
+				endInSec -= overlap;
+				duration.val(durationInSec);
+			}
+			end.val(formatTime(endInSec, end.val()));
+		}
+
+		start.on('keyup', updateEnd);
+		end.on('keyup', updateDuration);
+		duration.on('keyup', updateEnd);
+	});
+</script>

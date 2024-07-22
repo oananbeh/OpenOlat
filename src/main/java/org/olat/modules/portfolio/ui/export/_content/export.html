@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html lang="$r.getLanguageCode()">
+<head>
+	<title>$rootTitle</title>	
+	<link rel='stylesheet' href='$r.themeFullLink()' />
+	<link rel='stylesheet' href='$r.staticFullLink("js/jquery/sliderpips/jquery-ui-slider-pips.css")' />
+	<link rel='stylesheet' href='$r.staticFullLink("js/jquery/ui/jquery-ui-1.13.2.custom.min.css")' />
+	<script src='$r.staticFullLink("js/jquery/jquery-3.7.0.min.js")'></script>
+	<script src='$r.staticFullLink("js/d3/d3.min.js")'></script>
+	<script src='$r.staticFullLink("js/jquery/ui/jquery-ui-1.13.2.dnd.resize.slider.min.js")'></script>
+	<script src='$r.staticFullLink("js/jquery/sliderpips/jquery-ui-slider-pips.js")'></script>
+	<script src='$r.staticFullLink("js/jquery/openolat/jquery.statistics.radarchart.js")'></script>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<script>
+var o_info = new Object();
+o_info.latexit = false;
+	
+$r.mathJaxJavascriptConfig();
+
+function setFlexiFormDirtyByListener(e){
+	//
+}
+
+function o_mathjax() {
+	//
+}
+var BFormatter = {
+	// format on load
+	formatLatexFormulas : function(domId) {}
+};
+var BPlayer = {
+	insertPlayer: function (address,domId,width,height,start,duration,provider,streamer,autostart,repeat,controlbar,poster) {
+		var content = '<video src="' + address + '" controls width="' + width + '" height="' + height + '" />';
+		jQuery('#' + domId).append(content);
+	}
+}
+</script>
+<script src='${r.mathJaxCdnFullUrl()}tex-mml-chtml.js'></script>
+</head>
+<body class="o_page_margins o_offline_export $bodyCssClass">
+	<div id="o_main">
+	#if($r.available("cmp"))
+		$r.render("cmp")
+	#end
+	#if($r.available("metadata"))
+		<div class="o_pf_metadat">$r.render("metadata")</div>
+	#end
+	#if($r.available("content"))
+		<div class="o_pf_content">$r.render("content")</div>
+	#end
+	#if($r.available("comments"))
+		<div class="o_pf_comments">$r.render("comments")</div>
+	#end
+	</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+#if($hasResult)
+	#if ($emptyResult)
+		<div class="o_empty_state">
+			<div class="o_empty_visual"><i class="o_icon o_icon_empty_indicator"></i><i class="o_icon o_icon_database"></i></div>
+			<h3 class="o_empty_msg">
+				$r.translate("search.empty.result")
+			</h3>
+			<div class="o_empty_hint">
+				$r.translate("search.empty.result.hint",$searchResults.getNumberOfIndexDocuments())
+			</div>
+		</div>
+  	#else
+	  	<div id="o_search_results_header" class="clearfix o_block">
+	  		<i class="o_icon o_icon-fw o_icon_search"></i>
+		    $resultTitle
+		    <span class="o_search_highlight">
+		    	#if($highlight)
+		    		$r.render("dishighlight.page")
+		    	#else
+		    		$r.render("highlight.page")
+		    	#end
+			</span>
+			<div class="o_search_results_stats">
+			      $r.translate("search.result.numberofdocuments",$searchResults.getNumberOfIndexDocuments())
+			      $r.translate("search.result.querytime",$searchResults.getQueryTime())
+		    </div>
+			#if ($numOfPages != 1)
+			<ul class="pagination pagination-sm">
+			  <li>$r.render("previous.page")</li>
+			  <li class=" active"><span>$currentPage</span></li>
+			  <li>$r.render("next.page")</li>
+			</ul>
+			#end
+		</div>
+		
+	  	#if ($searchResults.hasTooManyResults())
+			<div id="o_search_results_toomany">$r.translate("too.many.results",$searchResults.getMaxHits())</div>
+			#end
+		#foreach ($result in $results)
+			$r.render("result_$foreach.count")
+		#end
+		
+		#if ($numOfPages != 1)
+		<ul class="pagination pagination-sm">
+		  <li>$r.render("previous.page")</li>
+		  <li class=" active"><span>$currentPage</span></li>
+		  <li>$r.render("next.page")</li>
+		</ul>
+		#end
+		
+	#end
+#end

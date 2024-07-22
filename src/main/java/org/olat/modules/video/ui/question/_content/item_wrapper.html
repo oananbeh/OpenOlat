@@ -1,0 +1,24 @@
+<div id="o_wrap_question_${videoElementId}" class="mejs__overlay o_video_question">
+	$r.render("question")
+</div>
+<script>
+jQuery(function() {
+	var player = jQuery('#o_so_vid${videoElementId}').data('player');
+	player.pause();
+	#if($disableKeyboard)
+	player.options.enableKeyboard = false;
+	#end
+	#if($r.isFalse($authorMode))
+	jQuery(player.controls).hide();
+	jQuery('#' + player.id + ' .mejs__overlay-play')
+		.hide()
+		.css("width", "0%");
+	#end
+	
+	var qtiContainerHeight = jQuery('#o_qti_container').height();
+	var videoHeight = jQuery('#o_so_vid${videoElementId} video').height();
+	if(videoHeight > 0 && videoHeight < qtiContainerHeight) {
+		jQuery('#o_wrap_question_${videoElementId}').addClass('o_video_large_question')
+	}
+});
+</script>

@@ -1,0 +1,127 @@
+<div class="panel panel-default o_expandable_panel o_assessment_stats">
+	<div class="panel-heading">
+		<h4 class="panel-title"><i class="o_icon o_icon_user"> </i> $r.translate("participants")</h4>
+	</div>
+	<div class="o_overview">
+		<div class="o_overview_members #if($small) o_overview_members_small #end">
+			<ul class="list-unstyled">
+				#if($r.available("assessed.identities"))
+					<li>$r.render("assessed.identities")</li>
+				#end
+				#if($r.available("groups"))
+					<li>$r.render("groups")</li>
+				#end
+				#if($r.available("curriculum.elements"))
+					<li>$r.render("curriculum.elements")</li>
+				#end
+			</ul>
+		</div>
+		<div class="o_overview_passed">
+			#if($r.available("passed.chart"))
+				$r.render("passed.chart")
+			#end
+			#if($r.available("done.chart"))
+				$r.render("done.chart")
+			#end
+			#if($r.available("num.passed") || $r.available("num.failed") || $r.available("num.undefined") || $r.available("num.done") || $r.available("num.not.done"))
+				<div class="o_overview_passed_fig">
+					<ul class="list-unstyled">
+						#if($r.available("num.passed"))
+							<li>$r.render("num.passed")</li>
+						#end
+						#if($r.available("num.failed"))
+							<li>$r.render("num.failed")</li>
+						#end
+						#if($r.available("num.undefined"))
+							<li>$r.render("num.undefined")</li>
+						#end
+						#if($r.available("num.done"))
+							<li>$r.render("num.done")</li>
+						#end
+						#if($r.available("num.not.done"))
+							<li>$r.render("num.not.done")</li>
+						#end
+					</ul>
+				</div>
+			#end
+		</div>
+		<div class="o_overview_score">
+			#if($r.available("score.chart"))
+				$r.render("score.chart")
+			#end
+		</div>
+	</div>
+	
+	#if($expanded)
+		$r.render("launches")
+		#if($r.visible("groupList"))
+			$r.render("groupList")
+		#end
+		#if($r.visible("curriculumElementList"))
+			$r.render("curriculumElementList")
+		#end
+		<div class="o_block"></div>
+		<script>
+			/* <![CDATA[ */ 
+			## Inspired by BFormatter.alignTableColumns()
+			## Column name has no/variable width.
+			## Column #members is as long as it's smallest header cell.
+			## Column avg score is as long as it's smallest header cell.
+			## Column passed is as long as the longest cell (without header cell).
+			var widthMembers = -1;
+			var widthScoreAvg = -1;
+			var widthPassed = 0;
+			var passedOffset = $hasScoreColumn? 1: 0;
+			## Calculate the 'best' columns width
+			jQuery('.o_assessment_stats .o_group_list table').each(function() {
+				for(i = 0; i < jQuery(this)[0].rows.length; i++){	## rows
+					if (i == 0) {
+						var cellWithMembers = jQuery(this)[0].rows[i].cells[1].clientWidth;
+						if(widthMembers == -1 || widthMembers > cellWithMembers) {
+							widthMembers = cellWithMembers;
+						}
+					}
+					
+					if (i == 0 && $hasScoreColumn) {
+						var cellWithScoreAvg = jQuery(this)[0].rows[i].cells[2].clientWidth;
+						if(widthScoreAvg == -1  || widthScoreAvg > cellWithScoreAvg) {
+							widthScoreAvg = cellWithScoreAvg;
+						}
+					}
+					if (i > 0 && $hasPassedColumn) {
+						var cellWithPassed = jQuery(this)[0].rows[i].cells[2 + passedOffset].clientWidth;
+						if(widthPassed < cellWithPassed) {
+							widthPassed = cellWithPassed;
+						}
+					}
+				}	
+			});
+			## Apply the calculated width to the columns.
+			jQuery('.o_assessment_stats .o_group_list table').each(function() {
+				jQuery(this)[0].rows[0].cells[1].style.width = widthMembers+'px';
+				if ($hasScoreColumn) {
+					jQuery(this)[0].rows[0].cells[2].style.width = widthScoreAvg+'px';
+				}
+				if ($hasPassedColumn) {
+ 					jQuery(this)[0].rows[0].cells[2 + passedOffset].style.width = widthPassed+'px';
+ 				}
+			});
+			if (widthMembers > 0) {
+				var withLaunch = widthMembers;
+				if (widthPassed > 0) {
+					withLaunch = widthPassed;
+				} else if (widthScoreAvg > 0) {
+					withLaunch = widthScoreAvg;
+				}
+				jQuery('.o_assessment_stats .o_launch_list table').each(function() {
+					jQuery(this)[0].rows[0].cells[1].style.width = withLaunch+'px';
+				});
+			}
+			/* ]]> */
+		</script>
+	#end
+</div>
+
+#if($r.available("gradeStats"))
+	$r.render("gradeStats")
+#end

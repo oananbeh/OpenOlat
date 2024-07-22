@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<!-- CXF OpenApiFeature -->  
+	<bean id="openApiFeature" class="org.apache.cxf.jaxrs.openapi.OpenApiFeature">
+		<!-- customize some of the properties -->
+		<property name="useContextBasedConfig" value="true"/>
+		<property name="scan" value="false"/>
+		<property name="resourcePackages">
+			<set>
+				<value>org.olat.restapi.group</value>
+				<value>org.olat.restapi.i18n</value>
+				<value>org.olat.restapi.repository</value>
+				<value>org.olat.restapi.repository.course</value>
+				<value>org.olat.restapi.repository.course.config</value>
+				<value>org.olat.restapi.security</value>
+				<value>org.olat.restapi.support</value>
+				<value>org.olat.restapi.support.vo</value>
+				<value>org.olat.restapi.support.vo.elements</value>
+				<value>org.olat.restapi.system</value>
+				<value>org.olat.restapi.system.vo</value>
+				<value>org.olat.commons.calendar.restapi</value>
+				<value>org.olat.commons.info.restapi</value>
+				<value>org.olat.core.commons.services.notifications.restapi</value>
+				<value>org.olat.core.commons.services.doceditor.drawio.restapi</value>
+				<value>org.olat.core.commons.services.doceditor.onlyoffice.restapi</value>
+				<value>org.olat.core.commons.services.export.restapi</value>
+				<value>org.olat.core.commons.services.vfs.restapi</value>
+				<value>org.olat.course.archiver.restapi</value>
+				<value>org.olat.course.assessment.restapi</value>
+				<value>org.olat.course.certificate.restapi</value>
+				<value>org.olat.course.db.restapi</value>
+				<value>org.olat.course.nodes.co</value>
+				<value>org.olat.course.nodes.en</value>
+				<value>org.olat.modules.bigbluebutton.restapi</value>
+				<value>org.olat.modules.curriculum.restapi</value>
+				<value>org.olat.modules.docpool.restapi</value>
+				<value>org.olat.modules.fo.restapi</value>
+				<value>org.olat.modules.gotomeeting.restapi</value>
+				<value>org.olat.modules.grading.restapi</value>
+				<value>org.olat.modules.lecture.restapi</value>
+				<value>org.olat.modules.openmeetings.restapi</value>
+				<value>org.olat.modules.qpool.restapi</value>
+				<value>org.olat.modules.reminder.restapi</value>
+				<value>org.olat.modules.taxonomy.restapi</value>
+				<value>org.olat.modules.todo.restapi</value>
+				<value>org.olat.modules.vitero.restapi</value>
+				<value>org.olat.modules.wiki.restapi</value>
+				<value>org.olat.registration.restapi</value>
+				<value>org.olat.user.restapi</value>
+			</set>
+		</property>
+	</bean>
+
+	<jaxrs:server address="/" basePackages="org.olat">
+		<jaxrs:providers>
+			<bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+			<bean class="org.olat.restapi.security.OpenOLATContainerResponseFilter" />
+		</jaxrs:providers>
+		<jaxrs:features>
+			<ref bean="openApiFeature" />
+		</jaxrs:features>
+	</jaxrs:server>
+	
+	<context:component-scan base-package="org.olat.restapi,org.olat.restapi.security,org.olat.restapi.system" />
+	
+	<bean id="exceptionMapper" class="org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper">
+		<property name="addMessageToResponse" value="true" />
+	</bean>
+	
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	
+	<bean id="systemSamplerTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+	    <property name="jobDetail" ref="systemSamplerJob" />
+	    <!-- adjust cron style syntax for your needs 
+	    A "Cron-Expression" is a string comprised of 6 or 7 fields separated by white space. The 6 mandatory and 1 optional fields are as follows:
+			Field Name 	  	Allowed Values 	  	Allowed Special Characters
+			Seconds 	  	0-59 	  			, - * /
+			Minutes 	  	0-59 	  			, - * /
+			Hours 	  		0-23 	  			, - * /
+			Day-of-month 	1-31 	  			, - * ? / L W C
+			Month 	  		1-12 or JAN-DEC 	, - * /
+			Day-of-Week 	1-7 or SUN-SAT 	  	, - * ? / L C #
+			Year (Optional)	empty, 1970-2099 	, - * /
+
+			As of OLAT 6.3 it's best to let the cronjob run every two hours since users can now choose how often 
+			they will get notified. The shortest interval is set to two hours. 	    	
+	    -->
+	    <property name="cronExpression" value="*/15 * * * * ?" />
+	    <property name="startDelay" value="60000" />
+	</bean>
+	
+	<bean id="systemSamplerJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+	  <property name="jobClass" value="org.olat.restapi.system.SamplerJob" />
+	</bean>
+	
+	<bean id="procSamplerTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+	    <property name="jobDetail" ref="procSamplerJob" />
+	    <property name="cronExpression" value="5 3,8,13,18,23,28,33,38,43,48,53,58 * * * ?" />
+	    <property name="startDelay" value="30000" />
+	</bean>
+	
+	<bean id="procSamplerJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+	  <property name="jobClass" value="org.olat.restapi.system.ProcSamplerJob" />
+	</bean>
+	
+	
+	<!-- Deadline Job -->
+	<bean id="restTokenTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="restTokenJob.${cluster.singleton.services}" />
+  	<!--  every day at 1:21 -->
+		<property name="cronExpression" value="0 21 1 * * ?" />
+		<property name="startDelay" value="60000" />
+	</bean>
+	<bean id="restTokenJob.enabled" class="org.springframework.scheduling.quartz.JobDetailFactoryBean" lazy-init="true">
+		<property name="jobClass" value="org.olat.restapi.security.RestTokenJob" />
+	</bean>
+	<bean id="restTokenJob.disabled" class="org.springframework.scheduling.quartz.JobDetailFactoryBean"  lazy-init="true">
+		<property name="jobClass" value="org.olat.core.commons.services.scheduler.DummyJob" />
+	</bean>
+
+</beans>

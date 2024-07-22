@@ -1,0 +1,8 @@
+<div class="o_sel_order_list">
+	<h2><i class="o_icon o_icon-fw o_icon_booking"> </i> $title</h2>
+	#set ($notEmpty = $r.isNotZero($r.getComponent("orderList").getFlexiTableElement().getRowCount()))
+	#if ($notEmpty)
+	<div class="o_hint">$description</div>
+	#end
+	$r.render("orderList")
+</div>

@@ -1,0 +1,47 @@
+<div class="o_form">
+	#if ($limitReached)
+	<div class="o_info">$r.translate("form.segment.category.message.limit")</div>
+	#end
+
+	<table class="o_video_category_container">
+		<thead>
+		<tr>
+			<th></th>
+			<th></th>
+			<th>$r.translate("form.segment.category.color")</th>
+			<th><i class="o_icon o_icon_mandatory" title="$r.translate('form.mandatory.hover')"></i>$r.translate("form.segment.category.label")</th>
+			<th><i class="o_icon o_icon_mandatory" title="$r.translate('form.mandatory.hover')"></i>$r.translate("form.segment.category.title")</th>
+			<th></th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		#foreach ($category in $categories)
+		<tr>
+			<td>$r.render(${category.getMoveUpLink().getComponent().getComponentName()})</td>
+			<td>$r.render(${category.getMoveDownLink().getComponent().getComponentName()})</td>
+			<td>$r.render(${category.getColorPickerElement().getComponent().getComponentName()})</td>
+			<td>
+				$r.render(${category.getLabel().getComponent().getComponentName()})
+				#if ($f.hasError(${category.getLabel().getComponent().getComponentName()}))
+				$r.render(${category.getLabel().getComponent().getComponentName()}, "error")
+				#end
+			</td>
+			<td>
+				$r.render(${category.getTitle().getComponent().getComponentName()})
+				#if ($f.hasError(${category.getTitle().getComponent().getComponentName()}))
+				$r.render(${category.getTitle().getComponent().getComponentName()}, "error")
+				#end
+			</td>
+			<td>$r.render(${category.getAddButton().getComponent().getComponentName()})</td>
+			<td>$r.render(${category.getDeleteButton().getComponent().getComponentName()})</td>
+		</tr>
+		#end
+
+		<tr>
+			<td colspan="3"></td>
+			<td colspan="4">$r.render("save") $r.render("cancel")</td>
+		</tr>
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,69 @@
+<script>
+function resize_${panelName}() {	
+	jQuery('#${panelName} .o_im_chat_history').each(function(index, el){
+		jQuery(el).scrollTop(el.scrollHeight);
+	});
+}
+function focus_${panelName}() {
+	try {
+		resize_${panelName}();
+		setTimeout(function(){ 
+			jQuery('#o_fioinput_${panelName}').focus(); 
+			## on mobile device (window on 0/0 position and window not fully in viewport), always scroll to top
+			## Text inpput on smart phone scolls content to make space for virtual keyboard. 
+			var dialogTop = jQuery('.ui-dialog.o_modal-ui').offset().top;
+			var viewportTop = jQuery(window).scrollTop();
+			if (dialogTop == 0 && viewportTop > 0) {
+				jQuery(window).scrollTop(0);
+			}
+		}, 100);
+	} catch (e) { if(window.console) console.log(e) }
+}
+</script>
+#set($hasResourceInfos = $r.isNotEmpty($resourceInfos))
+<div class='o_im #if($rosterDisplay == "supervised") o_im_roster_top #elseif($r.visible("roster")) o_im_roster_left #end  #if($hasResourceInfos) o_im_with_header #end'>
+	#if($r.isNotEmpty($resourceInfos))
+		<div class="o_im_resource_infos">
+			<h5><i class='o_icon $resourceIconCssClass'> </i> $r.escapeHtml($resourceInfos)</h5>
+		</div>
+	#end
+	#if($r.isNotEmpty($rosterNonVipEntries))
+		<div class="o_im_entries">
+			<div class="o_im_entries_non_vip">
+			#foreach($entry in $rosterNonVipEntries)
+				<span class="o_portrait"><span class="o_portrait">
+				#if($message.anonym) 
+					<img src="$r.staticLink("images/transparent.gif")" alt='$r.translate("portrait.generic=")' class="o_portrait_anonymous_small" aria-hidden="true">
+				#elseif ($message.avatarKey != "-1") 
+					<img src="$r.staticLink("images/transparent.gif")" alt="$r.translate("portrait.alt",$entry.name)" title="$r.translate("portrait.alt",$entry.name)" class="o_portrait_avatar_small" style="background-image: url('${avatarBaseURL}/${entry.avatarKey}/portrait_small.jpg')">
+				#else
+					<img src="$r.staticLink("images/transparent.gif")" alt='$r.translate("portrait.generic=")' class="o_portrait_dummy_small" aria-hidden="true">
+				#end 
+				</span></span> <span><i class='o_icon o_icon-fw ${entry.onlineCssStatus}'> </i> $r.escapeHtml($entry.name)</span>
+			#end
+			</div>
+			<div class="o_im_entries_number">$numOfAllEntriesMsg</div>
+		</div>
+	#elseif($r.isNotEmpty($resourceInfos))
+		<div class="o_im_entries"></div>
+	#end 
+	#if($r.visible("roster"))
+		<div class="o_im_roster">
+		$r.render("roster")
+		</div>
+	#end
+	<div class="o_im_chat">
+		<div class="o_im_load_history clearfix">
+			<span class="o_label">$r.translate("chat.load.history")</span>
+			<div class="btn-group btn-group-xs">
+				$r.render("im.today")
+				$r.render("im.lastweek") 
+				$r.render("im.lastmonth")	
+			</div>
+		</div>
+		$r.render("chatMsgFieldPanel")
+		<div class="o_im_chat_form">
+			$r.render("sendMessageForm")
+		</div>
+	</div>
+</div>

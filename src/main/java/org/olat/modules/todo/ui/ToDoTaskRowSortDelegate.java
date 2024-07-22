@@ -1,0 +1,162 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.modules.todo.ui;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.olat.core.commons.persistence.SortKey;
+import org.olat.core.gui.components.form.flexible.impl.elements.table.SortableFlexiTableModelDelegate;
+import org.olat.modules.todo.ToDoPriority;
+import org.olat.modules.todo.ToDoStatus;
+import org.olat.modules.todo.ui.ToDoTaskDataModel.ToDoTaskCols;
+
+/**
+ * 
+ * Initial date: 29 Mar 2023<br>
+ * @author uhensler, urs.hensler@frentix.com, http://www.frentix.com
+ *
+ */
+public class ToDoTaskRowSortDelegate extends SortableFlexiTableModelDelegate<ToDoTaskRow> {
+
+	private ToDoTaskDataModel toDoTaskTableModel;
+
+	public ToDoTaskRowSortDelegate(SortKey orderBy, ToDoTaskDataModel tableModel, Locale locale) {
+		super(orderBy, tableModel, locale);
+		this.toDoTaskTableModel = tableModel;
+	}
+	
+	@Override
+	protected List<ToDoTaskRow> getUnsortedRows() {
+		return toDoTaskTableModel.getBackups() != null
+				? new ArrayList<>(toDoTaskTableModel.getBackups())
+				: new ArrayList<>(1);
+	}
+
+	@Override
+	protected void sort(List<ToDoTaskRow> rows) {
+		int columnIndex = getColumnIndex();
+		ToDoTaskCols column = ToDoTaskCols.values()[columnIndex];
+		switch(column) {
+			case title: Collections.sort(rows, new TitleComporator()); break;
+			case status: Collections.sort(rows, new StatusComporator()); break;
+			case expenditureOfWork: Collections.sort(rows, new ExpenditureOfWorkComporator()); break;
+			case startDate: Collections.sort(rows, new StartDateComporator()); break;
+			case dueDate: Collections.sort(rows, new DueDateComporator()); break;
+			case due: Collections.sort(rows, new DueComporator()); break;
+			case doneDate: Collections.sort(rows, new DoneDateComporator()); break;
+			case priority: Collections.sort(rows, new PriorityComporator()); break;
+			case contextTitle: Collections.sort(rows, new OriginTitleComporator()); break;
+			case contextSubTitle: Collections.sort(rows, new OriginSubTitleComporator()); break;
+			default: {
+				super.sort(rows);
+			}
+		}
+	}
+	
+	private class TitleComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareString(r1.getTitle(), r2.getTitle());
+		}
+	}
+	
+	private class StatusComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			ToDoStatus status1 = r1.getStatus();
+			ToDoStatus status2 = r2.getStatus();
+			
+			int order1 = status1 != null? -status1.ordinal(): -99;
+			int order2 = status2 != null? -status2.ordinal(): -99;
+			
+			return compareInts(order1, order2);
+		}
+	}
+	
+	private class OriginTitleComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareString(r1.getOriginTitle(), r2.getOriginTitle());
+		}
+	}
+	
+	private class OriginSubTitleComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareString(r1.getOriginSubTitle(), r2.getOriginSubTitle());
+		}
+	}
+	
+	private class ExpenditureOfWorkComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareLongs(r1.getExpenditureOfWork(), r2.getExpenditureOfWork());
+		}
+	}
+	
+	private class StartDateComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareDateAndTimestamps(r1.getStartDate(), r2.getStartDate(), false);
+		}
+	}
+	
+	private class DueDateComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareDateAndTimestamps(r1.getDueDate(), r2.getDueDate(), false);
+		}
+	}
+	
+	private class DoneDateComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			return compareDateAndTimestamps(r1.getDoneDate(), r2.getDoneDate(), false);
+		}
+	}
+	
+	private class DueComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			Date dueDate1 = r1.isOverdue() != null? r1.getDueDate(): null;
+			Date dueDate2 = r2.isOverdue() != null? r2.getDueDate(): null;
+			return compareDateAndTimestamps(dueDate1, dueDate2, false);
+		}
+	}
+	
+	private class PriorityComporator implements Comparator<ToDoTaskRow> {
+		@Override
+		public int compare(ToDoTaskRow r1, ToDoTaskRow r2) {
+			ToDoPriority priority1 = r1.getPriority();
+			ToDoPriority priority2 = r2.getPriority();
+			
+			int order1 = priority1 != null? -priority1.ordinal(): -99;
+			int order2 = priority2 != null? -priority2.ordinal(): -99;
+			
+			return compareInts(order1, order2);
+		}
+	}
+
+}

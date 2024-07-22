@@ -1,0 +1,325 @@
+
+/*
+ * Overwrite jquery ui dialog
+ */
+ 
+@use "sass:list";
+
+.ui-widget {
+	font-family: $font-family-base;
+	font-size: 100%;
+}
+
+.ui-widget-header {
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	border-bottom:1px solid #eee;
+	
+	background: #fff;
+	font-weight: bold;
+}
+
+.ui-icon, .ui-widget-content .ui-icon, .ui-widget-header .ui-icon,
+.ui-state-default .ui-icon, .ui-state-hover .ui-icon, .ui-state-focus .ui-icon,
+.ui-state-active .ui-icon, .ui-state-highlight .ui-icon, .ui-state-error .ui-icon,
+.ui-state-error-text .ui-icon {
+	background: none;
+	background-image: none;
+}
+
+.ui-dialog {
+	@include box-shadow(0px 1px 8px -1px rgba(0,0,0,.35));
+	background-color: $o-dialog-window-bg;
+	
+	.ui-widget-header {
+		.ui-dialog-title {
+			color: $o-dialog-header-color;
+		  	font-weight: $o-dialog-header-font-weight;
+			font-family: $headings-font-family;
+		  	line-height: $headings-line-height;
+		}
+		
+		.ui-icon-closethick {
+			@include o-add-icon('xmark');
+			@include o-add-icon-font();
+			&:before {
+				color: #000;
+				opacity: 0.5;
+			}
+			background: #fff !important;
+			padding: 1px 0 0 1px;
+			text-indent: 0;
+			color: black;
+		}
+		
+		.ui-button.ui-corner-all {
+			border: none !important;
+			background: #fff !important;
+		}
+	}
+
+	.ui-widget-content {
+		border-color: #fff;
+		padding: 5px;
+		overflow: auto;
+		background: white !important;
+	}
+	
+	.ui-dialog-titlebar {
+		padding: 4px 7px 4px 7px;
+		background-color: $o-dialog-window-bar-bg !important;
+	}
+}
+
+.ui-dialog {
+	border-radius: $alert-border-radius;
+}
+
+.ui-dialog.ui-widget-content {
+	border: 1px solid transparent;
+}
+
+.ui-dialog.o_modal-ui {
+	/* in any case, never make dialog smaller than browser window */
+	max-width: 100vw;
+	max-height: 100vh;
+
+	div.ui-dialog-buttonpane {
+		display:none;
+	}
+	
+	/* on small screens set dimensions to take entire screen  */
+	@media (max-width: $screen-xs-max) { 
+		height: 100vh !important;	
+		width: 100vw !important;	
+		
+		div.ui-dialog-content {
+			height: 90vh !important;	
+		}
+	}	
+}
+
+/*
+ * slider
+ */
+.ui-slider.ui-slider-horizontal.ui-widget-content {
+	border-color: $o-slider-border;
+	background: $o-slider-background;
+	
+	&.ui-state-disabled {
+		opacity: 0.65;
+	}
+}
+
+.o_has_value.ui-slider.ui-slider-horizontal.ui-widget-content {
+	.ui-slider-handle {
+		border: 1px solid $o-slider-handler-border-color;
+		background-image: none;
+		background-color: $o-slider-handler-background-color;
+	}
+}
+
+.o_no_value.ui-slider.ui-slider-horizontal.ui-widget-content {
+	.ui-slider-handle {
+		border: 3px solid $o-slider-handler-border-color;
+		background-image: none;
+	}
+}
+
+/*
+ * Vanilla-JS Datepicker
+ */
+
+.datepicker-dropdown.active {
+	font-size: 16px;
+	
+	>.datepicker-picker {
+		box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+	}
+	
+	.dow, .datepicker-controls .button {
+		font-size: 14px;
+		height: 24px;
+	}
+	
+	.datepicker-view {
+		width: 252px;
+	}
+
+	.datepicker-cell {
+		height: 36px;
+	}
+}
+.datepicker-cell.today {
+	&.focused:not(.selected) {
+		background-color: #fff;
+	}
+	&:not(.selected) {
+		background-color: #fff;
+	}
+	&:not(.selected):not(.disabled) {
+		color: #00ccad;
+		border: 1px solid #00ccad;
+		font-weight: bold;
+	}
+	
+	
+}
+
+
+/*
+ * Overwrite some class of typehead needed by the flexi table
+ */
+
+//tags input
+.tag.label.label-info {
+	margin-right: 3px;
+}
+
+/*
+ * Swiper
+ */
+ body {
+	--swiper-theme-color: #{$o-swiper-color};
+	
+	.o_swiper_buttons {
+		.swiper-button-next,
+		.swiper-button-prev {
+			position: unset;
+			z-index: 5;
+			min-width: $o-swiper-button-width;
+			width: $o-swiper-button-width;
+			height: $o-swiper-button-height;
+			color: $o-swiper-button-color;
+			background-color: $o-swiper-button-bg-color;
+			border: $o-swiper-button-border;
+			border-radius: $o-swiper-button-border-radius;
+			&::after {
+				font-size: $o-swiper-button-font-size;
+				font-weight: bold;
+			}
+			&:hover {
+				color: $o-swiper-button-hover-color;
+				box-shadow: $o-swiper-button-hover-box-shadow;
+			}
+			&.o_swiper_button_disabled {
+				opacity: $o-swiper-button-disabled-opacity;
+			}
+			+.swiper-button-next {
+				margin-left: 5px;
+			}
+		}
+		
+		.swiper {
+			.swiper-button-next,
+			.swiper-button-prev {
+				display: none;
+			}
+		}
+	}
+ }
+ 
+ /*
+ *	basicLightbox
+ */
+.basicLightbox {
+	@include o-add-icon('xmark');
+	@include o-add-icon-font();
+ 	&:before {
+		color: white;
+		font-size: 200%;
+		background-color: rgba(0,0,0,.32);
+		position: absolute;
+		top: 15px;
+		right: 10px;
+		padding: 5px;
+		z-index: 2;
+		cursor: pointer; 	
+	}
+	&.o_lightbox_close_border {
+		.basicLightbox__placeholder {
+			max-width: 95%;
+			max-height: 95%;
+		}
+	}
+	
+	.o_lightbox_modal_form {
+		overflow-x: hidden;
+		overflow-y: auto;
+		width: calc(100vw - 60px);
+		max-height: calc(96vh - 40px);
+		padding: 20px;
+		
+		background-color: white;
+		border: 1px solid $modal-content-border-color;
+		border-radius: $border-radius-large;
+	}
+}
+
+@media (min-width: $screen-md-min) {
+	.basicLightbox .o_lightbox_modal_form {
+    	width: $modal-lg;
+    }
+}
+
+/* Above most modals and callouts */
+body .basicLightbox {
+	z-index: 100000; 
+}
+
+/* TwentyTwenty image comparison */
+.twentytwenty-wrapper {
+
+	&.twentytwenty-horizontal, &.twentytwenty-vertical {
+		.twentytwenty-before-label::before, .twentytwenty-after-label::before {
+			line-height: 30px;
+			background-color: rgba(85, 85, 85, 0.8);
+			border-radius: $border-radius-large;
+			font-size: unset;
+			font-family: unset;
+			letter-spacing: unset;
+		}
+	}
+
+	&.twentytwenty-horizontal {
+		.twentytwenty-before-label::before, .twentytwenty-after-label::before {
+			top: 10px;
+			margin-top: unset;
+		}
+	}
+
+	&.twentytwenty-vertical {
+		.twentytwenty-before-label::before, .twentytwenty-after-label::before {
+			left: 10px;
+			margin-left: unset;
+			width: unset;
+		}
+	}
+
+	.twentytwenty-container {
+		&.active {
+			.twentytwenty-overlay, :hover.twentytwenty-overlay {
+				background: unset;
+
+				.twentytwenty-before-label, .twentytwenty-after-label {
+					opacity: 1;
+				}
+			}
+		}
+
+		.twentytwenty-overlay {
+			.twentytwenty-before-label, .twentytwenty-after-label {
+				opacity: unset;
+			}
+		}
+
+		.twentytwenty-overlay:hover {
+			background: unset;
+		}
+
+		.twentytwenty-handle {
+			background-color: rgba(black, 0.33);
+		}
+	}
+}

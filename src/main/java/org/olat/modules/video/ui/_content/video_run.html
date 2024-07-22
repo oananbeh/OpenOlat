@@ -1,0 +1,285 @@
+<div class="o_video_run o_block_large_bottom #if($r.isTrue($progressFullWidth)) o_video_progress_full_width #end clearfix">
+	#foreach($layerPanelName in $layerPanelNames)
+		#if($r.available($layerPanelName))
+			$r.render($layerPanelName)
+		#end
+	#end
+	<div class="olatFlashMovieViewer">
+		<video id="$r.getId("o_vid")" #if($r.isTrue($usePoster)) poster="$masterUrl/poster.jpg$!nocache" #end controls #if(!$hasChapters) preload="none" #end oncontextmenu="return false;" #if( $autoplay ) autoplay #end class="o_video">			
+	    	#if($r.isNotEmpty($externalUrl))
+	    		<source type="$sourceType" src="$externalUrl" title="$r.escapeForHtmlAttribute($masterTitle)"/>
+	    	#else
+		    	#if ($videos.size() == 0 || $addMaster)
+			    	<source type="video/mp4" src="$masterUrl/video.mp4" title="$r.escapeForHtmlAttribute($masterTitle)"/>
+			    #end
+		    	#foreach($video in $videos)
+		    		#set($position = $foreach.count - 1)
+		    		<source type="video/mp4" src="$transcodedUrl/${video.getResolution()}video.mp4" title="$r.escapeForHtmlAttribute($displayTitles.get($position)) ($r.formatBytes(${video.getSize()}))" />
+		    	#end
+	    	#end
+	    	
+	    	## Use master video file if not optimized video is found
+	    	
+	  		#if( $trackfiles )
+		  		#foreach( $track in $trackfiles.keySet())
+		  		<track kind="subtitles" src="$masterUrl/$trackfiles.get($track)$!addForceReload" srclang="$track" />
+		  		#end
+		  	#end
+		  	
+		  	#if($hasChapters)
+			  	<track kind="chapters" src="$masterUrl/chapters.vtt$!addForceReload" srclang="en" />
+		  	#end
+		</video>
+
+		<script>
+		## using jQuery
+		var mediaElementBaseUrl = BPlayer._mediaElementBaseUrl();
+		jQuery('#$r.getId("o_vid")').mediaelementplayer({
+			enablePluginDebug: BPlayer.debugEnabled,
+
+			## Configuration for flash fallback			
+			## Set mode:'shim' to force flash usage
+			pluginPath: mediaElementBaseUrl,
+			stretching: 'responsive',
+			alwaysShowControls: $alwaysShowControls,
+			clickToPlayPause: $clickToPlayPause,
+			#if($r.isNotEmpty($height))
+				videoHeight: $height,
+			#end
+			#if($r.isNotEmpty($width))
+				videoWidth: $width,
+			#end
+			hls: {
+		        path: '$r.staticLink("movie/mediaelementjs/hls/hls.min.js")',
+		    },
+		    flv : {
+		        path: '$r.staticLink("movie/mediaelementjs/flv/flv.min.js")',
+		        withCredentials: true
+		    },
+			## Enabled features - should be same order as in player.js. 
+			## Special here is tracks and sourcechooser which are not available in player.js
+			features: ['playpause','current','volume','progress','duration','tracks' #if($useSourceChooser),'sourcechooser'#end ,'speed','fullscreen','markers'],
+			
+			#if($r.isNotEmpty($markers))
+			markers: [#foreach($marker in $markers) #if($foreach.index != 0),#end { 'id' : '${marker.id}', 'color': '${marker.color}', 'time': $marker.time, 'action': '${marker.action}', 'showInTimeline' : ${marker.showInTimeline} } #end],
+            markerColor: '#00FF00',
+            markerWidth: 3,
+            markerCallback: function (media, time, id) {
+            	$r.openJavaScriptCommand('marker'),'currentTime', time, 'markerId', id);
+            },
+            #end
+			
+            ## Set JS callback to retreive user selected video url or fixed url for external services that can not be changed. 
+            ## Triggers error for Vimeo private URLs otherwise
+            #if($r.isNotEmpty($externalUrlOriginal))
+            	#set($mediaSrc = "'$externalUrlOriginal'")
+            #else
+            	#set($mediaSrc = "mediaElement.src")            	
+            #end
+            	
+            	
+            
+			## Callback to communicate with the server
+			success: function (mediaElement, domObject, player) {
+		        jQuery('#$r.getId("o_vid")').data('player', player);
+		        jQuery('#$r.getId("o_vid")').data('playerloaded', false);
+
+				#if ($isVimeo)
+				var checkMarkers = () => {
+					if (player.options.markers.length > 0) {
+						var markers = player.controls.querySelectorAll('.' + player.options.classPrefix + 'time-marker');
+						if (markers.length > 0 && markers[0].style && !(markers[0].style.left)) {
+							if (player.media.duration) {
+								player.setmarkers(player.controls);
+							}
+							setTimeout(checkMarkers, 500);
+						}
+					}
+					if (player.media.duration) {
+						jQuery('#$r.getId("o_vid")').data('playerloaded', true);
+					}
+				};
+				checkMarkers();
+				#end
+
+				## listen to play events, fired when movie is finished
+		        mediaElement.addEventListener('play', function(e) {
+		        	if (!o_info.linkbusy) {
+						if (o_info.sendNextPlayEventWithResponse) {
+							o_info.sendNextPlayEventWithResponse = false;
+							$r.openJavaScriptCommand("play"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+						} else {
+							$r.openNoResponseJavaScriptCommand("play"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+						}
+						#if ($isVimeo)
+						checkMarkers();
+						#end
+					}
+		        }, false);
+		        ## listen to pause events, fired when movie is paused by user
+		        mediaElement.addEventListener('pause', function(e) {
+		        	if (!o_info.linkbusy) {
+						$r.openNoResponseJavaScriptCommand("pause"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+					}
+		        }, false);
+		        ## listen to seeked events, fired when user uses the slider in the movie
+		        mediaElement.addEventListener('seeked', function(e) {
+		        	if (!o_info.linkbusy) {
+						$r.openNoResponseJavaScriptCommand("seeked"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+					}
+		        }, false);
+		        
+				var mediaElementCurrentProgressPos = 0;	
+		        mediaElement.addEventListener('timeupdate', function(e) {
+		        	#if($r.isTrue($listenTimeUpdate))
+		        	if (!o_info.linkbusy) {
+						$r.openNoResponseJavaScriptCommand("timeupdate"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+					}
+		        	#end
+		        	#if($r.isTrue($listenProgress))
+		        	if (!o_info.linkbusy) {
+		        		## Report whenever the next percent has been reached. Depending on video size and timeupdate internvall not all percents are reported
+		        		if (mediaElementCurrentProgressPos + (mediaElement.duration / 100) <= mediaElement.currentTime) {
+		        			mediaElementCurrentProgressPos = mediaElement.currentTime;
+							$r.openNoResponseJavaScriptCommand("progress"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);		        		 
+		        		}
+					}
+					#end
+		        }, false);
+		        
+		        ## listen to end events, fired when movie is finished
+		        mediaElement.addEventListener('ended', function(e) {
+		        	if (!o_info.linkbusy) {
+					#if($r.isTrue($responseAtEnd))
+						$r.openJavaScriptCommand("ended"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+					#else
+						$r.openNoResponseJavaScriptCommand("ended"), 'currentTime', mediaElement.currentTime, 'src', $mediaSrc, 'duration', mediaElement.duration);
+					#end
+					}
+		        }, false);
+
+				##
+		        ## Preselect the preferred source
+		        #if($useSourceChooser)
+		        jQuery(jQuery('#' + player.id + '.mejs__source-chooser-selector input')[$preferredResolution]).prop("checked", true).trigger("click");
+		        #end
+		        
+		        ## Place the markers holder
+		        var markerCmpId = 'o_c' + '${r.getComponent("markers").getDispatchID()}';
+		        jQuery('#' + player.id + ' .mejs__layers').append('<div id="' + markerCmpId + '"><!-- empty --></div>');
+		        jQuery('#' + markerCmpId).hide();
+
+				#foreach($layerPanelName in $layerPanelNames)
+				jQuery('#' + player.id + ' .mejs__layers')
+					.append(jQuery('#o_c' + ${r.getComponent($layerPanelName).getDispatchID()}));
+				#end
+
+		        ## Not click to play
+		        #if($r.isFalse($clickToPlayPause))
+		        jQuery('#' + player.id + ' .mejs__overlay-play').remove();
+		        #end
+		        
+		        ## Preset the duration without loading the video
+		        jQuery('#' + player.id + ' .mejs__duration').html('$duration');
+		        
+		        var mediaElementResumeTime = 0;
+		        mediaElement.addEventListener('loadedmetadata', function(e) {
+		        	#if($r.isTrue($forwardSeekingRestricted))
+		        	mediaElementResumeTime = player.media.duration * $playProgress;
+		        	#end
+		        	jQuery('#$r.getId("o_vid")').data('playerloaded', true);
+		        }, false);
+		        
+				## Disable forward seeking
+				#if($r.isTrue($forwardSeekingRestricted))
+				_setCurrentTime_orig = player.media.setCurrentTime; ## store the native setCurrentTime temporarily
+				var scope = this;
+  				player.media.setCurrentTime = function(time) { 		## override it with our own method  				
+				    if(time <= mediaElement.currentTime || time <= mediaElementResumeTime){
+				    	_setCurrentTime_orig.apply(scope,[time]); 	## call the stored method if our conditions are met
+      				} else {
+      					showInfoBox("$r.translate("forwardSeekting.title")", "$r.translate("forwardSeekting.message")");
+      				}
+  				};
+  				#end
+  				#if($r.isTrue($startFullScreen))
+  				player.enterFullScreen();
+  				#end
+			}
+		});
+		</script>
+	</div>
+	
+	## Replay button
+	#if($r.isTrue($enableResumeDialog) && $playProgress)
+		<div id="$r.getId("o_vid")_resume" class="o_video_resume_wrapper"><div class="o_video_resume_panel">
+			<h3>$r.translate("resume.title")</h3>
+			<div class="o_video_resume_intro">
+				$resumeIntro
+			</div>
+			<div class="o_video_resume_buttons">
+				<a class="btn btn-small btn-primary o_video_resume_resume">
+					<i class="o_icon i_icon-fw o_icon_video_resume"> </i>
+					<span>$r.translate("resume.button.resume")</span>
+				</a>
+				<a class="btn btn-small btn-default o_video_resume_play">
+					<i class="o_icon i_icon-fw o_icon_video_replay"> </i>
+					<span>$r.translate("resume.button.play")</span>
+				</a>
+			</div>
+			<script>
+				"use strict";
+				jQuery(function() {
+					var pid = jQuery('#$r.getId("o_vid")').closest('.mejs__container').attr('id');
+					var xbigPlay = jQuery('#' + pid).find('.mejs__overlay-play');
+					jQuery("#${r.getId("o_vid")}_resume").appendTo(xbigPlay);
+
+					jQuery("#$r.getId("o_vid")_resume .o_video_resume_resume").click(function () {
+						jQuery("#$r.getId("o_vid")_resume").remove();
+						var id = jQuery('#$r.getId("o_vid")').closest('.mejs__container').attr('id');
+						var me_player = mejs.players[id];
+						me_player.media.addEventListener("loadedmetadata", function() {
+							me_player.currentTime = me_player.media.duration * $playProgress;; // set starting time
+							me_player.play();
+						});
+						me_player.media.load();
+					});
+					jQuery("#$r.getId("o_vid")_resume .o_video_resume_play").click(function () {
+						jQuery("#$r.getId("o_vid")_resume").remove();
+						var id = jQuery('#$r.getId("o_vid")').closest('.mejs__container').attr('id');
+						var me_player = mejs.players[id];
+						me_player.media.addEventListener("loadmetadata", function() {
+							me_player.currentTime = 0;
+							me_player.play();
+						});
+						me_player.media.load();
+					});
+				});
+			</script>
+		</div></div>
+	#end
+	
+	
+	#if($r.isTrue($downloadEnabled))
+		<div class="pull-right o_block_top">
+			$r.render("downloadOptions")
+		</div>
+	#end
+	
+	#if($r.isTrue($showTitle) && $r.isNotEmpty($title))
+	<h1>$r.escapeHtml($title)</h1>
+	#end
+	
+	#if($authors)
+	<div class="o_author o_block">
+		<span class="text-muted">$r.translateWithPackage("org.olat.repository", "course.made.by")</span> 
+		$r.escapeHtml($authors)
+	</div>
+	#end
+	#if($r.isTrue($showDescription) && $r.isNotEmpty($description))
+	<div class="o_desc clearfix">$r.xssScan($description)</div>
+	#end
+	#if($r.available("commentsAndRating"))
+		$r.render("commentsAndRating")
+	#end
+</div>

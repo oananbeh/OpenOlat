@@ -1,0 +1,10 @@
+.o_userbulk_changedcell {
+	font-style: italic;
+	font-weight: bold;
+}
+
+/* Width limitation for Admin -> Setup */
+.o_admin_property_table_column {
+	max-width: 200px; 
+	word-wrap: break-word;
+}

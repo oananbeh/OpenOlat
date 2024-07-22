@@ -1,0 +1,42 @@
+#if($wrongRight)
+#set($wrongRightClass = "o_wrong_right")
+#else
+#set($wrongRightClass = "")
+#end
+<div id="$r.getCId()" class="o_page_run_image_comparison $blockLayoutClass $wrongRightClass">
+	<div id="$r.getCId()_compare">
+		<img onload="$r.getId("image_loaded_")();" src="$mapperUrl/$beforeImageId" alt="$r.escapeHtml($beforeAltText)">
+		<img onload="$r.getId("image_loaded_")();" src="$mapperUrl/$afterImageId" alt="$r.escapeHtml($afterAltText)">
+	</div>
+	<div class="o_description">
+		$r.escapeHtml($description)
+	</div>
+</div>
+<script>
+	"use strict";
+
+	var imagesLoaded = 0;
+
+	function $r.getId("image_loaded_")() {
+		imagesLoaded++;
+		if (imagesLoaded >= 2) {
+			$r.getId("init_comparison_")();
+		}
+	}
+
+	function $r.getId("init_comparison_")() {
+		var options = {
+			#if($initialSliderPosition)
+			default_offset_pct: $initialSliderPosition,
+			#end
+			#if($horizontal)
+			orientation: 'horizontal',
+			#else
+			orientation: 'vertical',
+			#end
+			before_label: '$r.escapeHtml($beforeText)',
+			after_label: '$r.escapeHtml($afterText)',
+		};
+		jQuery('#$r.getCId()_compare').twentytwenty(options);
+	}
+</script>

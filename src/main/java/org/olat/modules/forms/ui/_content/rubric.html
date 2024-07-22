@@ -1,0 +1,181 @@
+<div class="o_evaluation_form $blockLayoutClass">
+#set($hasLeftLabels = $element.leftLabels)
+#set($hasRightLabels = $element.rightLabels)
+#set($isNoResponseEnabled = $element.noResponseEnabled)
+
+#if($hasLeftLabels && $hasRightLabels)
+	#set($colLeft = "col-sm-3")
+	#set($colMiddle = "col-sm-6")
+	#set($colRight = "col-sm-3")
+#elseif($hasLeftLabels)
+	#set($colLeft = "col-sm-6")
+	#set($colMiddle = "col-sm-6")
+	#set($colRight = "col-sm-0")
+#elseif($hasRightLabels)
+	#set($colLeft = "col-sm-0")
+	#set($colMiddle = "col-sm-6")
+	#set($colRight = "col-sm-6")
+#else
+	#set($colLeft = "col-sm-0")
+	#set($colMiddle = "col-sm-12")
+	#set($colRight = "col-sm-0")
+#end
+
+<div class="o_evaluation_block">
+#if($element.showName())
+	<div class="o_rubric_name">
+		$element.name
+	</div>
+#end
+#if($element.isDiscreteCardRubric())
+<div class="o_evaluation_discrete_card o_form">
+	#foreach($slider in $element.getSliders())
+	<div class="o_slider clearfix #if(!$isNoResponseEnabled)o_evaluation_no_no_response#end">
+		<div class="o_evaluation_label_top">
+			<div class="o_evaluation_label_top_left #if(!$hasRightLabels)o_evaluation_label_top_both#end">
+				$slider.startLabel
+			</div>
+			#if($hasRightLabels)
+				<div class="o_evaluation_label_top_right">
+					$slider.endLabel
+				</div>
+			#end
+		</div>
+		<div class="o_slider_elements">
+			<div class="o_evaluation_steps">
+				$r.render($slider.formItem)
+			</div>
+			<div class="o_evaluation_no_response">
+				#if($isNoResponseEnabled)
+					$r.render($slider.noResponseEl)
+				#end
+			</div>
+			<div class="o_slider_comments">
+				#if($r.isNotNull($slider.getSliderCommentElName()))
+					$r.render($slider.getSliderCommentElName(), "tr", "form")
+				#end
+			</div>
+		</div>
+	</div>
+	#end
+</div>
+#elseif($element.isDiscreteRubric() || $element.isDiscreteStarRubric() || $element.isDiscreteSliderRubric())
+#if($element.isDiscreteRubric())
+<div class="o_evaluation_discrete_radio">
+#elseif($element.isDiscreteStarRubric())
+<div class="o_evaluation_discrete_star #if($element.isUndistributedStar())o_eva_star_undistributed#end">
+#else
+<div class="o_evaluation_discrete_slider">
+#end
+	#if($element.isTopLabelRow())
+	<div class="clearfix">
+		<div class="$colLeft"></div>
+		<div class="$colMiddle o_slider_elements o_evaluation_steps_labels hidden-xs">
+			<div class="o_evaluation_step_labels o_evaluation_distributed #if(!$isNoResponseEnabled)o_evaluation_no_no_response#end">
+				#if($element.isStepLabels())
+					#foreach($stepLabel in $element.stepLabels)
+						<div>$r.escapeHtml($stepLabel)</div>
+					#end
+				#end
+			</div>
+			#if($isNoResponseEnabled)
+				<div class="o_evaluation_step_labels o_evaluation_distributed">
+					$r.translate("no.response")
+				</div>
+			#end
+		</div>
+		<div class="$colRight"></div>
+	</div>
+	#end
+	#foreach($slider in $element.getSliders())
+	<div class="o_slider clearfix #if(!$isNoResponseEnabled)o_evaluation_no_no_response#end">
+		<div class="$colLeft o_evaluation_label_top o_evaluation_label_top_small">
+			<div class="o_evaluation_label_top_left #if(!$hasRightLabels)o_evaluation_label_top_both#end">
+				$slider.startLabel
+			</div>
+			#if($hasRightLabels)
+				<div class="o_evaluation_label_top_right">
+					$slider.endLabel
+				</div>
+			#end
+		</div>
+		<div class="$colLeft o_evaluation_left_label #if(!$hasRightLabels)o_evaluation_left_label_la#end"">
+			$slider.startLabel
+		</div>
+		<div class="$colMiddle o_slider_elements">
+			#if($element.isStepLabels()) 
+				<div class="o_evaluation_step_labels o_evaluation_distributed hidden-sm hidden-md hidden-lg">
+				#if($element.isStepLabels())
+					#foreach($stepLabel in $element.stepLabels)
+						<div>$r.escapeHtml($stepLabel)</div>
+					#end
+				#end
+				</div>
+			#end
+			<div class="o_evaluation_steps o_evaluation_distributed">
+				$r.render($slider.formItem)
+			</div>
+			<div class="o_evaluation_no_response">
+				#if($isNoResponseEnabled)
+					$r.render($slider.noResponseEl)
+				#end
+			</div>
+			<div class="o_slider_comments">
+				#if($r.isNotNull($slider.getSliderCommentElName()))
+					$r.render($slider.getSliderCommentElName(), "tr", "form")
+				#end
+			</div>
+		</div>
+		<div class="$colRight o_evaluation_right_label">
+			$slider.endLabel
+		</div>
+	</div>
+	#end
+</div>
+#else
+<div class="o_evaluation_continous">
+	<div class="clearfix">
+		<div class="$colLeft"></div>
+		<div class="$colMiddle o_slider_elements o_evaluation_steps_labels hidden-xs">
+			<div class="o_evaluation_step_labels o_evaluation_distributed">
+			</div>
+			#if($isNoResponseEnabled)
+				<div class="o_evaluation_step_labels o_evaluation_distributed">
+					$r.translate("no.response")
+				</div>
+			#end
+		</div>
+		<div class="$colRight"></div>
+	</div>
+	#foreach($slider in $element.getSliders())
+	<div class="o_slider clearfix">
+		<div class="$colLeft o_evaluation_left_label #if(!$hasRightLabels)o_evaluation_left_label_la#end"">
+			$slider.startLabel
+		</div>
+		<div class="$colMiddle o_slider_elements">
+			<div class="o_evaluation_steps">
+				$r.render($slider.formItem)
+			</div>
+			<div class="o_evaluation_no_response">
+				#if($isNoResponseEnabled)
+					$r.render($slider.noResponseEl)
+				#end
+			</div>
+			<div class="o_slider_comments">
+				#if($r.isNotNull($slider.getSliderCommentElName()))
+					$r.render($slider.getSliderCommentElName(), "tr", "form")
+				#end
+			</div>
+		</div>
+		<div class="$colRight o_evaluation_right_label">
+			$slider.endLabel
+		</div>
+	</div>
+	#end
+</div>
+#end
+#if($errorMandatory)
+	<div class='o_error'>$r.translate("error.rubric.mandatory")</div>
+#end
+</div>
+</div>

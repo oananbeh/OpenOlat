@@ -1,0 +1,35 @@
+<div class="form-group clearfix">
+	<div class="o_video_question_details">
+		<div class="o_video_question_start_label">$r.render("start", "label")</div>
+		<div class="o_video_question_start btn-group">
+			<div class="btn-group o_video_apply_position_timestamp">$r.render("start")</div>
+			<div class="btn-group o_video_apply_position_button">$r.render("startApplyPosition")</div>
+		</div>
+
+		#if ($f.hasError("start"))
+		<div class="o_video_question_start_error">$r.render("start", "error")</div>
+		#end
+
+		<div class="o_video_question_time_limit_label">$r.render("timeLimit", "label")</div>
+		<div class="o_video_question_time_limit">$r.render("timeLimit")</div>
+
+		#if ($f.hasError("timeLimit"))
+		<div class="o_video_question_time_limit_error">$r.render("timeLimit", "error")</div>
+		#else
+		<div class="o_video_question_time_limit_example o_form_example help-block">
+			$r.render("timeLimit", "example")
+		</div>
+		#end
+
+		<div class="o_video_question_color_label">$r.render("color", "label")</div>
+		<div class="o_video_question_color_dropdown">$r.render("color")</div>
+
+		<div class="o_video_question_options_label">$r.render("options", "label")</div>
+		<div class="o_video_question_options">$r.render("options")</div>
+
+		<div class="o_video_question_table">$r.render("questionTable")</div>
+
+		<div class="o_video_question_buttons">$r.render("save") $r.render("cancel")</div>
+
+	</div>
+</div>

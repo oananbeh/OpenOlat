@@ -1,0 +1,179 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.modules.project.ui;
+
+import java.util.List;
+
+import org.olat.core.gui.UserRequest;
+import org.olat.core.gui.components.Component;
+import org.olat.core.gui.components.link.Link;
+import org.olat.core.gui.components.link.LinkFactory;
+import org.olat.core.gui.components.segmentedview.SegmentViewComponent;
+import org.olat.core.gui.components.segmentedview.SegmentViewEvent;
+import org.olat.core.gui.components.segmentedview.SegmentViewFactory;
+import org.olat.core.gui.components.stack.BreadcrumbedStackedPanel;
+import org.olat.core.gui.components.velocity.VelocityContainer;
+import org.olat.core.gui.control.Event;
+import org.olat.core.gui.control.WindowControl;
+import org.olat.core.gui.control.controller.BasicController;
+import org.olat.core.gui.control.generic.dtabs.Activateable2;
+import org.olat.core.id.Roles;
+import org.olat.core.id.context.ContextEntry;
+import org.olat.core.id.context.StateEntry;
+import org.olat.core.util.resource.OresHelper;
+import org.olat.modules.project.ProjectModule;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 
+ * Initial date: 21 Nov 2022<br>
+ * @author uhensler, urs.hensler@frentix.com, http://www.frentix.com
+ *
+ */
+public class ProjectsSiteController extends BasicController implements Activateable2 {
+	
+	private final VelocityContainer mainVC;
+	private final SegmentViewComponent segmentView;
+	private final Link myLink;
+	private Link templatesLink;
+	private Link adminLink;
+	
+	private BreadcrumbedStackedPanel myStackPanel;
+	private BreadcrumbedStackedPanel templatesStackPanel;
+	private BreadcrumbedStackedPanel adminStackPanel;
+	private ProjProjectMyController myCtrl;
+	private ProjProjectTemplatesController templatesCtrl;
+	private ProjProjectAdminController adminCtrl;
+	
+	@Autowired
+	private ProjectModule projectModule;
+
+	public ProjectsSiteController(UserRequest ureq, WindowControl wControl) {
+		super(ureq, wControl);
+		
+		mainVC = createVelocityContainer("main");
+		putInitialPanel(mainVC);
+
+		segmentView = SegmentViewFactory.createSegmentView("segments", mainVC, this);
+		segmentView.setDontShowSingleSegment(true);
+		
+		myLink = LinkFactory.createLink("segment.my", mainVC, this);
+		segmentView.addSegment(myLink, true);
+		
+		Roles roles = ureq.getUserSession().getRoles();
+		if (projectModule.canCreateProject(roles)) {
+			templatesLink = LinkFactory.createLink("segment.templates", mainVC, this);
+			segmentView.addSegment(templatesLink, false);
+		}
+		
+		if (roles.isProjectManager() || roles.isAdministrator()) {
+			adminLink = LinkFactory.createLink("segment.admin", mainVC, this);
+			segmentView.addSegment(adminLink, false);
+		}
+		
+		if (segmentView.getSegments().size() > 1) {
+			mainVC.contextPut("cssClass", "o_block_top");
+		}
+	}
+
+	@Override
+	public void activate(UserRequest ureq, List<ContextEntry> entries, StateEntry state) {
+		if (entries != null && entries.size() > 0) {
+			
+			String resName = entries.get(0).getOLATResourceable().getResourceableTypeName();
+			if (ProjectBCFactory.TYPE_MY.equalsIgnoreCase(resName)) {
+				doOpenMy(ureq);
+				myCtrl.activate(ureq, entries.subList(1, entries.size()), entries.get(0).getTransientState());
+			} else if (ProjectBCFactory.TYPE_TEMPLATES.equalsIgnoreCase(resName)) {
+				doOpenTemplates(ureq);
+				templatesCtrl.activate(ureq, entries.subList(1, entries.size()), entries.get(0).getTransientState());
+			} else if (ProjectBCFactory.TYPE_ADMIN.equalsIgnoreCase(resName)) {
+				doOpenAdmin(ureq);
+				adminCtrl.activate(ureq, entries.subList(1, entries.size()), entries.get(0).getTransientState());
+			} else if (ProjectBCFactory.TYPE_PROJECT.equalsIgnoreCase(resName)) {
+				// Legacy URLs should still work
+				doOpenMy(ureq);
+				myCtrl.activate(ureq, entries, state);
+			}
+		} else if (myCtrl == null) {
+			// When the site if opened the first time
+			doOpenMy(ureq);
+		}
+	}
+
+	@Override
+	protected void event(UserRequest ureq, Component source, Event event) {
+		if (source == segmentView) {
+			if (event instanceof SegmentViewEvent) {
+				SegmentViewEvent sve = (SegmentViewEvent)event;
+				String segmentCName = sve.getComponentName();
+				Component clickedLink = mainVC.getComponent(segmentCName);
+				if (clickedLink == myLink) {
+					doOpenMy(ureq);
+				} else if (clickedLink == templatesLink) {
+					doOpenTemplates(ureq);
+				} else if (clickedLink == adminLink) {
+					doOpenAdmin(ureq);
+				}
+			}
+		}
+	}
+	
+	public void doOpenMy(UserRequest ureq) {
+		removeAsListenerAndDispose(myCtrl);
+		
+		myStackPanel = new BreadcrumbedStackedPanel("mystack", getTranslator(), this);
+		WindowControl swControl = addToHistory(ureq, OresHelper.createOLATResourceableType(ProjectBCFactory.TYPE_MY), null);
+		
+		myCtrl = new ProjProjectMyController(ureq, swControl, myStackPanel);
+		listenTo(myCtrl);
+		myStackPanel.pushController(translate("segment.my"), myCtrl);
+		
+		mainVC.put("segmentCmp", myStackPanel);
+		segmentView.select(myLink);
+	}
+	
+	public void doOpenTemplates(UserRequest ureq) {
+		removeAsListenerAndDispose(templatesCtrl);
+		
+		templatesStackPanel = new BreadcrumbedStackedPanel("templatestack", getTranslator(), this);
+		WindowControl swControl = addToHistory(ureq, OresHelper.createOLATResourceableType(ProjectBCFactory.TYPE_TEMPLATES), null);
+		templatesCtrl = new ProjProjectTemplatesController(ureq, swControl, templatesStackPanel);
+		listenTo(templatesCtrl);
+		templatesStackPanel.pushController(translate("segment.templates"), templatesCtrl);
+		
+		mainVC.put("segmentCmp", templatesStackPanel);
+		segmentView.select(templatesLink);
+	}
+	
+	private void doOpenAdmin(UserRequest ureq) {
+		removeAsListenerAndDispose(adminCtrl);
+		
+		adminStackPanel = new BreadcrumbedStackedPanel("adminstack", getTranslator(), this);
+		WindowControl swControl = addToHistory(ureq, OresHelper.createOLATResourceableType(ProjectBCFactory.TYPE_ADMIN), null);
+		adminCtrl = new ProjProjectAdminController(ureq, swControl, adminStackPanel);
+		listenTo(adminCtrl);
+		adminStackPanel.pushController(translate("segment.admin"), adminCtrl);
+		
+		mainVC.put("segmentCmp", adminStackPanel);
+		segmentView.select(adminLink);
+	}
+	
+}

@@ -1,0 +1,547 @@
+.o_repo_details {
+	position: relative;
+	
+	.o_header {
+		border-bottom: $o-coursesite-meta-header-border-width solid $o-coursesite-meta-header-border;
+		
+		.o_lead {
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: left;
+			width: 100%;
+			
+			@media (max-width: $screen-xs-max) {
+				display: block;
+			}	
+			
+			.o_media  {
+				margin-right: 2em;
+				margin-bottom: 2em;
+				max-width: floor(570px * 0.75); //570x380
+				@media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+					max-width: floor(570px * 0.5); //570x380	
+				}
+				@media (max-width: $screen-xs-max) {
+					max-width: 100%;	
+					width: 100%;
+					.o_image, img, .o_video, video {
+						width: 100%;
+					}
+				}
+			}
+			.o_meta {
+				flex-grow: 1;
+				flex-shrink: 1;
+				width: 100%;
+				white-space: nowrap;
+				overflow-x: hidden;
+				text-overflow: ellipsis;	
+			}
+			
+			.o_ext_ref {
+				color: $text-muted;
+			}
+			h2 {
+				font-size: $o-coursesite-meta-title-font-size;
+				margin-top: 0;
+				white-space: normal;
+				i {
+					display: none;
+				}
+			}
+			.o_teaser {
+				white-space: normal;
+			}
+			
+			.o_educational_type {
+				margin-right: .5em;
+				margin-top: auto;
+				margin-bottom: auto;
+				line-height: normal;
+			}
+			
+			.o_author{
+				color: $o-coursesite-meta-author-color;
+				white-space: normal;
+			}
+		
+			.o_start_wrapper {
+				margin: 2em 0 2em 0;
+				.o_start_inner {
+					display: inline-block; 
+					@media (max-width: $screen-xs-max) {
+						display: block;
+						width: 100%;
+					}
+				}
+			}
+			.o_start, .o_book {
+				display: inline-block;
+			}
+		}
+	}
+	
+	.o_repo_meta {
+		border: 1px solid $o-coursesite-sidecol-border;
+		border-radius: $o-coursesite-sidecol-radius;
+		background: $o-coursesite-sidecol-bg;
+		padding: 0 $o-coursesite-sidecol-padding $o-coursesite-sidecol-padding  $o-coursesite-sidecol-padding;
+		column-count: 1;
+		.o_tag.o_taxonomy {
+			max-width: calc(100vw - 80px);
+		}
+	}
+	&>div {
+		margin-bottom: 20px;
+	}
+
+	display: grid;
+	grid-template-columns: 1fr;
+	
+	.o_subcolumn {
+		break-inside: avoid-column;
+		padding-top: 10px;
+	}
+	
+	@media (min-width: 500px) {
+		.o_repo_meta {
+			column-count: 2;
+			.o_tag.o_taxonomy {
+				max-width: calc(50vw - 48px);
+			}
+		}
+		.subcolumn {
+			width: 45%;	
+		}
+	}
+	
+	@media (min-width: $screen-md-min) {
+		grid-template-columns: 1fr auto;
+		&>div {
+			grid-column-start: span 2;
+		}
+		.o_repo_column {
+			grid-column-start: span 1;
+		}
+		.o_repo_meta {
+			&.o_repo_column {
+				min-width: 300px;
+				max-width: 450px;
+				margin-top: 20px; // Align with description title
+				margin-left: 60px;
+				column-count: 1;
+				.o_subcolumn {
+					width: auto;
+				}
+			}
+			.o_tag.o_taxonomy {
+				max-width: 100%;
+			}
+		}
+	}
+
+	.o_social {
+		@include clearfix();
+		.o_rating_wrapper {
+			float: left;
+		}
+		.o_comments {
+			@extend %o_undecorated;
+			margin-left: 1em;
+		}
+	}	
+    .o_signout {
+	    margin: 2em 0 1em 0;
+    }
+    .o_tag {
+    	display: inline-block;
+    }
+}
+
+.o_license_info {
+	margin: 2em 0 1em 0;
+	.o_icon {
+		float: left;
+		margin-right: 0.5em;
+	}
+	.o_license,
+	.o_licensor {
+		font-weight: bold;
+		font-size: 110%;
+		line-height: 2em;
+		vertical-align: text-bottom;
+		display: inline-block;
+	}
+	.o_license_text {
+		clear: both;
+		font-style: italic;
+		margin-top: 1em;
+	}
+}
+
+.o_meta .o_closed {
+	padding: 2px 5px;
+	margin: 5px 0;
+}
+
+.o_overview .o_closed {
+	padding: 5px 10px;
+	margin: 15px 15px 15px 0;
+	display: inline-block;
+}
+.o_re_access_denied {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5em;
+	
+	.o_re_access_denied_cross {
+		fill: $o-repo-access-denied-cross-fill;
+	}
+	.o_re_access_denied_message {
+		text-align: center;
+		font-size: 1.5em
+	}
+	.o_re_access_denied_hint {
+		text-align: center;
+	}
+}
+
+.o_repo_links_microsites {
+	.o_togglebox_wrapper {
+		margin-bottom: 0;
+	}
+}
+
+.o_ac_runtime_type {
+	padding: 12px;
+	display: grid;
+	align-items: center;
+	grid-template-columns: 50px 1fr auto;
+	
+	>i {
+		font-size: 200%;
+	}
+	h5 {
+		margin: 0 0 5px 0;
+	}
+	p {
+		margin: 0;
+		color: #777;
+	}
+}
+
+@media (min-width: 768px) {
+	.o_form.form-horizontal.o_ac_runtime_type_form label {
+		padding-top: 1.5em;
+	}
+}
+
+.o_ac_overview {
+	.panel-body {
+		padding: 0px;
+	}
+}
+.o_access_method_list {
+	.o_access_method {
+		margin-top: 15px;
+	}
+	.o_ac_method {
+		border: $o-ac-method-border;
+		border-radius: $o-ac-method-border-radius;
+		padding: 15px;
+		h3 {
+			margin-top: 0;
+		}
+		display:flex;
+		flex-direction: row;
+		@media (max-width: 1000px) {
+			flex-direction: column;
+		} 
+		.o_ac_method_info {
+			padding-right: 15px;
+			@media (max-width: 1000px) {
+				padding-bottom: 15px;
+			}
+		}
+		.o_ac_method_details {
+			min-width: 300px;
+			padding: 15px 0px 15px 15px;
+			border-left: $o-ac-method-border;
+			@media (max-width: 1000px) {
+				border-left: 0;
+				border-top: $o-ac-method-border;
+				padding: 15px 0px;
+			}
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			.o_ac_method_icon {
+				display: flex;
+				justify-content: center;
+			}
+			>div {
+				width: 100%;
+				max-width: 300px;
+			}
+			button {
+				width: 100%;
+			}
+		}
+	}
+}
+
+
+tr.o_entry_closed, tr.o_entry_closed td, tr.o_entry_closed td span,
+tr.o_entry_unpublished, tr.o_entry_unpublished td, tr.o_entry_unpublished td span {
+	text-decoration: line-through;
+}
+
+tr.o_entry_deleted {
+
+}
+
+
+/* status element in dropdown menu */
+a.o_repo_tools_status {
+	cursor:pointer;
+	margin: 0 2px 2px 2px;
+	text-align: left;
+}
+
+/* Status full style, e.g. in toolbar */
+.o_labeled,
+.o_toolbar .o_tools_container a.o_labeled {
+	&.o_repo_status_preparation {
+	    background-color: $o-repo-preparation-color;
+	    border-color: $o-repo-preparation-color;
+	    color: $o-repo-status-color-bright;
+	}
+	&.o_repo_status_review {
+	    @extend %o_labeled_yellow;
+	}
+	&.o_repo_status_coachpublished {
+	    background-color: $o-repo-coachpublished-color;
+	    border: 2px dashed $o-repo-published-color; 
+	    color: $o-repo-status-color-bright;
+		text-shadow: 0 0 3px #555;    
+	} 
+	&.o_repo_status_published { 
+	    background-color: $o-repo-published-color;
+	    border-color: $o-repo-published-color;
+	    color: $o-repo-status-color-bright;
+	}
+	&.o_repo_status_closed {
+	    background-color: $o-repo-closed-color;
+	    border-color: $o-repo-closed-color;
+	    color: $o-repo-status-color-bright;
+	}
+	&.o_repo_status_trash {
+	    background-color: $o-repo-trash-color;
+	    border-color: $o-repo-trash-color;
+	    color: $o-repo-status-color-bright;
+	}
+	&.o_repo_status_deleted {
+	    background-color: $o-repo-deleted-color;
+	    border-color: $o-repo-deleted-color;
+	    color: $o-repo-status-color-bright;
+	}
+}
+/* hover effect for menu pulldowns in toolbar */
+.o_toolbar .o_tools_container a.o_labeled:hover {
+	&.o_repo_status_preparation {
+	    background-color: darken($o-repo-preparation-color,10%);
+	}
+	&.o_repo_status_review {
+		background-color: darken($o-labeled-yellow-bg-color,10%);
+	}
+	&.o_repo_status_coachpublished {
+	    background-color: darken($o-repo-coachpublished-color,10%);
+	}
+	&.o_repo_status_published {
+	    background-color: darken($o-repo-published-color,10%);
+	}
+	&.o_repo_status_closed {
+	    background-color: darken($o-repo-closed-color,10%);
+	}
+	&.o_repo_status_trash {
+	    background-color: darken($o-repo-trash-color,10%);
+	}
+	&.o_repo_status_deleted {
+	    background-color: darken($o-repo-deleted-color,10%);
+	}
+}
+
+/* Status light style, mainly for in-table renderings */
+.o_labeled_light,
+.o_toolbar .o_tools_container a.o_labeled_light {
+	&.o_repo_status_preparation {
+	    border-color: 		$o-repo-preparation-color;
+	    color: 				$o-repo-preparation-color;
+	}
+	&.o_repo_status_review {
+	    @extend %o_labeled_light_yellow;
+	}
+	&.o_repo_status_coachpublished {
+	    border-color: 		$o-repo-published-color;
+	    border-style: 		dashed;
+	    color: 				$o-repo-published-color;
+	}
+	&.o_repo_status_published {
+	    border-color: 		$o-repo-published-color;
+	    color: 				$o-repo-published-color;
+	}
+	&.o_repo_status_closed {
+	    border-color: 		$o-repo-closed-color;
+	    color: 				$o-repo-closed-color;
+	}
+	&.o_repo_status_trash {
+	    border-color: 		$o-repo-trash-color;
+	    color: 				$o-repo-trash-color;
+	}
+	&.o_repo_status_deleted {
+	    border-color: 		$o-repo-deleted-color;
+	    color: 				$o-repo-deleted-color;
+	}	
+}
+
+/* Member management */
+.o_member_infos {
+	position: relative;
+	
+	.o_user_portrait {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	
+	.o_member_infos_inner {
+		margin-left: 120px;
+	}
+	.o_member_infos_inner>div {
+		display: grid;
+		grid-template-columns: 2fr 2fr;
+		column-gap: 20px;
+	}
+}
+
+
+.o_fake_participant_stop {
+	display: flex;
+	align-items: center;
+	@media (max-width: $screen-xs-min) {
+		flex-wrap: wrap;
+	}
+	.o_fps_message {
+		display: flex;
+		align-items: center;
+		.o_icon {
+			color: $brand-warning;
+			font-size: 200%;
+		}
+		.o_fps_text {
+			margin: 0 10px;
+		}
+	}
+	.o_fps_button {
+		@media (max-width: $screen-xs-min) {
+			text-align: center;
+			width: 100%;
+			margin-top: 5px;
+		}
+	}
+}
+
+form { .o_form { .o_radio_cards_wrapper {
+.o_course_design.o_radio_cards {
+	label {
+		flex-basis: 279px;
+		.o_radio_text_wrapper {
+			display: flex;
+			flex-direction: column;
+			.o_radio_desc {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				.o_course_design_desc {
+					height: 100%;
+					
+					// small aus dem o_course_design_desc rausnehmen
+				}
+			}
+		}
+		.o_radio_icon:not(.o_icon) {
+			height: 130px;
+			border: none;
+		}
+	}
+	.o_course_design_desc {
+		ul {
+			 padding-left: 1em;
+		}
+	}
+}
+}}}
+.o_course_design_assistance {
+	table {
+		table-layout: fixed;
+		tr {
+			th:not(:last-child), td:not(:last-child) {
+				border-right: 1px solid $table-border-color;
+			}
+			ul {
+				 padding-left: 1em;
+			}
+		}
+	}
+	.o_course_design_icon {
+		height: 130px;
+		background-position: top left;
+		background-repeat: no-repeat;
+		background-size: contain;
+	}
+}
+.o_course_design_path_icon {
+	background-image:url('#{$o-images-path}course/course-design-path.png')
+}
+.o_course_design_progress_icon {
+	background-image:url('#{$o-images-path}course/course-design-progress.png')
+}
+.o_course_design_classic_icon {
+	background-image:url('#{$o-images-path}course/course-design-classic.png')
+}
+
+/* Bulk change */
+.o_labeled_light {
+	&.o_bulk_status_add {
+		background-color: $state-success-text;
+		border-color: $state-success-text;
+		color: $o-repo-status-color-bright;
+	}
+	&.o_bulk_status_remove {
+		background-color:  $state-danger-text;
+		border-color: $state-danger-text;
+		color: $o-repo-status-color-bright;
+	}
+}
+.o_settings_bulk_overview {
+	table {
+		width: auto;
+		tbody {
+			td {
+				border-top: 0;
+				&:is(.o_bulk_overview_change *) {
+					padding: 2px 8px;
+				}
+			}
+			.o_bulk_overview_step {
+				font-size: 20px;
+			}
+			.o_bulk_overview_change + .o_bulk_overview_step {
+				td {
+					padding: 24px 8px 8px 8px;
+				}
+			}
+		}
+	}
+}

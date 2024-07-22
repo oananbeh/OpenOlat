@@ -1,0 +1,189 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.modules.project.ui;
+
+import java.util.List;
+
+import org.olat.core.commons.services.doceditor.ui.CreateDocumentController;
+import org.olat.core.commons.services.tag.TagInfo;
+import org.olat.core.commons.services.tag.ui.component.TagSelection;
+import org.olat.core.commons.services.vfs.VFSMetadata;
+import org.olat.core.gui.UserRequest;
+import org.olat.core.gui.components.form.flexible.FormItemContainer;
+import org.olat.core.gui.components.form.flexible.elements.TextAreaElement;
+import org.olat.core.gui.components.form.flexible.elements.TextElement;
+import org.olat.core.gui.components.form.flexible.impl.Form;
+import org.olat.core.gui.components.form.flexible.impl.FormBasicController;
+import org.olat.core.gui.control.Controller;
+import org.olat.core.gui.control.WindowControl;
+import org.olat.core.util.FileUtils;
+import org.olat.core.util.StringHelper;
+import org.olat.core.util.Util;
+import org.olat.modules.project.ProjFile;
+import org.olat.modules.project.ProjProject;
+import org.olat.modules.project.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 
+ * Initial date: 12 Dec 2022<br>
+ * @author uhensler, urs.hensler@frentix.com, http://www.frentix.com
+ *
+ */
+public class ProjFileContentController extends FormBasicController {
+	
+	private TextElement filenameEl;
+	private TextElement titleEl;
+	private TagSelection tagsEl;
+	private TextAreaElement descriptionEl;
+	
+	private final ProjProject project;
+	private final List<TagInfo> projectTags;
+	private String initialFilename;
+	
+	@Autowired
+	private ProjectService projectService;
+
+	public ProjFileContentController(UserRequest ureq, WindowControl wControl, Form mainForm, ProjProject project, ProjFile file) {
+		super(ureq, wControl, LAYOUT_VERTICAL, null, mainForm);
+		setTranslator(Util.createPackageTranslator(CreateDocumentController.class, getLocale(), getTranslator()));
+		this.project = project;
+		this.projectTags = projectService.getTagInfos(project, file != null? file.getArtefact(): null);
+		
+		initForm(ureq);
+	}
+	
+	@Override
+	protected void initForm(FormItemContainer formLayout, Controller listener, UserRequest ureq) {
+		titleEl = uifactory.addTextElement("title", -1, null, formLayout);
+		
+		filenameEl = uifactory.addTextElement("file.filename", -1, null, formLayout);
+		filenameEl.setMandatory(true);
+		
+		tagsEl = uifactory.addTagSelection("tags", "tags", formLayout, getWindowControl(), projectTags);
+		
+		descriptionEl = uifactory.addTextAreaElement("file.description", "file.description", -1, 3, 1, true, false, null, formLayout);
+	}
+
+	public String getFilenameFormDispatchId() {
+		return filenameEl.getFormDispatchId();
+	}
+	
+	public String getFilename() {
+		return filenameEl.isVisible() && StringHelper.containsNonWhitespace(filenameEl.getValue()) ? filenameEl.getValue(): null;
+	}
+	
+	public void setFilename(String filename, boolean initialFilename) {
+		if (initialFilename) {
+			this.initialFilename = filename;
+		}
+		filenameEl.setValue(filename);
+	}
+	
+	public void updateUI(VFSMetadata vfsMetadata) {
+		titleEl.setValue(vfsMetadata.getTitle());
+		descriptionEl.setValue(vfsMetadata.getComment());
+	}
+
+	public String getTitleFormDispatchId() {
+		return titleEl.getFormDispatchId();
+	}
+	
+	public String getTitle() {
+		return StringHelper.containsNonWhitespace(titleEl.getValue())? titleEl.getValue(): null;
+	}
+	
+	public String getDescription() {
+		return StringHelper.containsNonWhitespace(descriptionEl.getValue())? descriptionEl.getValue(): null;
+	}
+
+	public void updateVfsMetdata(VFSMetadata vfsMetadata) {
+		String title = StringHelper.containsNonWhitespace(titleEl.getValue())? titleEl.getValue(): null;
+		vfsMetadata.setTitle(title);
+		String description = StringHelper.containsNonWhitespace(descriptionEl.getValue())? descriptionEl.getValue(): null;
+		vfsMetadata.setComment(description);
+	}
+	
+	public List<String> getTagDisplayValues() {
+		return tagsEl.getDisplayNames();
+	}
+	
+	@Override
+	protected boolean validateFormLogic(UserRequest ureq) {
+		boolean allOk = super.validateFormLogic(ureq);
+		
+		if (filenameEl.isVisible()) {
+			filenameEl.clearError();
+			if (!StringHelper.containsNonWhitespace(filenameEl.getValue())) {
+				filenameEl.setErrorKey("form.mandatory.hover");
+				allOk &= false;
+			} else if(filenameEl.getValue().length() >= 255) {
+				filenameEl.setErrorKey("form.error.toolong", new String[] { Integer.toString(255) });
+				allOk &= false;
+			} else {
+				// update in GUI so user sees how we optimized
+				String filename = getCleanedFilename();
+				filenameEl.setValue(filename);
+				if (invalidFilename(filename)) {
+					filenameEl.setErrorKey("create.doc.name.notvalid");
+					allOk &= false;
+				} else if (isCheckExistsFile(filename) && projectService.existsFile(project, filename)) {
+					filenameEl.setErrorKey("create.doc.already.exists", new String[] { filename });
+					allOk &= false;
+				}
+			}
+		}
+		
+		return allOk;
+	}
+
+	private boolean isCheckExistsFile(String filename) {
+		if (initialFilename == null) {
+			// New file uploaded
+			return true;
+		}
+		
+		// Existing file: Check only if name changed.
+		return !initialFilename.equals(filename);
+	}
+
+	private boolean invalidFilename(String docName) {
+		return !FileUtils.validateFilename(docName);
+	}
+	
+	private String getCleanedFilename() {
+		String filename = filenameEl.getValue();
+		String suffix = StringHelper.containsNonWhitespace(initialFilename)
+				? FileUtils.getFileSuffix(initialFilename)
+				: FileUtils.getFileSuffix(filename);
+		if (StringHelper.containsNonWhitespace(suffix)) {
+			return filename.endsWith("." + suffix)
+					? filename
+					: filename + "." + suffix;
+		}
+		return filename;
+	}
+
+	@Override
+	protected void formOK(UserRequest ureq) {
+		//
+	}
+
+}

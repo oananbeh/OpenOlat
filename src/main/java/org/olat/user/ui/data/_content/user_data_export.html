@@ -1,0 +1,28 @@
+<fieldset class="o_form form-horizontal" role="form">
+	<div class="o_hint">$r.translate("export.user.data.explain")</div>
+
+	#if($r.isTrue($processing))
+		<div class="o_warning">$r.translate("export.user.data.processing")</div>
+		<div class="o_button_group">
+			$r.render("cancel")
+		</div>
+	#else
+		#if($r.isTrue($ready))
+			<div class="o_hint">$r.translate("export.user.data.ready")</div>
+		#else
+			<div class="o_hint">$r.translate("export.user.data.notReady")</div>
+		#end
+		
+		<div class="form-group clearfix">
+			<label class="control-label col-sm-3" for="export_url">$r.translate("export.url")</label>
+			<div class="col-sm-9"><div class="o_copy_code o_nowrap form-control-static">
+				<input id="export_url" name="export_url" value="$dataBusinessPath" onclick="this.select()"/>
+			</div></div>
+		</div>
+		$r.render("export.options", "3_9", "form")
+		<div class="o_button_group">
+			$r.render("export.start")
+			$r.render("cancel")
+		</div>
+	#end
+</fieldset>

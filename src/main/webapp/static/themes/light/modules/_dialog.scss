@@ -1,0 +1,338 @@
+/* Info and other dialog boxes, displayed inline in content */
+.o_info, %o_info { 
+	@include o-make-message-box($o-box-info-bg, $o-box-info-color);
+}
+.o_info_with_icon, %o_info_with_icon { 
+	@include o-make-message-box($o-box-info-bg, $o-box-info-color, 'circle-info');
+}
+.o_note, %o_note { 
+	@include o-make-message-box($o-box-note-bg, $o-box-note-color);
+}
+.o_note_with_icon, %o_note_with_icon { 
+	@include o-make-message-box($o-box-note-bg, $o-box-note-color, 'lightbulb');
+}
+.o_tip, %o_tip { 
+	@include o-make-message-box($o-box-tip-bg, $o-box-tip-color);
+}
+.o_tip_with_icon, %o_tip_with_icon { 
+	@include o-make-message-box($o-box-tip-bg, $o-box-tip-color, 'hand-point-up');
+}
+.o_important, %o_important { 
+	@include o-make-message-box($o-box-important-bg, $o-box-important-color); 
+}
+.o_important_with_icon, %o_important_with_icon { 
+	@include o-make-message-box($o-box-important-bg, $o-box-important-color, 'circle-exclamation');
+}
+.o_success, %o_success { 
+	@include o-make-message-box($o-box-success-bg, $o-box-success-color);
+}
+.o_success_with_icon, %o_success_with_icon { 
+	@include o-make-message-box($o-box-success-bg, $o-box-success-color, 'circle-check');
+}
+.o_warning, %o_warning { 
+	@include o-make-message-box($o-box-warning-bg, $o-box-warning-color);
+}
+.o_warning_with_icon, %o_warning_with_icon { 
+	@include o-make-message-box($o-box-warning-bg, $o-box-warning-color, 'triangle-exclamation');
+}
+.o_error, %o_error { 
+	@include o-make-message-box($o-box-error-bg, $o-box-error-color);
+}
+.o_error_with_icon, %o_error_with_icon { 
+	@include o-make-message-box($o-box-error-bg, $o-box-error-color, 'circle-xmark');
+}
+
+.o_instruction {
+	@extend %o_warning;
+	margin-top: 0px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.o_instruction > .o_button_group {
+	margin-bottom: 0px;
+}
+.o_hint, %o_hint {
+	margin: $o-box-margin 0;
+}
+
+.o_info_with_icon h4:first-child {
+	margin-top: 1px;
+}
+
+.o_info_with_icon {
+	
+	>a.o_collapse_title {
+		display: grid;
+		grid-template-columns: 1fr 15px;
+		text-decoration: none;
+	}
+	
+	>a.o_collapse_title.collapsed>h4 {
+		margin-bottom: 1px;
+	}
+}
+
+.o_warning_with_icon p:last-child {
+	margin-bottom: 1px;
+}
+
+/* Callout window (implemented with bootstrap popover, see CloseableCalloutWindowController for JS part */
+div.o_callout_overlay { 
+	position: fixed; 
+	top: 0; left: 0; 
+	width:100%; height:100%; 
+	zoom:1;  
+	background: #000; 
+	@include opacity(0);
+}
+
+/* Info messages appear on top of page and auto-disapear, alerts are modal and must be accepted manually */
+.o_alert_info {
+	position: fixed;
+	top: -100%;	
+	left: 0;
+	display: none;
+ 	z-index: 2000; /* modal is 1050 */
+ 	width: 100%;
+ 	text-align: center;
+ 	
+ 	.alert {
+		color: $text-color;
+	  	background-color: $o-box-info-bg;
+	  	border-color: $o-box-info-color;
+		position: relative;
+		width: auto;
+		margin:0 auto;
+		text-align: left;
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+		border-top: 0;
+		@include box-shadow(0px 2px 10px -1px rgba(0,0,0,.8));
+		
+		.o_alert_close {
+			float: right;
+			color: $gray-light;
+			&:hover {
+				color: $gray;			
+			}
+		}
+		@media (min-width: $screen-sm-min) {
+		  // Automatically set modal's width for larger viewports
+		    width: 600px;
+		}
+ 	}
+}
+
+/* Sticky info (admins can create stick-messages that will show for all users) */
+#o_msg_sticky, #o_msg_sticky_preview { 	
+	position: relative;
+	color: $state-danger-text;
+	background-color: $state-danger-bg; 
+	border: 1px solid $state-danger-border;
+	padding: $padding-large-vertical $padding-large-horizontal $padding-large-vertical $line-height-computed * 3;
+	min-height: $line-height-computed * 2 + ($padding-large-vertical * 2);
+	
+	margin: -$navbar-margin-bottom 0 $navbar-margin-bottom 0;
+	
+	.o_icon_info_msg {
+		position: absolute;
+		left: floor($line-height-computed * 0.5);
+		top: floor($line-height-computed * 0.25);
+		font-size: $line-height-computed * 2;
+	}
+	
+	&.o_msg_sticky_fullscreen {
+		margin-top: 0;
+	}
+}
+#o_msg_sticky_preview { 	
+	margin-top: 0;
+}
+
+// Modal
+dialog.dialog {
+	
+	padding: 20px 10px;
+	border: none;
+	background: rgba(0,0,0,.0);
+	height: 100vh;
+	
+	&.o_wizard {
+		width: 80%;
+		
+		.modal-dialog {
+			width: 100%;
+		}
+	}
+	
+	.modal-dialog {
+		margin: 0 !important;
+		
+		.modal-content {
+			overflow-x: hidden;
+			overflow-y: auto;
+			max-height: calc(96vh - 40px);
+		}
+	}
+}
+
+dialog.o-modal-alert-warning,
+dialog.o-modal-alert-danger,
+dialog.o-modal-alert-info {
+	padding: 20px 10px;
+	border: none;
+	background: rgba(0,0,0,.0);
+	height: 100vh;
+	
+	.modal-dialog {
+		margin: 0 !important;
+	}
+}
+
+dialog.popover {
+	margin: 0;
+	border: none;
+	background: none;
+	box-shadow: none;
+	
+	.popover-title {
+		margin-top: 10px;
+  		background-color: $popover-bg;
+		border: 1px solid $popover-fallback-border-color;
+		border: 1px solid $popover-border-color;
+		border-bottom: 1px solid darken($popover-title-bg, 5%);
+  		border-top-left-radius: $border-radius-large;
+  		border-top-right-radius: $border-radius-large;
+		@include box-shadow(0 5px 10px rgba(0, 0, 0, .2));
+	}
+	
+	.popover-content {
+		margin-top: 10px;
+  		background-color: $popover-bg;
+		border: 1px solid $popover-fallback-border-color;
+		border: 1px solid $popover-border-color;
+		border-radius: $border-radius-large;
+		@include box-shadow(0 5px 10px rgba(0, 0, 0, .2));
+	}
+	
+	.popover-title ~ .popover-content {
+  		margin-top: 0;
+  		border-top: none;
+  		border-top-left-radius: 0;
+  		border-top-right-radius: 0;
+	}
+	
+	&.bottom {
+		margin-top: 0;
+	}
+	
+	&.bottom>.arrow {
+		top: 1px;
+	}
+}
+
+dialog::backdrop {
+	background: rgba(0,0,0,.5);
+}
+
+dialog.popover::backdrop {
+	background: none;
+}
+
+body#o_body:has(dialog.dialog.modal.show) {
+	overflow: hidden;
+}
+
+/* extend bootstrap modal classes for extra large modal views that should us entire available space, e.g. in wizards */
+.modal {
+	.o_modal_fullwidth {
+		@media (min-width: $screen-sm-min) {
+			width: 90%;
+		}
+		@media (min-width: $screen-md-min) {
+			width: 80%;
+		}
+	}
+	.modal-content {
+		width: 100%;
+	  	height: 100%;
+	  	display: flex;
+	  	flex-direction: column;
+	}
+	/* make header and footer sticky to be always visible, specially in wizard */
+	.modal-header {
+		flex-grow: 0;
+  		width: 100%;
+  		position: relative;
+		background: $o-dialog-header-background;
+		box-shadow: 0 4px 4px $o-dialog-header-background;
+	}
+	.modal-body {
+		flex-grow:1;
+		overflow-y: auto; /* scroll only here in modal dialog */
+	}
+	.modal-footer {
+		flex-grow: 0;
+		width: 100%;
+		position: relative;
+		background: $o-dialog-footer-background;
+		box-shadow: 0 -4px 4px $o-dialog-header-background;
+	}
+	
+	.modal-header h4 {
+		color: $o-dialog-header-color;
+	  	font-weight: $o-dialog-header-font-weight;
+		font-family: $headings-font-family;
+	  	line-height: $headings-line-height;
+	  	margin-top: 0;
+	  	margin-bottom: 0;
+	}
+	.o_modal_close {
+		/* make room for context-help in header */
+		margin-left: 10px;
+	}
+}
+/* when page is in full-width mode, also apply to modal, e.g. for editors */
+body.o_width_full dialog.modal {
+	@media (min-width: $screen-sm-min) {
+		width: 90%;
+	}
+	@media (min-width: $screen-md-min) {
+		width: 80%;
+	}
+	
+	> .modal-dialog {
+		width: 100%;
+	}
+}
+
+
+.modal.o_offcanvas_right_modal .modal-dialog {
+	margin: -1px -1px 0 auto;
+	width: 90vw;
+	height: 100vh; 
+	
+	.modal-content {
+		border-radius: 0;
+		min-height: 100%;
+	}
+}
+
+.o_ltop_modal_panel .modal {
+	z-index: 70040;
+}
+
+
+/* dialog overrides from bootstrap */
+body .modal-body.alert {
+	border-radius: $border-radius-large;
+}
+.o-modal-alert-success {
+	@include o-alert-variant($o-box-success-bg, $o-box-success-color, 'circle-check');
+}
+.o-modal-alert-warning {
+ 	@include o-alert-variant($o-box-warning-bg, $o-box-warning-color, 'triangle-exclamation');
+}
+.o-modal-alert-danger {
+	@include o-alert-variant($o-box-error-bg, $o-box-error-color, 'circle-xmark');
+}

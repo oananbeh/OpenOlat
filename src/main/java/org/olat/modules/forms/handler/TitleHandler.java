@@ -1,0 +1,171 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.modules.forms.handler;
+
+import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.olat.core.gui.UserRequest;
+import org.olat.core.gui.components.form.flexible.impl.Form;
+import org.olat.core.gui.components.text.TextComponent;
+import org.olat.core.gui.components.text.TextFactory;
+import org.olat.core.gui.control.WindowControl;
+import org.olat.core.gui.translator.Translator;
+import org.olat.core.util.Util;
+import org.olat.modules.ceditor.CloneElementHandler;
+import org.olat.modules.ceditor.PageElement;
+import org.olat.modules.ceditor.PageElementCategory;
+import org.olat.modules.ceditor.PageElementEditorController;
+import org.olat.modules.ceditor.PageElementInspectorController;
+import org.olat.modules.ceditor.RenderingHints;
+import org.olat.modules.ceditor.PageElementStore;
+import org.olat.modules.ceditor.PageRunElement;
+import org.olat.modules.ceditor.SimpleAddPageElementHandler;
+import org.olat.modules.ceditor.model.BlockLayoutSettings;
+import org.olat.modules.ceditor.model.TitleElement;
+import org.olat.modules.ceditor.model.TitleSettings;
+import org.olat.modules.ceditor.ui.TitleEditorController;
+import org.olat.modules.ceditor.ui.TitleInspectorController;
+import org.olat.modules.ceditor.ui.TextRunComponent;
+import org.olat.modules.forms.SessionFilter;
+import org.olat.modules.forms.model.xml.Title;
+import org.olat.modules.forms.ui.ReportHelper;
+import org.olat.modules.forms.ui.model.EvaluationFormComponentElement;
+import org.olat.modules.forms.ui.model.EvaluationFormComponentReportElement;
+import org.olat.modules.forms.ui.model.EvaluationFormExecutionElement;
+import org.olat.modules.forms.ui.model.EvaluationFormReportElement;
+import org.olat.modules.forms.ui.model.ExecutionIdentity;
+
+/**
+ * 
+ * Initial date: 04.07.2016<br>
+ * @author srosse, stephane.rosse@frentix.com, http://www.frentix.com
+ *
+ */
+public class TitleHandler implements EvaluationFormElementHandler, PageElementStore<TitleElement>,
+		SimpleAddPageElementHandler, CloneElementHandler, EvaluationFormReportHandler {
+
+	private static final AtomicInteger idGenerator = new AtomicInteger();
+	
+	@Override
+	public String getType() {
+		return "formhtitle";
+	}
+
+	@Override
+	public String getIconCssClass() {
+		return "o_icon_header";
+	}
+	
+	@Override
+	public PageElementCategory getCategory() {
+		return PageElementCategory.text;
+	}
+
+	@Override
+	public int getSortOrder() {
+		return 10;
+	}
+
+	@Override
+	public PageRunElement getContent(UserRequest ureq, WindowControl wControl, PageElement element, RenderingHints hints) {
+		TextComponent cmp = getComponent(element);
+		return new TextRunComponent(cmp, true);
+	}
+
+	@Override
+	public PageElementEditorController getEditor(UserRequest ureq, WindowControl wControl, PageElement element) {
+		if (element instanceof Title title) {
+			return new TitleEditorController(ureq, wControl, title, this, true);
+		}
+		return null;
+	}
+	
+	@Override
+	public PageElementInspectorController getInspector(UserRequest ureq, WindowControl wControl, PageElement element) {
+		if(element instanceof Title) {
+			return new TitleInspectorController(ureq, wControl, (Title)element, this, true);
+		}
+		return null;
+	}
+
+	@Override
+	public PageElement createPageElement(Locale locale) {
+		Translator translator = Util.createPackageTranslator(TitleEditorController.class, locale);
+		String content = translator.translate("title.example");
+		Title part = new Title();
+		part.setId(UUID.randomUUID().toString());
+		part.setContent(content);
+		TitleSettings settings = new TitleSettings();
+		settings.setSize(3);
+		settings.setLayoutSettings(BlockLayoutSettings.getPredefined());
+		part.setTitleSettings(settings);
+		return part;
+	}
+
+	@Override
+	public PageElement clonePageElement(PageElement element) {
+		if (element instanceof Title) {
+			Title title = (Title)element;
+			Title clone = new Title();
+			clone.setId(UUID.randomUUID().toString());
+			clone.setContent(title.getContent());
+			clone.setLayoutOptions(title.getLayoutOptions());
+			return clone;
+		}
+		return null;
+	}
+
+	@Override
+	public TitleElement savePageElement(TitleElement element) {
+		return element;
+	}
+
+	@Override
+	public EvaluationFormExecutionElement getExecutionElement(UserRequest ureq, WindowControl wControl, Form rootForm,
+			PageElement element, ExecutionIdentity executionIdentity) {
+		PageRunElement runElement = getContent(ureq, wControl, element, null);
+		if (runElement != null) {
+			return new EvaluationFormComponentElement(runElement);
+		}
+		return null;
+	}
+
+	private TextComponent getComponent(PageElement element) {
+		String htmlContent = "";
+		String cssClass = "";
+		if (element instanceof Title title) {
+			String content = title.getContent();
+			TitleSettings titleSettings = title.getTitleSettings();
+			htmlContent = TitleElement.toHtml(content, titleSettings);
+			cssClass = TitleElement.toCssClassWithMarkerClass(titleSettings, true);
+		}
+		return TextFactory.createTextComponentFromString("title_" + idGenerator.incrementAndGet(), htmlContent,
+				cssClass, false, null);
+	}
+
+	@Override
+	public EvaluationFormReportElement getReportElement(UserRequest ureq, WindowControl windowControl, PageElement element,
+			SessionFilter filter, ReportHelper reportHelper) {
+		return new EvaluationFormComponentReportElement(getComponent(element));
+	}
+
+}

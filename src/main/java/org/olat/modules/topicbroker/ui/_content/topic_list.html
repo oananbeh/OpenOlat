@@ -1,0 +1,28 @@
+<div class="o_tb_topics">
+	<fieldset>
+		<legend class="o_flex_first_grow">
+			<div>$r.translate("topics.title")</div>
+			#if($statusLabel)
+				<div>$statusLabel</div>
+			#end
+		</legend>
+		#if ($info)
+			<div class="o_hint">$info</div>
+		#end
+		#if($r.available("config"))
+			$r.render("config")
+		#end
+		<div class="o_button_group o_button_group_right">
+			$r.render("topics.export")
+			#if($r.available("topic.dropdown") && $r.visible("topic.dropdown"))
+				<div class="btn-group">
+					$r.render("topic.create")
+					$r.render("topic.dropdown")
+				</div>
+			#elseif($r.available("topic.create") && $r.visible("topic.create"))
+				$r.render("topic.create")
+			#end
+		</div>
+		$r.render("table")
+	</fieldset>
+</div>

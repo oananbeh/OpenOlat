@@ -1,0 +1,288 @@
+@use "sass:math";
+
+.o_process {
+	position: relative;
+	padding-left: 25px;
+	overflow-y: hidden;
+	
+	.o_step {
+		position: relative;
+		height: auto;
+		padding-top: $o-step-padding-top;
+		padding-left: $o-step-padding-left;
+		
+		.o_step_block {
+			border: $o-step-border;
+			border-radius: $o-cn-style-border-radius;
+		}
+		
+		.o_header {
+			padding: $o-step-border-header-padding;
+			background-color: $o-step-border-header-bg-color;
+		}
+		
+		.o_content {
+			border-top: $o-step-border;
+			padding: $o-step-border-content-padding;
+			
+			.o_button_group {
+				margin-top: 1em;
+			}
+		}
+		
+		>.o_button_group {
+			margin-bottom: 0;
+		}
+	}
+
+	.o_bar {
+		position: absolute;
+		top: $o-step-padding-top;
+		left: floor($o-step-milestone-size * 0.5);
+		height: 100%;
+		
+		&:after {
+			position: absolute;
+			top: 9px;
+			left: floor(math.div($o-step-milestone-size, -2) - $o-step-border-width);
+			height: $o-step-milestone-size;
+			width: $o-step-milestone-size;
+			font-size: $o-step-bubble-font-size;
+			@include o-make-icon();
+		}
+		
+		&:before {
+			content: ' ';
+			position: absolute;
+			top: 10px + $o-step-bubble-font-size - 2;
+			left: floor(math.div($o-step-milestone-size, -2) + 3);
+			height: calc(100% - 17px);
+			width: 2px;
+			border: 2px solid $o-step-color;
+			font-size: $o-step-bubble-font-size;
+			margin-bottom: 16px;
+		}
+	}
+	
+	.o_step:last-child .o_bar:before {
+		display: none;
+	}
+	
+	.o_step.o_active {
+		.o_bar {
+			@include o-add-icon('dot-circle', false, false); 		
+			color: $o-step-active-color !important;
+			border: unset;
+			background-color: unset;
+		}
+		
+		.o_bar:before {
+			border-color: $o-step-active-marker-color !important;
+			border-style: dashed;
+		}
+	}
+	
+	.o_step.o_notavailable {
+		.o_bar {
+			@include o-add-icon('circle', false, false); 		
+			color: $o-step-notavailable-color !important;
+			border: unset;
+			background-color: unset;
+		}
+		
+		.o_bar:before {
+			border-color: $o-step-notavailable-marker-color !important;
+			border-style: dashed;
+		}
+	}
+	
+	.o_step.o_expired  {
+		.o_bar {
+			@include o-add-icon('dot-circle', false, false); 		
+			color: $o-step-expired-color !important;
+			border: unset;
+			background-color: unset;
+		}
+		
+		.o_bar:before {
+			left: floor(math.div($o-step-milestone-size, -2) + 3);
+			height: calc(100% - 16px);
+			border: none;
+			outline-color: $o-step-expired-marker-color !important;
+			outline-style: dashed;
+			outline-width: 2px;
+			outline-offset: 0px;
+		}
+	}
+	
+	.o_step.o_expired ~ .o_step.o_notavailable  {
+		.o_bar:before {
+			left: floor(math.div($o-step-milestone-size, -2) + 3);
+			height: calc(100% - 16px);
+			border: none;
+			outline-color: $o-step-expired-marker-color !important;
+			outline-style: dashed;
+			outline-width: 2px;
+			outline-offset: 0px;
+		}
+	}
+	
+	.o_step.o_done {
+		.o_bar {
+			border-color: $o-step-done-color !important;
+			@include o-add-icon('check-circle', false, false); 		
+		}
+		.o_bar:before {
+			border-color: $o-step-done-marker-color !important;
+		}
+		.o_bar:after {
+			color: $o-step-done-color !important;
+		}
+	}
+	
+	.o_step_grading.o_step.o_active {
+		.o_bar {
+			@include o-add-icon('circle', false, false); 		
+		}
+	}
+	
+	h4.o_title {
+		margin: 0 0 1px 0;	
+	}
+
+	.o_meta {
+		margin-top: 10px;
+	}
+	
+	.o_meta + .o_meta {
+		margin-top: 0;
+	}
+	
+	.o_expired_warning {
+		color: darken($o-step-status-expired-color, 20%);
+	}
+}
+
+.o_process_status_badge {
+	float: right;
+	display: inline-block;
+	padding: 1px 25px;
+	border-radius: $border-radius-small;
+	
+	&.o_process_status_done {
+	    background-color: 	$o-step-status-done-color;
+	    color: 				#fff;
+	}
+	&.o_process_status_waiting {
+	    border-color		: $o-step-status-waiting-border-color;
+	    background-color	: $o-step-status-waiting-bg-color;
+	    color				: $o-step-status-waiting-color;
+	}
+	&.o_process_status_review {
+		border-color		: $o-step-status-review-border-color;
+	    background-color	: $o-step-status-review-bg-color;
+	    color				: $o-step-status-review-color;
+	}
+	&.o_process_status_notavailable {
+	    background-color: 	$o-step-status-notavailable-color;
+	    color: 				#fff;
+	}
+	&.o_process_status_active {
+	    border-color		: $o-step-status-active-border-color;
+	    background-color	: $o-step-status-active-bg-color;
+	    color				: $o-step-status-active-color;
+	}
+	&.o_process_status_expired {
+	    background-color: 	$o-step-status-expired-color;
+	    color: 				#fff;
+	}
+	&.o_process_status_late {
+		background-color: 	$o-step-status-late-color;
+	    color: 				#fff;
+	}
+}
+
+.o_process_status_late {
+	color: $o-step-status-late-color;
+}
+
+.o_process_status_extended {
+	color: $o-step-status-extended-color;
+}
+
+.o_labeled_light {
+	&.o_process_status_done {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-done-color;
+	    color: $o-step-status-done-color;
+	}
+	&.o_process_status_waiting {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-waiting-color;
+	    color: $o-step-status-waiting-color;
+	}
+	&.o_process_status_review {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-review-color;
+	    color: $o-step-status-review-color;
+	}
+	&.o_process_status_notavailable {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-notavailable-color;
+	    color: $o-step-status-notavailable-color;
+	}
+	&.o_process_status_extended {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-extended-color;
+	    color: $o-step-status-extended-color;
+	}
+	&.o_process_status_auto_collect {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-auto-collect-color;
+	    color: $o-step-status-auto-collect-color;
+	}
+	&.o_process_status_active {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-active-color;
+	    color: $o-step-status-active-color;
+	}
+	&.o_process_status_expired {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-expired-color;
+	    color: $o-step-status-expired-color;
+	}
+	&.o_process_status_late {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-expired-color;
+	    color: $o-step-status-expired-color;
+	}
+	&.o_process_status_need_revision {
+		font-weight: normal;
+		text-transform: lowercase;
+	    background-color: #fff;
+	    border-color: $o-step-status-need-revision-color;
+	    color: $o-step-status-need-revision-color;
+	}
+}
+
+.o_process_assignment {
+	padding-left: 2em;
+}

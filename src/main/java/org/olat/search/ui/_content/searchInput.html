@@ -1,0 +1,51 @@
+<div id="o_search_form">
+	<div id="o_search_form_content"><div>
+		$r.contextHelpWithWrapper($contextHelpPage)
+		#if($advancedSearchFlag)
+			<div id="o_local_fulltextsearch">
+				$r.render("ext_search_form")
+			</div>
+			$r.render("switch.simple.search")
+		#else
+			<div id="o_local_fulltextsearch">
+				$r.render("search_form")
+			</div>
+			$r.render("switch.advanced.search")
+			$r.render("context")
+		#end
+	</div></div>
+	## toggle the form on/off on click to the form title
+	<script>
+	/* <![CDATA[ */
+		jQuery(function() {
+			jQuery('#o_search_form_toggler').click(function() {
+				jQuery('#o_search_form_content').slideToggle(300);
+			});
+		});
+	/* ]]> */
+	</script>
+</div>
+
+<div id="o_search_results">
+	#if ($hasDidYouMean)
+		<div class="o_empty_state">
+			<div class="o_empty_visual"><i class="o_icon o_icon_empty_indicator"></i><i class="o_icon o_icon_database"></i></div>
+			<h3 class="o_empty_msg">
+				$r.translate("search.did.you.mean")
+			</h3>
+			<div class="o_empty_hint">
+				$r.translate("search.did.you.mean.hint")
+		      	#set ($wordCounter = 0)
+		      	<ul class="list-inline o_search_did_you_mean_words">
+				  	#foreach( $link in $didYouMeanLinks )
+				    	#set ($linkname = "didYouMeanLink-$wordCounter")
+				    	<li>$r.render($linkname)</li>
+				    	#set ($wordCounter = $wordCounter + 1)
+				  	#end
+		      	</ul>				
+			</div>
+		</div>
+	#else
+		$r.render("resultList")
+	#end
+</div>

@@ -1,0 +1,146 @@
+.o_docpool {
+	.o_docpool_main_breadcrumb {
+		>.o_toolbar {
+			margin-bottom: 2em;
+		}
+	}
+}
+
+.o_taxonomy_level_overview {
+	margin-bottom: 20px;
+	.control-label,
+	.form-control-static {
+		padding-top: 0;
+	}
+}
+
+.o_taxonomy_listing.o_rendertype_custom {
+	
+	.o_table_body.container-fluid {
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+	
+	.o_taxonomy_row {
+		position: relative;
+		display: inline-block;
+		height: 255px;	
+		width: 450px;
+		vertical-align: top;
+		margin-right: 10px;
+		
+		ul {
+			padding-left: 2em;
+		}
+	}
+}
+
+.o_tag.o_competence,
+.o_tag.o_taxonomy {
+	@extend %o_nowrap;
+	background-color: #ffffff;
+	color: $o-competences-font-color;
+	border-color: $o-competences-color; 
+	border-radius: 0.5em;
+	vertical-align: bottom;
+	
+	&:hover {
+		text-decoration: none;
+		color: $o-competences-font-color;
+	}
+	
+	&.o_tag_clickable {
+		&:hover {
+			text-decoration: none;
+			background-color: darken(#ffffff, 10%);
+			border-color: $o-competences-color;
+		}
+		
+		&:active {
+			background-color: darken(#ffffff, 15%);
+			border-color: $o-competences-color;
+		}
+	}
+	
+	&.o_tag_selected {
+		color: $o-competences-selected-color;
+		background-color: #fff;
+		border-color: $o-competences-selected-border-color;
+		
+		&.o_tag_clickable {
+			&:hover {
+				text-decoration: none;
+				background-color: darken(#ffffff, 10%);
+				border-color: darken($o-competences-selected-border-color, 10%);
+			}
+			
+			&:active {
+				background-color: darken(#ffffff, 15%);
+				border-color: darken($o-competences-selected-border-color, 15%);
+			}
+		}
+	}
+}	
+
+.o_competences {
+	div#o_main_toolbar.o_toolbar {
+		margin-top: 0px;
+	}		
+}
+.o_taxonomy_tags {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+/** Taxonomy level selection element **/
+.o_tax_ls_button {
+	font-size: 12px;
+	display: flex;
+	&>span {
+		width: 100%;
+	}
+	.o_icon {
+		margin: auto 0 auto auto;
+	}
+	.o_tax_ls_tags {
+		gap: 2px;
+		.o_tag {
+			@extend %o_nowrap;
+			background-color: #ffffff;
+			color: $o-competences-font-color;
+			border-color: $o-competences-color; 
+			border-radius: 0.5em;
+			margin: 0;
+		}
+	}
+	&:is(.form-group *) {
+		width: 100%;
+		max-width: 100%;
+		min-height: $input-height-base;
+	}
+}
+.o_tax_ls_selections {
+	padding-right: 15px;
+}
+.o_tax_ls_search {
+	margin-bottom: 10px;
+}
+.o_tax_ls_option {
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	small {
+		line-hight: 1em;
+	}
+}
+.o_tax_ls_expand {
+	border-top: 1px solid #e7e7e7;
+	.o_tax_ls_expand_button {
+		height: 20px;
+		width: 32px;
+		padding: 0px 8px;
+		border: 1px solid #e7e7e7;
+		border-top-left-radius: 0px;
+		border-top-right-radius: 0px;
+	}
+}

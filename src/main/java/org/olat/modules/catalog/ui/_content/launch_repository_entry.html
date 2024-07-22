@@ -1,0 +1,128 @@
+<div class="o_catalog_re_launcher">
+	<div class="o_launcher_title o_flex_first_grow">
+		<div class="o_repo_title">
+			<h3>
+				#if($title)
+					$title
+				#else
+					$r.render("title")
+				#end
+			</h3>
+			#if($r.available("show.all"))
+				$r.render("show.all")
+			#end
+		</div>
+		<div id="o_swiper_button_prev_$launcherId" class="swiper-button-prev"></div>
+		<div id="o_swiper_button_next_$launcherId" class="swiper-button-next"></div>
+	</div>
+	#if($r.available("emptyState"))
+		$r.render("emptyState")
+	#end
+	<div id="o_swiper_$launcherId" class="swiper o_entry_cards o_swiper_buttons">
+		<div class="swiper-wrapper">
+			#foreach($row in $items)
+				<div class="swiper-slide">
+					<div class="o_repo_entry_card o_card #if($row.getEducationalType()) $row.getEducationalType().getCssClass() #end" onClick="$r.openJavaScriptCommand("select", false, true), 'key', '$row.key');" role="link">
+						<div class="o_visual">
+							#if($row.isThumbnailAvailable())
+								<img src="${row.getThumbnailRelPath()}" alt="$r.translate("rentry.pic.alt")" />
+							#else
+								<div class="o_visual_not_available"></div>
+							#end
+						</div>
+						#if($row.educationalTypeName)
+							<div class="o_educational_type">
+								<span>$row.educationalTypeName</span>
+							</div>
+						#end
+						<div class="o_meta">
+							<div class="o_ext_ref">
+								#if ($row.getExternalRef())
+									$r.escapeHtml($r.xssScan($row.getExternalRef()))
+								#end
+							</div>
+							<h4 class="o_title o_card_title">$r.render("$row.getDisplayNameLinkName()")</h4>
+							#if($r.isNotEmpty($row.teaser))
+								<div class="o_teaser">$r.xssScan($row.teaser)</div>
+							#end
+							#if($r.isNotEmpty($row.authors))
+								<div class="o_authors o_flex_item_max">$r.xssScan($row.authors)</div>
+							#end
+							#if($r.isNotEmpty($row.expenditureOfWork))
+								<div class="o_exp_work o_flex_item_max">$r.xssScan($row.expenditureOfWork)</div>
+							#end
+							#if($r.isNotEmpty($row.language))
+								<div class="o_language o_flex_item_max">$r.xssScan($row.language)</div>
+							#end
+							#if($r.isNotEmpty($row.executionPeriod))
+								<div class="o_execution_period o_flex_item_max">$row.executionPeriod</div>
+							#end
+							#if($r.isNotEmpty($row.location))
+								<div class="o_location o_flex_item_max">$r.xssScan($row.location)</div>
+							#end
+							#if($row.taxonomyLevels && !$row.taxonomyLevels.empty)
+								<div class="o_taxonomy_levels">
+									#foreach($taxonomy in $row.taxonomyLevels)
+									<span class="o_tag o_taxonomy" title="$r.escapeForHtmlAttribute($taxonomy.materializedPathIdentifiersWithoutSlash)">
+										$r.escapeHtml($taxonomy.displayName)
+									</span>
+									#end
+								</div>
+							#end
+						</div>
+					</div>
+				</div>
+			#end
+		</div>
+		<div class="swiper-button-prev"></div>
+		<div class="swiper-button-next"></div>
+		<div class="swiper-pagination"></div>
+	</div>
+</div>
+<script>
+## If we have to change the number of slides dynamically:
+## https://stackoverflow.com/questions/10612024/event-trigger-on-a-class-change
+## https://stackoverflow.com/questions/64459585/can-you-modify-the-number-of-slidesperview-in-swiperjs-after-it-was-init
+## 
+## numCards * cardMinWidth + ((numCards-1) * spaceBetween) + mainLayoutPadding (e.g.: 3*208 + 2*10)
+## cardMinWidth: see .o_taxonomy_launchers
+var bp = document.querySelector('body.o_width_full')
+		? {
+			426: { slidesPerView: 2, slidesPerGroup: 2 },
+			644: { slidesPerView: 3, slidesPerGroup: 3 },
+			862: { slidesPerView: 4, slidesPerGroup: 4 },
+			1080: { slidesPerView: 5, slidesPerGroup: 5 },
+			1298: { slidesPerView: 6, slidesPerGroup: 6 },
+			1516: { slidesPerView: 7, slidesPerGroup: 7 },
+			1734: { slidesPerView: 8, slidesPerGroup: 8 },
+			1952: { slidesPerView: 9, slidesPerGroup: 9 },
+			2170: { slidesPerView: 10, slidesPerGroup: 10 },
+			2388: { slidesPerView: 11, slidesPerGroup: 11 },
+			2606: { slidesPerView: 12, slidesPerGroup: 12 },
+			2824: { slidesPerView: 13, slidesPerGroup: 13 },
+			3042: { slidesPerView: 14, slidesPerGroup: 14 }
+		}
+		: {
+			426: { slidesPerView: 2, slidesPerGroup: 2 },
+			644: { slidesPerView: 3, slidesPerGroup: 3 },
+			862: { slidesPerView: 4, slidesPerGroup: 4 },
+			1080: { slidesPerView: 5, slidesPerGroup: 5 }
+		}
+	;
+new Swiper('#o_swiper_$launcherId', {
+	slidesPerView: 1,
+	slidesPerGroup: 1,
+	spaceBetween: 10,
+	breakpoints: bp,
+	breakpointsBase: 'container',
+	navigation: {
+		prevEl: '#o_swiper_button_prev_$launcherId',
+		nextEl: '#o_swiper_button_next_$launcherId',
+		disabledClass: 'o_swiper_button_disabled'
+	},
+	pagination: {
+		el: '.swiper-pagination',
+		clickable: true
+	}
+});
+</script>

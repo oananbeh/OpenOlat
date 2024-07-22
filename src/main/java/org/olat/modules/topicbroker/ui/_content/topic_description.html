@@ -1,0 +1,46 @@
+<div class="o_tb_topic_descriptions">
+	#if($r.isNotEmpty($description))
+		<div class="o_tb_topic_description">
+			<div class="o_tb_legend">
+				$r.translate("topic.description")
+			</div>
+			<div>
+				$description
+			</div>
+		</div>
+	#end
+	<div class="o_tb_topic_participants">
+		<div class="o_tb_legend">
+			$r.translate("topic.participants.num")
+		</div>
+		<div>
+			$participantRange
+		</div>
+	</div>
+	#if($groups && $groups.size() > 0)
+		<div class="o_tb_group_restrictionss">
+			<div class="o_tb_legend">
+				$r.translate("topic.group.restriction")
+			</div>
+			<ul class="list-unstyled">
+				#foreach($group in $groups)
+					<li>$r.render($group)</li>
+				#end
+			</ul>
+		</div>
+	#end
+	#foreach($customField in $customFields)
+		<div class="o_tb_topic_custom_item">
+			<div class="o_tb_legend">
+				$r.escapeHtml($customField.name)
+			</div>
+			<div>
+				#if($r.isNotEmpty($customField.text))
+					$customField.text
+				#elseif($r.isNotEmpty($customField.fileLinkName))
+					$r.render("$customField.fileLinkName")
+				#end
+			</div>
+		</div>
+	#end
+</div>

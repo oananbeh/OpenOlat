@@ -1,0 +1,39 @@
+<fieldset>
+	<legend>$r.contextHelpWithWrapper("manual_user/learningresources/Course_Element_vitero/")
+	$r.translate("booking.admin.title")</legend>
+	#if($bookingDisplays.isEmpty())
+	<div class="o_empty_state">
+		<div class="o_empty_visual"><i class="o_icon o_icon_empty_indicator"></i><i class="o_icon o_cal_icon"></i></div>
+		<h3 class="o_empty_msg">
+			$r.translate("table.empty")			
+		</h3>
+	</div>
+	#else
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">$r.translate("group.name")</th>
+				<th scope="col">$r.translate("booking.begin")</th>
+				<th scope="col">$r.translate("booking.end")</th>
+				<th scope="col" colspan="4"></th>
+			</tr>
+		</thead>
+		<tbody>
+		#foreach($bookingDisplay in $bookingDisplays)
+			<tr>
+				<td>$bookingDisplay.groupName</td>
+				<td>$r.formatDateAndTime($bookingDisplay.begin)</td>
+				<td>$r.formatDateAndTime($bookingDisplay.end)</td>
+				<td>$r.render($bookingDisplay.editButton.component.componentName)</td>
+				<td>$r.render($bookingDisplay.usersButton.component.componentName)</td>
+				<td>$r.render($bookingDisplay.groupButton.componentName)</td>
+				<td>$r.render($bookingDisplay.deleteButton.component.componentName)</td>
+			</tr>
+		#end
+		</tbody>
+	</table>
+	#end
+	<div class="o_button_group">
+		$r.render("buttons-cont")
+	</div>
+</fieldset>

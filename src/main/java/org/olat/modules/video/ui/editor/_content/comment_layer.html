@@ -1,0 +1,51 @@
+#if ($showComment)
+<div class="o_video_comment_container">
+	<div class="o_video_comment_header">
+		$r.render("close")
+	</div>
+	<div id="o_video_comment_box" class="o_video_comment_box o_video_colored_border ${color}">
+		<div class="o_video_comment_author_box" title="$name">
+			<div class="o_portrait">
+				#if ($avatarKey)
+				<img src="$r.staticLink("images/transparent.gif")" alt="$name"
+				     class="o_portrait_avatar_small o_video_comment_author_portrait_tiny"
+				     style="background-image: url('${avatarBaseURL}/${avatarKey}/portrait_small.jpg');">
+				#else
+				<img src="$r.staticLink("images/transparent.gif")" alt="$name"
+				     class="o_portrait_dummy_small o_video_comment_author_portrait_tiny">
+				#end
+			</div>
+			$name
+		</div>
+		#if ($r.available("video"))
+		<div class="o_video_comment_player">
+			$r.render("video")
+		</div>
+		#end
+		#if ($text)
+		<div class="o_video_comment_text">
+			$r.xssScan($text)
+		</div>
+		#end
+	</div>
+</div>
+
+#if ($text)
+$r.mathJax("o_video_comment_box")
+#end
+
+<script>
+	jQuery(function() {
+		const playerId = '#o_so_vid${videoElementId}';
+		const player = jQuery(playerId).data('player');
+
+		const playListener = () => {
+			player.media.removeEventListener(playListener);
+			jQuery('.o_video_comment_container').hide();
+		};
+
+		player.media.addEventListener('play', playListener);
+	});
+</script>
+
+#end

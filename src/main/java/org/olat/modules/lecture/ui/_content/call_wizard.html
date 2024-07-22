@@ -1,0 +1,45 @@
+<div class="o_rollcall_portrait clearfix">
+	$r.render("portrait")
+</div>
+<div class="clearfix">
+	$r.render("userDescr")
+</div>
+
+<fieldset>
+	<legend>$r.translate("rollcall.do")</legend>
+	<div class="clearfix">
+		<table class="table">
+			<thead>
+				<tr>
+					#foreach($check in $checks)
+						<th scope="col">$r.translate("table.header.lecture.number", $foreach.count)</th>
+					#end
+					<th scope="col"> </th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					#foreach($check in $checks)
+						<td>$r.render("check_${foreach.index}")</td>
+					#end
+					<td>$r.render("all")</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	#if($r.available("authorized.absence"))
+		$r.render("authorized.absence", "minimal")
+		$r.render("absence.category", "minimal")
+		$r.render("absence.reason", "minimal")
+	#end
+	<div class="o_block">
+		$r.render("comment", "minimal")
+	</div>
+	<div class="o_button_group">
+		$r.render("cancel")
+		$r.render("save")
+		#if($r.available("close"))
+			$r.render("close")
+		#end
+	</div>
+</fieldset>

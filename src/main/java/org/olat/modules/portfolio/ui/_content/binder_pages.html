@@ -1,0 +1,83 @@
+<div class="o_portfolio_content clearfix">
+	<div class="o_header_with_buttons">
+		<h2><i class="o_icon o_icon-fw o_icon_pf_binder"> </i> $r.translate("binder.title", $binderTitle) #if($owners && !$owners.isEmpty())<small>$r.translate("binder.by",$owners)</small>#end</h2>
+		##$binderKey
+		#if($r.available("timeline.switch.on") || $r.available("timeline.switch.off"))
+		<div class="o_button_group o_noprint">
+			$r.render("timeline.switch.off")
+			$r.render("timeline.switch.on")
+			$r.contextHelpWithWrapper("manual_user/learningresources/Portfolio_template_Administration_and_editing/")	
+		</div>
+		#end
+		#if($r.isNotNull($referenceEntryName))
+			<div class="o_portfolio_repo_link o_block_bottom o_block_move_up_small"><a href="$referenceEntryUrl" class="small"><i class="o_icon o_CourseModule_icon"> </i> $r.translate("binder.entry.name"): $r.escapeHtml($referenceEntryName)</a></div>
+		#end
+		
+	</div>
+
+	<div class="o_portfolio_entries #if($timelineSwitch) o_portfolio_withtimeline #end">
+		#if($r.available("summary"))
+			<div class="o_block_large_bottom">
+				$r.render("summary")
+			</div>
+		#end			
+
+		#if($r.isNotNull($competencesUsage) && $r.isNotEmpty($competencesUsage))
+		<div class="o_block clearfix"> 
+			<div class="pull-left o_small"><i class="o_icon o_icon_fw o_icon_competences" title="$r.translate("competences")"> </i>
+			#foreach($competenceUsage in $competencesUsage)
+				$r.render($competenceUsage.getName())
+			#end
+			</div>
+		</div>
+		#end
+		
+		#if($r.isNotNull($categoriesUsage) && $r.isNotEmpty($categoriesUsage))
+		<div class="o_block clearfix"> 
+			<div class="pull-left o_small"><i class="o_icon o_icon_fw o_icon_tags" title="$r.translate("categories")"> </i>
+			#foreach($categoryUsage in $categoriesUsage)
+				$r.render($categoryUsage.getName())
+			#end
+			</div>
+		</div>
+		#end		
+		
+		$r.render("table")
+		
+		#if($r.available("create.new.section"))
+		<div class="panel panel-placeholder o_block_large o_noprint">
+			<div class="panel-heading">
+				<h5 class="panel-title">$r.translate("create.new.section.title")</h5>
+			</div>
+			<div class="panel-body">
+				<p>$r.translate("create.new.section.text")</p>
+				<div class="o_button_group">
+					$r.render("create.new.section")
+				</div>
+			</div>
+		</div>
+		#end
+		<div class="o_button_group o_noprint">
+			<div class="btn-group">
+			#if($r.visible("section.paging.previous"))
+				$r.render("section.paging.previous")
+			#end
+			#if($r.visible("section.paging.one"))
+				$r.render("section.paging.one")
+			#end
+			#if($r.visible("section.paging.all"))
+				$r.render("section.paging.all")
+			#end
+			#if($r.visible("section.paging.next"))
+				$r.render("section.paging.next")
+			#end
+			</div>
+		</div>
+	</div>
+	
+	#if($timelineSwitch)
+	<div class="o_portfolio_timeline">
+		<div id='o_portfolio_entries_timeline_${r.getComponent("timeline").getDispatchID()}'>$r.render("timeline")</div>
+	</div>
+	#end
+</div>

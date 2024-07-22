@@ -1,0 +1,11 @@
+<div id="$r.getCId()">
+	<div class="o_lecture_authorized_absence">$r.render($row.getAuthorizedAbsence())
+	#if($r.visible($row.getReasonLink()))
+		$r.render($row.getReasonLink())
+	#end
+	#if($r.visible($row.getNoticeLink()))
+		$r.render($row.getNoticeLink())
+	#end
+	</div>
+	$r.render("errors")
+</div>

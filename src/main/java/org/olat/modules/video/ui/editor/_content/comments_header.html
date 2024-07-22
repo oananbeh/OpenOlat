@@ -1,0 +1,26 @@
+<div class="form-group clearfix">
+	<div class="o_video_common_form_header">
+		#if ($hasComments)
+		<div class="o_video_common_form_header_prev">$r.render("previousComment")</div>
+		<div class="o_video_common_form_header_items">$r.render("comments")</div>
+		<div class="o_video_common_form_header_next">$r.render("nextComment")</div>
+		#end
+
+		<div class="o_video_common_form_header_add_item">$r.render("addComment")</div>
+		<div class="o_video_common_form_header_commands">$r.render("commands")</div>
+	</div>
+</div>
+<script>
+	jQuery(() => {
+		const selector = '.o_video_common_form_header_items option';
+		const options = jQuery(selector);
+		for (let i = 0; i < options.length; i++) {
+			const option = jQuery(options[i]);
+			let text = option.text();
+			if (text.length > 40) {
+				text = text.substring(0, 40) + '...';
+			}
+			option.text(text);
+		}
+	});
+</script>

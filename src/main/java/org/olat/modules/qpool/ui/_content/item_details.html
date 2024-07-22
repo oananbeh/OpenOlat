@@ -1,0 +1,38 @@
+
+<div class="clearfix">
+	$r.render("review")
+</div>
+#if($r.available("convert.item.long"))
+<div class="o_error">
+	$r.translate("error.qti.deprecated")
+	<div class="o_button_group">
+		$r.render("convert.item.long")
+	</div>
+</div>
+#elseif($r.isTrue($deprecatedForm))
+<div class="o_error">$r.translate("error.qti.deprecated.no.conversion")</div>
+#end
+<div class="row">
+	#if($metadataSwitch)
+		<div class="col-md-8">
+			#if($r.isTrue($corrupted))
+				<div class="o_error">$r.translate("error.corrupted.question")</div>
+			#elseif($r.available("type_specifics"))
+				$r.render("type_specifics")
+			#end
+			$r.render("comments")
+		</div>
+		<div class="col-md-4">
+			$r.render("metadatas")
+		</div>
+	#else
+	<div class="col-md-12">
+		#if($r.isTrue($corrupted))
+			<div class="o_error">$r.translate("error.corrupted.question")</div>
+		#elseif($r.available("type_specifics"))
+			$r.render("type_specifics")
+		#end
+		$r.render("comments")
+	</div>
+	#end
+</div>

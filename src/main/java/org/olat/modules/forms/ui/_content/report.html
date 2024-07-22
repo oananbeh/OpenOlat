@@ -1,0 +1,20 @@
+<div class="o_evaluation_form">
+	#if($r.available("header"))
+		$r.render("header")
+	#end
+	#foreach($fragment in $fragments)
+		<div class="o_report_block">
+			<div class="$fragment.cssClass">$r.render($fragment.componentName)</div>
+		</div>
+	#end
+</div>
+#if($alignRubricsTables)
+	<script>
+		/* <![CDATA[ */ 
+		jQuery(function() {
+			var tables = jQuery('.o_rubric_table table');
+			BFormatter.alignTableColumns(tables);
+		});
+		/* ]]> */
+	</script>
+#end

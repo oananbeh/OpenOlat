@@ -1,0 +1,239 @@
+<legend>$r.translate("form.timeline.title")</legend>
+
+$r.render("timelineEvents")
+
+#if ($f.hasError("timelineEvents"))
+	$r.render("timelineEvents_ERROR")
+#end
+
+#if ($showPlayHead)
+<div id="o_video_play_head">
+	<div class="o_video_play_head_marker">
+		<i class='o_icon o_icon-lg o_icon_caret o_video_play_head_marker_icon'></i>
+	</div>
+	<div class="o_video_play_head_text">
+		00:00:00
+	</div>
+</div>
+
+<script>
+	function scrollHandler(e) {
+		timeUpdateListener(e, "scroll");
+	}
+
+	function dragDropStopHandler() {
+		const videoElementId = 'o_so_vid$videoElementId';
+		const durationInSecondsFallback = $durationInSeconds;
+		const videoElement = jQuery('#' + videoElementId);
+		const player = videoElement.data('player');
+		const playHead = jQuery('#o_video_play_head');
+		const videoChannels = jQuery('.o_video_channels');
+
+		if (playHead && videoChannels && player) {
+			const xPlayHead = playHead.offset().left;
+			const xScroll = videoChannels.scrollLeft();
+			const xChannels = videoChannels.offset().left;
+			const widthScrollableChannels = videoChannels.get(0).scrollWidth;
+			const durationInSeconds = player.media.duration ? player.media.duration : durationInSecondsFallback;
+			let currentTimeInSeconds = (xPlayHead + xScroll - xChannels) * durationInSeconds / widthScrollableChannels;
+			currentTimeInSeconds = Math.max(currentTimeInSeconds, 0);
+			currentTimeInSeconds = Math.min(currentTimeInSeconds, durationInSeconds);
+
+			setCurrentTimeInVideoElement(videoElement, currentTimeInSeconds);
+		}
+	}
+
+	function setCurrentTimeInVideoElement(videoElement, currentTimeInSeconds) {
+		const player = videoElement.data('player');
+		const loaded = videoElement.data('playerloaded');
+		if (player) {
+			if (loaded) {
+				player.pause();
+				player.setCurrentTime(currentTimeInSeconds);
+			} else {
+				const metaListener = () => {
+					player.setCurrentTime(currentTimeInSeconds);
+					player.pause();
+					player.media.removeEventListener(metaListener);
+				};
+				player.play();
+				player.media.addEventListener('loadedmetadata', metaListener);
+			}
+
+			#if ($isYoutube)
+			const muted = player.muted;
+			const deferredCommand = () => {
+				player.pause();
+				player.setMuted(muted);
+				player.media.dispatchEvent(mejs.Utils.createEvent('timeupdate', player.media));
+			};
+			if (loaded) {
+				player.setMuted(true);
+				player.play();
+				setTimeout(deferredCommand, 200);
+			} else {
+				const metaListener = (e) => {
+					setTimeout(deferredCommand, 200);
+					player.media.removeEventListener(metaListener);
+				};
+				player.setMuted(true);
+				player.play();
+				player.media.addEventListener('loadedmetadata', metaListener);
+			}
+			#end
+		}
+	}
+
+	function clickHandler(e) {
+		const videoElementId = 'o_so_vid$videoElementId';
+		const durationInSecondsFallback = $durationInSeconds;
+		const videoElement = jQuery('#' + videoElementId);
+		const videoChannels = jQuery('.o_video_channels');
+		const player = videoElement.data('player');
+
+		if (videoElement && videoChannels && player) {
+			const widthScrollableChannels = videoChannels.get(0).scrollWidth;
+			const targetX = jQuery(this).offset().left;
+			const relativeX = e.pageX - targetX;
+			const durationInSeconds = player.media.duration ? player.media.duration : durationInSecondsFallback;
+			let currentTimeInSeconds = relativeX * durationInSeconds / widthScrollableChannels;
+			currentTimeInSeconds = Math.max(currentTimeInSeconds, 0);
+			currentTimeInSeconds = Math.min(currentTimeInSeconds, durationInSeconds);
+			setCurrentTimeInVideoElement(videoElement, currentTimeInSeconds);
+		}
+	}
+
+	function initTimeLine() {
+		const playHead = jQuery('#o_video_play_head');
+		const playHeadText = jQuery('.o_video_play_head_text');
+		const videoChannels = jQuery('.o_video_channels');
+		const timeBar = jQuery('#o_video_time_bar');
+		const timeBarContainer = jQuery('#o_video_time_bar_container');
+
+		if (playHead && playHeadText && videoChannels && timeBar && timeBarContainer) {
+			initPlayHead(videoChannels, playHead);
+
+			const currentTimeInSeconds = $currentTimeInSeconds;
+			const durationInSeconds = $durationInSeconds;
+			adjustPlayHeadAndTimeBar(playHead, playHeadText, timeBar, videoChannels, currentTimeInSeconds, durationInSeconds);
+			adjustScrollPosition(videoChannels, currentTimeInSeconds, durationInSeconds);
+
+			videoChannels.scroll(scrollHandler);
+
+			const videoElementId = 'o_so_vid$videoElementId';
+			const videoElement = jQuery('#' + videoElementId);
+			const player = videoElement.data('player');
+			player.media.removeEventListener(timeUpdateListener);
+			player.media.addEventListener('timeupdate', timeUpdateListener);
+
+			playHead.draggable({
+				axis: 'x',
+				containment: '#o_video_timeline_containment',
+				stop: dragDropStopHandler
+			});
+
+			timeBarContainer.click(clickHandler);
+		}
+	}
+
+	function initPlayHead(videoChannels, playHead) {
+		const videoChannelsOffset = videoChannels.offset();
+		const playHeadLeft = videoChannelsOffset.left;
+		const playHeadTop = videoChannelsOffset.top - 10;
+		const playHeadHeight = videoChannels.height() + 20;
+		playHead.offset({left: playHeadLeft - 1, top: playHeadTop});
+		playHead.height(playHeadHeight);
+	}
+
+	function formatTime(sec) {
+		const hours = Math.floor(sec / 3600);
+		const minutes = Math.floor((sec - (hours * 3600)) / 60);
+		const seconds = Math.floor(sec - (hours * 3600) - (minutes * 60));
+
+		let timeString = '';
+		if (hours < 10) {
+			timeString += '0' + hours + ':';
+		} else {
+			timeString += hours + ':';
+		}
+		if (minutes < 10) {
+			timeString += '0';
+		}
+		timeString += minutes + ':';
+
+		if (seconds < 10) {
+			timeString += '0' + seconds;
+		} else {
+			timeString += seconds;
+		}
+
+		return timeString;
+	}
+
+	function timeUpdateListener(e, mode) {
+		const playHead = jQuery('#o_video_play_head');
+		const videoChannels = jQuery('.o_video_channels');
+		const playHeadText = jQuery('.o_video_play_head_text');
+		const timeBar = jQuery('#o_video_time_bar');
+		const videoElementId = 'o_so_vid$videoElementId';
+		const videoElement = jQuery('#' + videoElementId);
+		if (!videoElement) {
+			return;
+		}
+
+		const player = videoElement.data('player');
+		if (!player) {
+			return;
+		}
+
+		const currentTimeInSeconds = player.media.currentTime;
+		const durationInSeconds = player.media.duration;
+
+		adjustPlayHeadAndTimeBar(playHead, playHeadText, timeBar, videoChannels, currentTimeInSeconds, durationInSeconds);
+
+		if (mode !== "scroll") {
+			adjustScrollPosition(videoChannels, currentTimeInSeconds, durationInSeconds);
+		}
+	}
+
+	function adjustPlayHeadAndTimeBar(playHead, playHeadText, timeBar, videoChannels, currentTimeInSeconds, durationInSeconds) {
+		const videoChannelsX = videoChannels.offset().left;
+		const videoChannelsWidth = videoChannels.get(0).scrollWidth;
+		const videoChannelsViewportWidth = videoChannels.width();
+		const videoChannelsScrollLeft = videoChannels.scrollLeft();
+		const playHeadTop = playHead.offset().top;
+		const playHeadX = videoChannelsX + currentTimeInSeconds * videoChannelsWidth / durationInSeconds - videoChannelsScrollLeft;
+		const playHeadVisible = (playHeadX >= videoChannelsX && playHeadX <= (videoChannelsX + videoChannelsViewportWidth));
+		const timeBarWidth = currentTimeInSeconds * videoChannelsWidth / durationInSeconds;
+		playHeadText.text(formatTime(currentTimeInSeconds));
+		if (playHeadVisible) {
+			playHead.css({ 'opacity' : 1 });
+			playHeadText.show();
+		} else {
+			playHead.css({ 'opacity' : 0 });
+			playHeadText.hide();
+		}
+		playHead.offset({left: playHeadX - 1, top: playHeadTop});
+		timeBar.width(timeBarWidth);
+	}
+
+	function adjustScrollPosition(videoChannels, currentTimeInSeconds, durationInSeconds) {
+		const videoChannelsX = videoChannels.offset().left;
+		const videoChannelsWidth = videoChannels.get(0).scrollWidth;
+		const videoChannelsViewportWidth = videoChannels.width();
+		const videoChannelsScrollLeft = videoChannels.scrollLeft();
+		const playHeadX = videoChannelsX + currentTimeInSeconds * videoChannelsWidth / durationInSeconds - videoChannelsScrollLeft;
+
+		const overlapLeft = Math.max(videoChannelsX - playHeadX + 50, 0);
+		const overlapRight = Math.max(playHeadX - (videoChannelsX + videoChannelsViewportWidth) + 50, 0);
+		const minScrollLeft = 0;
+		const maxScrollLeft = videoChannelsWidth - videoChannelsViewportWidth;
+		let newScrollLeft = videoChannels.scrollLeft() - overlapLeft + overlapRight;
+		newScrollLeft = Math.max(minScrollLeft, newScrollLeft);
+		newScrollLeft = Math.min(newScrollLeft, maxScrollLeft);
+		videoChannels.scrollLeft(newScrollLeft);
+	}
+
+	initTimeLine();
+</script>
+#end

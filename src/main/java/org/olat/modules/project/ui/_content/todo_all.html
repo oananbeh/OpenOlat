@@ -1,0 +1,18 @@
+<div class="o_proj_todo_all">
+	<div class="o_proj_title o_block_large">
+		<div>
+			<div class="o_proj_avatar_title_ref">
+				$r.render("avatar")
+				<div class="o_proj_title_ref">
+					<h2>$r.translate("todo.all.title")</h2>
+				</div>
+			</div>
+		</div>
+		<div class="o_proj_title_cmds">
+			#if($r.available("todo.create") && $r.visible("todo.create"))
+				$r.render("todo.create")
+			#end
+		</div>
+	</div>
+	$r.render("table")
+</div>

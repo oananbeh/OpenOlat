@@ -1,0 +1,98 @@
+<div class="o_proj_widget o_proj_calendar_widget panel panel-default">
+	<div class="o_proj_title o_proj_widget_title panel-heading">
+		<div>
+			<h3>
+				$r.render("calendar.widget.title")
+			</h3>
+		</div>
+		<div class="o_proj_widget_cmds">
+			#if($r.available("create.dropdown") && $r.visible("create.dropdown"))
+				$r.render("create.dropdown")
+			#elseif($r.available("appointment.create") && $r.visible("appointment.create"))
+				$r.render("appointment.create")
+			#elseif($r.available("milestone.create") && $r.visible("milestone.create"))
+				$r.render("milestone.create")
+			#end
+		</div>
+	</div>
+	<div class="panel-body">
+		#if($r.isNotEmpty($milestoneRows))
+			<div class="o_proj_milestones">
+				<div class="o_proj_full_row">
+					<h4>
+						$r.translate("calendar.widget.next.milestone")
+					</h4>
+				</div>
+				#foreach($row in $milestoneRows)
+					<div class="o_proj_card o_card o_proj_card_cleft">
+						<div class="o_proj_card_meta o_flex_first_grow">
+							<div>
+								<i class="o_icon o_icon-lg #if($row.warning)o_icon_warn#end"> </i> $r.escapeHtml($row.getDisplayName())
+							</div>
+							<div class="o_proj_calendar_widget_date">
+								$row.getDueName()
+							</div>
+						</div>
+					</div>
+				#end
+			</div>
+		#end
+		<div class="o_proj_appointments">
+			<div class="o_proj_full_row o_block_top">
+				<h4>
+					$r.translate("calendar.widget.today")
+				</h4>
+			</div>
+			#if($r.isNotEmpty($todayRows))
+				#foreach($row in $todayRows)
+					<div class="o_proj_card o_card o_proj_card_cleft $row.getColorCssClass()">
+						<div class="o_proj_card_meta o_flex_first_grow">
+							<div>
+								#if($r.isNotNull($row.getDisplayNameItemName()))
+									$r.render($row.getDisplayNameItemName())
+								#else
+									$r.escapeHtml($row.getDisplayName())
+								#end
+							</div>
+							<div class="o_proj_calendar_widget_date">
+								$row.getDueName()
+							</div>
+						</div>
+					</div>
+				#end
+			#else
+				$r.translate("calendar.widget.no.appointments")
+			#end
+			
+			<div class="o_proj_full_row o_block_top">
+				<h4>
+					$r.translate("calendar.widget.next")
+				</h4>
+			</div>
+			#if($r.isNotEmpty($nextRows))
+				#foreach($row in $nextRows)
+					<div class="o_proj_card o_card o_proj_card_cleft $row.getColorCssClass()">
+						<div class="o_proj_card_meta o_flex_first_grow">
+							<div>
+								#if($r.isNotNull($row.getDisplayNameItemName()))
+									$r.render($row.getDisplayNameItemName())
+								#else
+									$r.escapeHtml($row.getDisplayName())
+								#end
+							</div>
+							<div class="o_proj_calendar_widget_date">
+								$row.getDueName()
+							</div>
+						</div>
+					</div>
+				#end
+			#else
+				$r.translate("calendar.widget.no.appointments")
+			#end
+			
+		</div>
+		<div class="o_button_group">
+			$r.render("calendar.show.all")
+		</div>
+	</div>
+</div>

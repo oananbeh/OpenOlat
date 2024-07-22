@@ -1,0 +1,28 @@
+<div class="form-group clearfix">
+	<div class="o_video_comment_details">
+		<div class="o_video_comment_se_label">$r.render("start", "label")</div>
+		<div class="o_video_comment_start btn-group">
+			<div class="btn-group o_video_apply_position_timestamp">$r.render("start")</div>
+			<div class="btn-group o_video_apply_position_button">$r.render("startApplyPosition")</div>
+		</div>
+
+		#if ($f.hasError("start"))
+		<div class="o_video_comment_error_start">$r.render("start", "error")</div>
+		#end
+
+		<div class="o_video_comment_color_label">$r.render("color", "label")</div>
+		<div class="o_video_comment_color_dropdown">$r.render("color")</div>
+
+		#if ($showVideo)
+		<div class="o_video_comment_video_label">$r.render("video", "label")</div>
+		<div class="o_video_comment_video">$r.render("video")</div>
+		#end
+
+		#if ($showText)
+		<div class="o_video_comment_text_label">$r.render("text", "label")</div>
+		<div class="o_video_comment_text">$r.render("text")</div>
+		#end
+
+		<div class="o_video_comment_buttons">$r.render("save") $r.render("cancel")</div>
+	</div>
+</div>

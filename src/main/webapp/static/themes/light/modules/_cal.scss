@@ -1,0 +1,385 @@
+/* calender colors for events: must be the last thing in the file !! */
+.o_cal_orange { background: $o-cal-orange-bg; border-color: $o-cal-orange-border-color; color: $o-cal-orange-color; }
+.o_cal_orange .fc-list-event-dot {border-color: $o-cal-orange-bg	;}
+.o_cal_orange div.fc-event-main { color: $o-cal-orange-color; } 
+.o_cal_class.o_cal_orange { border-left: $o-cal-color-width solid $o-cal-orange-bg;}
+.o_cal_sec.o_cal_orange_sec { border-left: $o-cal-sec-border-width solid $o-cal-orange-bg; }
+
+.o_cal_green { background: $o-cal-green-bg; border-color: $o-cal-green-border-color; color: $o-cal-green-color; }
+.o_cal_green .fc-list-event-dot {border-color: $o-cal-green-bg	;}
+.o_cal_green div.fc-event-main { color: $o-cal-green-color; } 
+.o_cal_class.o_cal_green { border-left: $o-cal-color-width solid $o-cal-green-bg;}
+.o_cal_sec.o_cal_green_sec { border-left: $o-cal-sec-border-width solid $o-cal-green-bg; }
+
+.o_cal_blue { background: $o-cal-blue-bg; border-color: $o-cal-blue-border-color; color: $o-cal-blue-color; }
+.o_cal_blue .fc-list-event-dot {border-color: $o-cal-blue-bg	;}
+.o_cal_blue div.fc-event-main { color: $o-cal-blue-color; } 
+.o_cal_class.o_cal_blue { border-left: $o-cal-color-width solid $o-cal-blue-bg;}
+.o_cal_sec.o_cal_blue_sec { border-left: $o-cal-sec-border-width solid $o-cal-blue-bg; }
+
+.o_cal_yellow { background: $o-cal-yellow-bg; border-color: $o-cal-yellow-border-color; color: $o-cal-yellow-color; }
+.o_cal_yellow .fc-list-event-dot {border-color: $o-cal-yellow-bg	;}
+.o_cal_yellow div.fc-event-main { color: $o-cal-yellow-color; } 
+.o_cal_class.o_cal_yellow { border-left: $o-cal-color-width solid $o-cal-yellow-bg;}
+.o_cal_sec.o_cal_yellow_sec { border-left: $o-cal-sec-border-width solid $o-cal-yellow-bg; }
+
+.o_cal_red { background: $o-cal-red-bg; border-color: $o-cal-red-border-color; color: $o-cal-red-color; }
+.o_cal_red .fc-list-event-dot {border-color: $o-cal-red-bg	;}
+.o_cal_red div.fc-event-main { color: $o-cal-red-color; } 
+.o_cal_class.o_cal_red { border-left: $o-cal-color-width solid $o-cal-red-bg;}
+.o_cal_sec.o_cal_red_sec { border-left: $o-cal-sec-border-width solid $o-cal-red-bg; }
+
+.o_cal_rebeccapurple { background: $o-cal-rebeccapurple-bg; border-color: $o-cal-rebeccapurple-border-color; color: $o-cal-rebeccapurple-color; }
+.o_cal_rebeccapurple .fc-list-event-dot {border-color: $o-cal-rebeccapurple-bg	;}
+.o_cal_rebeccapurple div.fc-event-main { color: $o-cal-rebeccapurple-color; } 
+.o_cal_class.o_cal_rebeccapurple { border-left: $o-cal-color-width solid $o-cal-rebeccapurple-bg;}
+.o_cal_sec.o_cal_rebeccapurple_sec { border-left: $o-cal-sec-border-width solid $o-cal-rebeccapurple-bg; }
+
+.o_cal_fuchsia { background: $o-cal-fuchsia-bg; border-color: $o-cal-fuchsia-border-color; color: $o-cal-fuchsia-color; }
+.o_cal_fuchsia .fc-list-event-dot {border-color: $o-cal-fuchsia-bg	;}
+.o_cal_fuchsia div.fc-event-main { color: $o-cal-fuchsia-color; } 
+.o_cal_class.o_cal_fuchsia { border-left: $o-cal-color-width solid $o-cal-fuchsia-bg;}
+.o_cal_sec.o_cal_fuchsia_sec { border-left: $o-cal-sec-border-width solid $o-cal-fuchsia-bg; }
+
+.o_cal_olive { background: $o-cal-olive-bg; border-color: $o-cal-olive-border-color; color: $o-cal-olive-color; }
+.o_cal_olive .fc-list-event-dot {border-color: $o-cal-olive-bg	;}
+.o_cal_olive div.fc-event-main { color: $o-cal-olive-color; } 
+.o_cal_class.o_cal_olive { border-left: $o-cal-color-width solid $o-cal-olive-bg;}
+.o_cal_sec.o_cal_olive_sec { border-left: $o-cal-sec-border-width solid $o-cal-olive-bg; }
+
+.o_cal_navy { background: $o-cal-navy-bg; border-color: $o-cal-navy-border-color; color: $o-cal-navy-color; }
+.o_cal_navy .fc-list-event-dot {border-color: $o-cal-navy-bg	;}
+.o_cal_navy div.fc-event-main { color: $o-cal-navy-color; } 
+.o_cal_class.o_cal_navy { border-left: $o-cal-color-width solid $o-cal-navy-bg;}
+.o_cal_sec.o_cal_navy_sec { border-left: $o-cal-sec-border-width solid $o-cal-navy-bg; }
+
+.o_cal_maroon { background: $o-cal-maroon-bg; border-color: $o-cal-maroon-border-color; color: $o-cal-maroon-color; }
+.o_cal_maroon .fc-list-event-dot {border-color: $o-cal-maroon-bg	;}
+.o_cal_maroon div.fc-event-main { color: $o-cal-maroon-color; } 
+.o_cal_class.o_cal_maroon { border-left: $o-cal-color-width solid $o-cal-maroon-bg;}
+.o_cal_sec.o_cal_maroon_sec { border-left: $o-cal-sec-border-width solid $o-cal-maroon-bg; }
+
+.o_cal_lime { background: $o-cal-lime-bg; border-color: $o-cal-lime-border-color; color: $o-cal-lime-color; }
+.o_cal_lime .fc-list-event-dot {border-color: $o-cal-lime-bg	;}
+.o_cal_lime div.fc-event-main { color: $o-cal-lime-color; } 
+.o_cal_class.o_cal_lime { border-left: $o-cal-color-width solid $o-cal-lime-bg;}
+.o_cal_sec.o_cal_lime_sec { border-left: $o-cal-sec-border-width solid $o-cal-lime-bg; }
+
+.o_cal_grey { background: $o-cal-grey-bg; border-color: $o-cal-grey-border-color; color: $o-cal-grey-color; }
+.o_cal_grey .fc-list-event-dot {border-color: $o-cal-grey-bg	;}
+.o_cal_grey div.fc-event-main { color: $o-cal-grey-color; } 
+.o_cal_class.o_cal_grey { border-left: $o-cal-color-width solid $o-cal-grey-bg;}
+.o_cal_sec.o_cal_grey_sec { border-left: $o-cal-sec-border-width solid $o-cal-grey-bg; }
+
+
+.o_sel_calendar_print_chooser {
+	padding-right:4em;
+}
+
+.o_cal_config_enabled, .o_cal_config_disabled {
+	position: relative;
+	float: left; display: inline;
+}
+
+.o_cal_config_calendar {
+	margin: 0 5px; 
+	padding: 1px 6px 1px 4px;
+	position: relative; 
+	width: 200px;
+	overflow: hidden;
+	float: left;
+	display: inline;
+}
+
+.o_cal_colorchooser_selected {
+	@include o-add-icon('check');
+}
+
+#o_cal_colorchooser {
+	div {
+		border-style: solid;
+		border-width: 1px;
+		margin: 5px 4px;
+		display: inline-block;
+	}
+	
+	div:hover {
+		border: 1px solid #333; 
+	}
+	
+	a {
+		width: 20px;
+		height: 20px;
+		display: inline-block;
+	}
+}
+
+.o_cal_color_element {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	border-style: solid;
+	border-width: 1px;
+}
+.o_cal_event_color {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.o_cal_wv_event_tooltip_content {
+	.o_cal_description {
+		background-color: $o-cal-desc-background-color;
+		padding: 10px 7px;
+		margin: 10px -7px;
+	}
+	.o_cal_tooltip_buttons {
+		text-align: center;
+		margin-top: 20px;
+	}
+}
+
+/* local helper to create the calendar icons */
+@mixin o-cal-event-icon($iconName) {
+	@include o-add-icon($iconName);
+	@include o-add-icon-font();
+	&:before {
+		float: right;
+		margin-right: 4px;
+		margin-top: 4px;
+	}
+}
+.fc-daygrid-block-event .fc-event-time, .fc-daygrid-block-event .fc-event-title {
+	padding-right: 1em;
+	@extend %o_nowrap;
+}
+	
+	
+.o_cal_event_managed > .fc-event-title, .o_cal_event_managed .fc-event-title-container  {
+	@include o-cal-event-icon('lock');
+}
+
+.o_cal_event_not_managed > .fc-event-title, .o_cal_event_not_managed .fc-event-title-container {
+	@include o-cal-event-icon('user');
+}
+
+.o_cal_event_livestream > .fc-event-title, .o_cal_event_livestream .fc-event-title-container {
+	@include o-cal-event-icon('video-camera');
+}
+
+.o_cal_event_managed.o_cal_event_livestream > .fc-event-title, .o_cal_event_managed.o_cal_event_livestream .fc-event-title-container {
+	@include o-cal-event-icon('video-camera');
+	&:before {
+		content : "#{$fa-var-video-camera}\00a0#{$fa-var-lock}"; /* override dual icon */ 
+	}
+}
+
+.o_cal_event_not_managed.o_cal_event_livestream > .fc-event-title, .o_cal_event_not_managed.o_cal_event_livestream .fc-event-title-container {
+	@include o-cal-event-icon('video-camera');
+	&:before {
+		content: "#{$fa-var-video-camera}\00a0#{$fa-var-user}"; /* override dual icon */
+	}
+}
+
+.o_cal .fc {
+	.fc-toolbar {
+		flex-wrap: wrap;
+		gap: 5px;
+	}
+}
+
+/* 
+ * fullcalendar bootstrapify
+ */
+ .o_cal .fc {
+ 
+	.fc-button {
+		@include button-variant($btn-default-color, $btn-default-bg, $btn-default-border);
+		
+		&.fc-button-default {
+			text-shadow: none;
+		}
+		&.fc-button-active {
+			@include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border);
+		}
+	}
+	
+	.fc-listYear-button {
+			@include o-add-button-icon-left('rectangle-list', false);
+	}
+	.fc-dayGridMonth-button{
+			@include o-add-button-icon-left('calendar-days');
+	}
+	.fc-timeGridWeek-button{
+			@include o-add-button-icon-left('calendar-week');
+	}
+	.fc-timeGridDay-button {
+			@include o-add-button-icon-left('calendar-day');
+	}
+	
+	table.fc-list-table .fc-list-event {
+		background-color: white;
+		color: #5D5D5D ! important;
+		
+		a, span {
+			color: #5D5D5D ! important;
+		}
+	}
+}
+
+/*
+ * Print view
+ */
+body.o_cal_print {
+	fieldset {
+		border: none;
+		margin-bottom: 2em;
+	}
+	legend {
+		font-size: 2em;
+		font-weight: bold;
+		span {
+			display: block;
+			font-size: $font-size-base;
+			font-weight: normal;
+		}
+	}
+	
+	ul.o_cal_wv_list {
+		list-style-type: none;
+		padding: 0;
+		>li {
+			page-break-inside : avoid;
+			margin-bottom: 2em;
+		}
+		.o_cal_date {
+			font-size: 1.25em;
+			font-weight: bold;
+			padding: 0.5em 0 0.5em 0;
+		}
+		ul.o_cal_events {
+			list-style-type: none;
+			padding: 0.5em 0 0 0;
+			li.o_cal_event {
+				position: relative;
+				left: ($o-cal-color-width + 10px);
+				page-break-inside : avoid;
+				clear: both;				
+				margin-bottom: 1.5em;
+				padding-right: ($o-cal-color-width + 10px);
+
+
+				.o_cal_time {
+					float: left;
+					font-weight: bold;
+					margin-right: 1em;
+				}
+				.o_cal_subject {
+					font-weight: bold;
+					
+					p {
+						margin: 0;
+					}
+				}
+				
+				.o_cal_location,
+				.o_cal_description,
+				.o_cal_freebusy {
+					clear: both;				
+				}
+				
+				.o_cal_freebusy {
+					font-style: italic;
+				}
+			}
+		}
+	}
+	/* show calendar color as a border (background color is not printed) */
+	.o_cal_class {
+		position: absolute;
+		left: -($o-cal-color-width + 10px);
+		width: $o-cal-color-width;
+	}
+	
+	/* the calendar legend - color info */
+	#o_cal_config {
+		legend {
+			font-size: 1.25em;
+		}
+		.o_cal_config_calendar {
+			margin: 0;
+			padding: 0;
+		}
+		.o_cal_config_calendar {
+			position: relative;
+			left: ($o-cal-color-width + 10px);
+			float: none;
+			padding-right: ($o-cal-color-width + 10px);
+		}
+	}
+	
+}
+.o_cal_entry_edit {
+	.o_cal_all_day {
+		div {
+			display: inline-block;
+		}
+	}
+	.o_first_date.form-group {
+		>div {
+			margin-bottom: 0;
+		}
+	}
+	.o_cal_status_color_reset {
+		display: grid;
+		gap: 10px;
+		grid-template-columns: 1fr 1fr 1fr;
+		.btn {
+			width: 100%;
+		}
+		p {
+			margin-top: 25px;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+	.o_cal_color_reset {
+		display: grid;
+		gap: 10px;
+		grid-template-columns: 2fr 1fr;
+		.btn {
+			width: 100%;
+		}
+		p {
+			margin-top: 25px;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+}
+.o_cal_entry_links {
+	margin-bottom: 15px;
+	padding: 0 5px;
+	.o_cal_link_item {
+		display: flex;
+		.o_cal_links_pair {
+			display: flex;
+			margin-top: 20px;
+			.o_cal_pair_item {
+				min-width: 80%;
+			}
+			@media (max-width: $screen-md) {
+				flex-direction: column;
+			}
+		}
+		.o_cal_link_delete {
+			padding-top: 44px;
+			margin-left: auto;
+		}
+	}
+}
+.o_cal_links {
+	display: flex;
+	margin-top: 4%;
+	flex-direction: column;
+}

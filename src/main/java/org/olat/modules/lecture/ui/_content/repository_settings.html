@@ -1,0 +1,24 @@
+<fieldset #if(!$!f.domReplacementWrapperRequired) id="$r.getCId()" #end class="o_form form-horizontal o_sel_repo_lecture_settings_form">
+	<legend>$r.contextHelpWithWrapper("manual_user/learningresources/Lectures_and_absences/")		
+		$r.translate("lecture.course.admin.title")
+	</legend> 
+#if($off_warn)
+	<div class="row"><div class="col-sm-12">
+		<div class="o_warning">$off_warn
+			<div class="o_button_group">
+			#if($r.visible("override.lecture"))
+				$r.render("override.lecture")
+			#elseif($r.visible("unoverride.lecture"))
+				$r.render("unoverride.lecture")
+			#end
+			</div>
+		</div>
+	</div></div>
+#end
+
+#foreach ($item in $formitemnames)
+	#if ($f.isVisible($item) && $item != "override.lecture" && $item != "unoverride.lecture")
+		$r.render(${item}, "3_9", "form")
+	#end
+#end
+</fieldset>

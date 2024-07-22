@@ -1,0 +1,282 @@
+// Core variables and mixins
+@import "../../../bootstrap/stylesheets/bootstrap/mixins";
+
+// Reset
+@import "../../../bootstrap/stylesheets/bootstrap/normalize";
+@import "../../../bootstrap/stylesheets/bootstrap/print";
+/* we use font-awesome instead
+@import "../../../bootstrap/stylesheets/bootstrap/glyphicons"; 
+*/
+
+// Core CSS
+@import "../../../bootstrap/stylesheets/bootstrap/scaffolding";
+@import "../../../bootstrap/stylesheets/bootstrap/type";
+@import "../../../bootstrap/stylesheets/bootstrap/code";
+@import "../../../bootstrap/stylesheets/bootstrap/grid";
+@import "../../../bootstrap/stylesheets/bootstrap/tables";
+@import "../../../bootstrap/stylesheets/bootstrap/forms";
+@import "../../../bootstrap/stylesheets/bootstrap/buttons";
+
+// Components
+@import "../../../bootstrap/stylesheets/bootstrap/component-animations";
+@import "../../../bootstrap/stylesheets/bootstrap/dropdowns";
+@import "../../../bootstrap/stylesheets/bootstrap/button-groups";
+@import "../../../bootstrap/stylesheets/bootstrap/input-groups";
+@import "../../../bootstrap/stylesheets/bootstrap/navs";
+@import "../../../bootstrap/stylesheets/bootstrap/navbar";
+@import "../../../bootstrap/stylesheets/bootstrap/breadcrumbs";
+@import "../../../bootstrap/stylesheets/bootstrap/pagination";
+@import "../../../bootstrap/stylesheets/bootstrap/pager";
+@import "../../../bootstrap/stylesheets/bootstrap/labels";
+@import "../../../bootstrap/stylesheets/bootstrap/badges";
+@import "../../../bootstrap/stylesheets/bootstrap/jumbotron";
+@import "../../../bootstrap/stylesheets/bootstrap/thumbnails";
+@import "../../../bootstrap/stylesheets/bootstrap/alerts";
+@import "../../../bootstrap/stylesheets/bootstrap/progress-bars";
+@import "../../../bootstrap/stylesheets/bootstrap/media";
+@import "../../../bootstrap/stylesheets/bootstrap/list-group";
+@import "../../../bootstrap/stylesheets/bootstrap/panels";
+@import "../../../bootstrap/stylesheets/bootstrap/responsive-embed";
+@import "../../../bootstrap/stylesheets/bootstrap/wells";
+@import "../../../bootstrap/stylesheets/bootstrap/close";
+
+// Components w/ JavaScript
+@import "../../../bootstrap/stylesheets/bootstrap/modals";
+@import "../../../bootstrap/stylesheets/bootstrap/tooltip";
+@import "../../../bootstrap/stylesheets/bootstrap/popovers";
+//@import "../../../bootstrap/stylesheets/bootstrap/carousel";
+
+// Utility classes
+@import "../../../bootstrap/stylesheets/bootstrap/utilities";
+@import "../../../bootstrap/stylesheets/bootstrap/responsive-utilities";
+
+
+/* override */
+body div.tooltip-inner, dialog div.tooltip-inner {
+	max-width: 400px;
+	min-width: 400px;
+}
+
+body div.popover,
+body dialog.popover {
+	max-width:450px;
+	input {
+		max-width: 100%;
+	}
+}
+
+body div.popover.o_wide_popover,
+body dialog.popover.o_wide_popover {
+	max-width:650px;
+}
+
+body div.popover-title,
+body dialog.popover-title {
+	background-color: white;
+	font-weight: bold;
+}
+
+body .modal-body.alert {
+	border-radius:0;
+}
+
+body .o_modal_large .modal-lg {
+	width: calc(100% - 70px);
+}
+
+body .progress {
+	margin-bottom:0;
+}
+
+body .modal-body {
+	padding: 20px;
+}
+
+/* extend panel to contain multiple separated bodies */
+.panel-body:nth-child(n+2) {
+	border-top: 1px solid $panel-default-border;
+}
+
+/* collapsible panels must have pointer cursor to indicate clickable space*/	
+.panel .panel-heading[data-toggle="collapse"] {
+	cursor: pointer;
+}
+
+/* fix misplaced error icon */
+.form-control-feedback {
+	right: 0;
+	&:before {
+		line-height: $input-height-base;
+		display: inline-block;
+		vertical-align: middle;
+	}
+}
+
+/* fix misplaced static buttons */
+.form-control-static .btn.btn-default {
+	margin-top: -2px;
+}
+
+
+.form-horizontal .has-feedback .form-control-feedback {
+	right: 0;
+}
+
+.btn.btn-primary.o_disabled {
+	color: $btn-primary-color !important;
+}
+
+
+body .progress-bar {
+	&[aria-valuenow="1"], &[aria-valuenow="2"] {
+		min-width: 1px;
+	}
+}
+
+/* typically in course rights table*/
+td.text-left>div.form-inline>label.checkbox-inline>input[type='checkbox'] {
+	position: relative;
+}
+
+/* 
+	iOS: prevent browser zoom when selecting a form (iOS zooms when input element font size < 16px but does not zoom back)
+	https://stackoverflow.com/questions/2989263/disable-auto-zoom-in-input-text-tag-safari-on-iphone
+	https://stackoverflow.com/questions/30102792/css-media-query-target-only-ios-devices
+*/
+@media screen and (max-width: 768px) {
+	@supports (-webkit-overflow-scrolling: touch) {
+	  	.form-control,
+	  	.ui-widget input, .ui-widget select, .ui-widget textarea {
+    		font-size: 16px;
+  		}
+	}
+}
+
+/* fix wrong margin for navbar (e.g. folder-comp) */
+@media (min-width: 768px){
+	.navbar-right {
+		margin-right: 0;
+	}
+}
+
+// The dropdown menu (ul)
+.dropdown-menu {
+	// Links within the dropdown menu
+	> li > a {
+		padding: 3px 10px;
+	}
+}
+
+.dropdown-header {
+	padding: 3px 10px;
+}
+
+/* more padding between inline checkboxes / radios */
+.form-horizontal .radio-inline, .form-horizontal .checkbox-inline, 
+.form-inline .radio-inline, .form-inline .checkbox-inline {
+	margin-right: 10px;
+}
+.form-horizontal .radio-inline.btn {
+	margin-right: 0;
+}
+
+// We override bootstrap defaults for tooltips of glossary terms
+.o_gloss_tooltip {
+	&.tooltip.in {
+		opacity: 1;
+	}
+
+	&.tooltip.top .tooltip-arrow {
+		border-top-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.top-left .tooltip-arrow {
+		border-top-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.top-right .tooltip-arrow {
+		border-top-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.right .tooltip-arrow {
+		border-right-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.left .tooltip-arrow {
+		border-left-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.bottom .tooltip-arrow {
+		border-bottom-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.bottom-left .tooltip-arrow {
+		border-bottom-color: $o-gloss-tooltip-border-color;
+	}
+
+	&.tooltip.bottom-right .tooltip-arrow {
+		border-bottom-color: $o-gloss-tooltip-border-color;
+	}
+
+	.tooltip-inner {
+		opacity: 1;
+		font-family: $font-family-base;
+		font-size: $font-size-base;
+		line-height: $line-height-base;
+		color: $text-color;
+		background-color: $body-bg;
+		text-align: left;
+		border-radius: 5px;
+		border: 2px solid $o-gloss-tooltip-border-color;
+	}
+}
+
+.dropdown-menu > li > label {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: $dropdown-link-hover-color;
+    background-color: $dropdown-link-hover-bg;
+  }
+}
+
+// Active state
+.dropdown-menu > .active > label {
+  &,
+  &:hover,
+  &:focus {
+    color: $dropdown-link-active-color;
+    text-decoration: none;
+    outline: 0;
+    background-color: $dropdown-link-active-bg;
+  }
+}
+
+ .dropdown-menu > li > label {
+    display: block;
+    padding: 3px 10px;
+    margin: 0;
+    clear: both;
+    font-weight: normal;
+    line-height: $line-height-base;
+    color: $dropdown-link-color;
+    white-space: nowrap; // prevent links from randomly breaking onto new lines
+  }
+
+/* a11y: accessibility fix: visually set focus for drop-down toggles */
+.dropdown-toggle:focus-visible {
+	@include tab-focus;
+}
+
+/* a11y: backport from bootstrap 5 to hide elements in the UI that shall be readable by screenreaders */
+.visually-hidden {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important; // Fix for https://github.com/twbs/bootstrap/issues/25686
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}

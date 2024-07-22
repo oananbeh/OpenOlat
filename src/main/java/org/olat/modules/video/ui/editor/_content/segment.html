@@ -1,0 +1,99 @@
+<div class="form-group clearfix">
+
+	<div class="o_video_segment_details">
+		<div class="o_video_segment_se_label">$r.render("start", "label")</div>
+
+		<div class="o_video_segment_start btn-group">
+			<div class="btn-group o_video_apply_position_timestamp">$r.render("start")</div>
+			<div class="btn-group o_video_apply_position_button">$r.render("startApplyPosition")</div>
+		</div>
+
+		#if ($f.hasError("start"))
+		<div class="o_video_segment_error_start">$r.render("start", "error")</div>
+		#end
+
+		<div class="o_video_segment_dash" style="display: inline-block; text-align: center; line-height: 32px;">-</div>
+
+		<div class="o_video_segment_end btn-group">
+			<div class="btn-group o_video_apply_position_timestamp">$r.render("end")</div>
+			<div class="btn-group o_video_apply_position_button">$r.render("endApplyPosition")</div>
+		</div>
+
+		#if ($f.hasError("end"))
+		<div class="o_video_segment_error_end">$r.render("end", "error")</div>
+		#end
+
+		#if ($overlapError)
+		<div class="o_video_segment_error_start_end o_error">$r.translate("form.segment.error.overlap")</div>
+		#end
+
+		<div class="o_video_segment_duration_label">$r.render("duration", "label")</div>
+
+		<div class="o_video_segment_duration">$r.render("duration")</div>
+
+		#if ($f.hasError("duration"))
+		<div class="o_video_segment_error_duration">$r.render("duration", "error")</div>
+		#else
+		<div class="o_video_segment_error_duration o_form_example help-block">$r.render("duration", "example")</div>
+		#end
+
+		<div class="o_video_segment_category_label">$r.render("category", "label")</div>
+		<div class="o_video_segment_category_button">$r.render("category")</div>
+		<div class="o_video_segment_category_edit">$r.render("editCategories")</div>
+
+		<div class="o_video_segment_buttons">$r.render("save") $r.render("cancel")</div>
+	</div>
+</div>
+
+<script>
+	jQuery(() => {
+		const start = jQuery('.o_video_segment_start input');
+		const end = jQuery('.o_video_segment_end input');
+		const duration = jQuery('.o_video_segment_duration input');
+		const minDuration = 5;
+
+		const parseTimeToSeconds = (timeString) => {
+			const parts = timeString.split(':');
+			return (+parts[0]) * 3600 + (+parts[1]) * 60 + (+parts[2]);
+		}
+
+		const formatTime = (timeInSec, defaultTimeString) => {
+			if (timeInSec <= 0) {
+				return defaultTimeString;
+			}
+			return new Date(timeInSec * 1000).toISOString().substring(11, 19);
+		}
+
+		const updateDuration = () => {
+			const startInSec = parseTimeToSeconds(start.val());
+			let endInSec = parseTimeToSeconds(end.val());
+			let durationInSec = endInSec - startInSec;
+			const durationDeficit = Math.max(0, minDuration - (endInSec - startInSec));
+			if (durationDeficit > 0) {
+				durationInSec += durationDeficit;
+			}
+			duration.val(durationInSec);
+			return true;
+		};
+
+		const updateEnd = () => {
+			const startInSec = parseTimeToSeconds(start.val());
+			const durationInSec = parseInt(duration.val());
+			if (isNaN(startInSec) || isNaN(durationInSec)) {
+				return;
+			}
+			let newEndInSec = startInSec + durationInSec;
+			if ($videoDurationInSeconds > 0) {
+				newEndInSec = Math.min(newEndInSec, $videoDurationInSeconds);
+			}
+			const newDurationInSec = newEndInSec - startInSec;
+			const endTimeString = formatTime(newEndInSec, end.val());
+			end.val(endTimeString);
+			duration.val(newDurationInSec);
+		}
+
+		start.on('keyup', updateEnd);
+		end.on('keyup', updateDuration);
+		duration.on('keyup', updateEnd);
+	});
+</script>

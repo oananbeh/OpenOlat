@@ -1,0 +1,56 @@
+<div class="o_scorm">
+	<script>
+		var settings = {
+			autocommit: true,
+			autocommitSeconds: 60,
+			asyncCommit: true,
+			logLevel: 4,
+			dataCommitFormat: "flattened",
+			lmsCommitUrl: "${scormAgainCallbackUri}/${scoId}.json"	
+		};
+		window.API = new Scorm12API(settings);
+		window.API.currentScoId = "${scoId}";
+		#if($r.isNotNull($startCmis))
+		window.API.loadFromFlattenedJSON($startCmis);
+		#end
+		window.API.on("LMSInitialize", function() {
+			$r.backgroundCommand("LMSInitialize");
+		});
+		window.API.on("LMSFinish", function() {
+			var flatCmis = window.API.renderCommitCMI(true);
+			var flatCmisString = JSON.stringify(flatCmis);
+			$r.openScormCommand("LMSFinish"), 'cmis', flatCmisString);
+		});
+		
+		function o_unloadSCO(command, currentScoId, nextScoId) {
+			var iframeDoc = document.getElementById("${frameId}").contentDocument;
+			iframeDoc.location.replace("about:blank");
+			iframeDoc = null;
+			
+			if((window.API.currentState == 0 || window.API.currentState == 2) && window.API.currentScoId === currentScoId) {
+				// SCO was not initialized or is already finished, go to the next step now
+				var flatCmis = window.API.renderCommitCMI(true);
+				var flatCmisString = JSON.stringify(flatCmis);
+				$r.openScormCommand("LMSTimeout"), 'command', command, 'ignore-validating-error', 'oo-ignore-validating-error', 'scoId', '${scoId}', 'cmis', flatCmisString);
+			} else {
+				setTimeout(function() {
+					if(window.API.currentState == 1 && window.API.currentScoId === currentScoId) {
+						// SCO was not finished, go to the next step now
+						var flatCmis = window.API.renderCommitCMI(true);
+						var flatCmisString = JSON.stringify(flatCmis);
+						$r.openJavaScriptCommand("LMSTimeout"), 'command', command, 'ignore-validating-error', 'oo-ignore-validating-errors', 'scoId', '${scoId}', 'cmis', flatCmisString);
+					}
+				}, 1900);
+			}
+		}
+	</script>
+	#if($showNavButtons)
+		$r.render("scoTopButtons")
+	#end
+	<div class="o_scorm_content">
+		$r.render("contentpackage")
+	</div>
+	#if($showNavButtons && $r.visible("contentpackage"))
+		$r.render("scoBottomButtons")
+	#end
+</div>

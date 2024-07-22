@@ -1,0 +1,181 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.modules.forms.ui;
+
+import org.olat.core.gui.UserRequest;
+import org.olat.core.gui.components.form.flexible.FormItemContainer;
+import org.olat.core.gui.components.form.flexible.elements.MultipleSelectionElement;
+import org.olat.core.gui.components.form.flexible.elements.StaticTextElement;
+import org.olat.core.gui.components.form.flexible.impl.Form;
+import org.olat.core.gui.components.form.flexible.impl.FormBasicController;
+import org.olat.core.gui.control.Controller;
+import org.olat.core.gui.control.Event;
+import org.olat.core.gui.control.WindowControl;
+import org.olat.core.util.CodeHelper;
+import org.olat.core.util.StringHelper;
+import org.olat.modules.ceditor.ui.BlockLayoutClassFactory;
+import org.olat.modules.ceditor.ui.event.ChangePartEvent;
+import org.olat.modules.forms.EvaluationFormManager;
+import org.olat.modules.forms.EvaluationFormResponse;
+import org.olat.modules.forms.EvaluationFormSession;
+import org.olat.modules.forms.model.jpa.EvaluationFormResponses;
+import org.olat.modules.forms.model.xml.Disclaimer;
+import org.olat.modules.forms.ui.model.EvaluationFormResponseController;
+import org.olat.modules.forms.ui.model.Progress;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 
+ * Initial date: 09.05.2018<br>
+ * @author uhensler, urs.hensler@frentix.com, http://www.frentix.com
+ *
+ */
+public class DisclaimerController extends FormBasicController implements EvaluationFormResponseController {
+	
+	private static final String ACCEPTED_KEY = "disclaimer.accepted";
+	private static final String[] ACCEPTED_KEYS = { ACCEPTED_KEY };
+	private static final String ACCEPTED_DB_KEY = "accepted";
+	
+	private StaticTextElement textEl;
+	private MultipleSelectionElement agreementEl;
+	
+	private Disclaimer disclaimer;
+	private EvaluationFormResponse response;
+	private boolean validationEnabled = true;
+	
+	@Autowired
+	private EvaluationFormManager evaluationFormManager;
+
+	public DisclaimerController(UserRequest ureq, WindowControl wControl, Disclaimer disclaimer) {
+		super(ureq, wControl, LAYOUT_VERTICAL);
+		this.disclaimer = disclaimer;
+		initForm(ureq);
+		setBlockLayoutClass();
+	}
+
+	private void setBlockLayoutClass() {
+		this.setFormStyle("o_form_disclaimer o_form_element " + BlockLayoutClassFactory.buildClass(disclaimer.getLayoutSettings(), true));
+	}
+
+	public DisclaimerController(UserRequest ureq, WindowControl wControl, Disclaimer disclaimer, Form rootForm) {
+		super(ureq, wControl, LAYOUT_VERTICAL, null, rootForm);
+		this.disclaimer = disclaimer;
+		initForm(ureq);
+		setBlockLayoutClass();
+	}
+
+	@Override
+	protected void initForm(FormItemContainer formLayout, Controller listener, UserRequest ureq) {
+		long sufix = CodeHelper.getRAMUniqueID();
+
+		textEl = uifactory.addStaticTextElement("agreement_" + sufix, null, disclaimer.getText(), formLayout);
+		textEl.setElementCssClass("o_disclaimer o_disclaimer_content");
+		boolean hasText = StringHelper.containsNonWhitespace(disclaimer.getText());
+		textEl.setVisible(hasText);
+		
+		agreementEl = uifactory.addCheckboxesVertical("disclaimer_" + sufix, null, formLayout,
+				ACCEPTED_KEYS, new String[] { disclaimer.getAgreement() }, null, null, 1);
+	}
+	
+	void update() {
+		textEl.setValue(disclaimer.getText());
+		boolean hasText = StringHelper.containsNonWhitespace(disclaimer.getText());
+		textEl.setVisible(hasText);
+		agreementEl.setKeysAndValues(ACCEPTED_KEYS, new String[] { disclaimer.getAgreement() });
+	}
+
+	@Override
+	protected void event(UserRequest ureq, Controller source, Event event) {
+		if (event instanceof ChangePartEvent changePartEvent) {
+			if (changePartEvent.getElement() instanceof Disclaimer disclaimer) {
+				this.disclaimer = disclaimer;
+				update();
+				setBlockLayoutClass();
+			}
+		}
+	}
+
+	@Override
+	public void setValidationEnabled(boolean enabled) {
+		this.validationEnabled = enabled;
+	}
+
+	@Override
+	protected boolean validateFormLogic(UserRequest ureq) {
+		agreementEl.clearError();
+		if (!validationEnabled) return true;
+		
+		boolean allOk = super.validateFormLogic(ureq);
+		
+		if (!agreementEl.isAtLeastSelected(1)) {
+			agreementEl.setErrorKey("disclaimer.not.accepted");
+			allOk = false;
+		}
+		
+		return allOk;
+	}
+
+	@Override
+	protected void formOK(UserRequest ureq) {
+		//
+	}
+
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		agreementEl.setEnabled(!readOnly);
+	}
+
+	@Override
+	public boolean hasResponse() {
+		return response != null && ACCEPTED_DB_KEY.equals(response.getStringuifiedResponse());
+	}
+
+	@Override
+	public void initResponse(UserRequest ureq, EvaluationFormSession session, EvaluationFormResponses responses) {
+		response = responses.getResponse(session, disclaimer.getId());
+		boolean accepted = response != null && ACCEPTED_DB_KEY.equals(response.getStringuifiedResponse());
+		agreementEl.select(ACCEPTED_KEY, accepted);
+	}
+
+	@Override
+	public void saveResponse(UserRequest ureq, EvaluationFormSession session) {
+		boolean accepted = agreementEl.isAtLeastSelected(1);
+		if (accepted && response == null) {
+			response = evaluationFormManager.createStringResponse(disclaimer.getId(), session, ACCEPTED_DB_KEY);
+		} else if (!accepted) {
+			deleteResponse(session);
+		}
+	}
+	
+	@Override
+	public void deleteResponse(EvaluationFormSession session) {
+		if (response != null) {
+			evaluationFormManager.deleteResponse(response);
+			response = null;
+		}
+	}
+
+	@Override
+	public Progress getProgress() {
+		int current = hasResponse()? 1: 0;
+		return Progress.of(current, 1);
+	}
+
+}

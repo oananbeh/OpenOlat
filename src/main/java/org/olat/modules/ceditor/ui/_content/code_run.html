@@ -1,0 +1,90 @@
+<div class="o_page_run_code $blockLayoutClass">
+<div class="o_page_run_code_box">
+	<pre><code id="$r.getCId()_code"
+		   class="#if($codeLanguage) language-$codeLanguage #end #if($lineNumbersEnabled) o_line_numbers_enabled #end"
+		   #if($height && !$expanded) style="height: $height; overflow: auto;" #end>$content</code></pre>
+	<div id="$r.getCId()_overlay" class="o_button_overlay"></div>
+	<script>
+		"use strict";
+		function copyToClipboard(selector, lineNumbersEnabled) {
+			if (lineNumbersEnabled) {
+				copyToClipboardWithLineNumbers(selector);
+			} else {
+				copyToClipboardWithoutLineNumbers(selector);
+			}
+		}
+
+		function copyToClipboardWithLineNumbers(selector) {
+			const tableRows = jQuery(`${selector} tr`);
+			let targetText = '';
+			for (let i = 0; i < tableRows.length; i++) {
+				const line = jQuery(tableRows.get(i)).text();
+				targetText += `${line}\n`;
+			}
+			navigator.clipboard.writeText(targetText);
+		}
+
+		function copyToClipboardWithoutLineNumbers(selector) {
+			navigator.clipboard.writeText(jQuery(selector).text() + '\n');
+		}
+
+		function codeCopiedNotification(anchorDiv) {
+			anchorDiv.title = '$r.translate("code.copied")';
+			const anchor = jQuery(anchorDiv);
+			const icon = anchor.find('i.o_icon');
+			icon.removeClass('o_icon_copy');
+			icon.addClass('o_icon_check');
+			setTimeout(() => {
+				anchorDiv.title = '$r.translate("code.copy.to.clipboard")';
+				icon.removeClass('o_icon_check');
+				icon.addClass('o_icon_copy');
+			}, 2000);
+		}
+
+		function adjustToScrollbars(codeElement) {
+			const horizontalScrollbarVisible = codeElement.scrollWidth > codeElement.clientWidth;
+			if (horizontalScrollbarVisible) {
+				const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+				if (isSafari) {
+					codeElement.style.overflowX = 'scroll';
+				}
+			}
+		}
+
+		jQuery(function() {
+			const codeElement = document.getElementById('$r.getCId()_code');
+			const overlayElement = document.getElementById('$r.getCId()_overlay');
+			hljs.highlightElement(codeElement);
+			#if($lineNumbersEnabled)
+				hljs.lineNumbersBlock(codeElement);
+			#end
+			const cssClasses = Array.from(codeElement.classList).filter((c) => c.startsWith('language-'));
+			if (cssClasses.length > 0) {
+				const languageClassParts = cssClasses[0].split('-');
+				if (languageClassParts.length > 1) {
+					const languageName = languageClassParts[1];
+					let languageLabel = languageName;
+					if (languageName === 'plaintext') {
+						languageLabel = '$r.translate("code.plaintext")';
+					}
+					overlayElement.innerHTML =
+						'<a href="javascript:;" ' +
+						'   title="$r.translate('code.copy.to.clipboard')" ' +
+						'   onclick="copyToClipboard(\'#$r.getCId()_code\', $lineNumbersEnabled); codeCopiedNotification(this); this.blur();">' +
+						'  <i class="o_icon o_icon_copy"> </i> ' + languageLabel + '</a>';
+				}
+			}
+			setTimeout(function() {
+				adjustToScrollbars(codeElement);
+			}, 0);
+		});
+	</script>
+</div>
+#if($height && $allowExpand)
+<div class="o_page_run_code_expand o_expand_ctrl">
+	<div class="o_button_group">
+		$r.render("expandCollapseButton")
+	</div>
+</div>
+#end
+</div>

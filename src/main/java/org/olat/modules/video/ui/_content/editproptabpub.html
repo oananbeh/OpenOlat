@@ -1,0 +1,19 @@
+#if($r.isNotEmpty($warningOffersMsg))
+	<div class="o_warning_with_icon">$r.xssScan($warningOffersMsg)</div>
+#end
+#if($r.visible("runtimeType"))
+	$r.render("runtimeType")
+#end
+$r.render("accessAndBooking")
+#if($r.visible("videoCollectionAccess"))
+	$r.render("videoCollectionAccess")
+#end
+#if($r.visible("offers"))
+	$r.render("offers")
+#end
+#if($r.visible("lti13Access"))
+	<div class="o_block_bottom">
+		$r.render("lti13Access")
+	</div>
+#end
+$r.render("accessOverview")

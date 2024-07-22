@@ -1,0 +1,48 @@
+@charset "UTF-8";
+
+/*
+ *  =================================================
+ *  
+ *   SaSS file for OpenOLAT content styles. This is 
+ *   included in iframes to nicely display content. 
+ *   
+ *   @author gnaegi, www.frentix.com
+ *   @date April 2014
+ *
+ *	 also read themes.README!
+ *  =================================================
+ */
+@import "license";
+@import "functions";
+
+/* 	
+	Configuration 
+*/
+@import "config";
+
+/* 
+	Bootstrap includes for base element styling 
+*/
+@import "../../bootstrap/stylesheets/bootstrap/mixins";
+@import "../../bootstrap/stylesheets/bootstrap/normalize";
+@import "../../bootstrap/stylesheets/bootstrap/print";
+
+@import "../../bootstrap/stylesheets/bootstrap/scaffolding"; 
+@import "../../bootstrap/stylesheets/bootstrap/type";
+
+
+/* 
+	OpenOLAT includes 
+*/
+@import "modules/mixins";
+@import "modules/icons"; /* must be second include - provides classes used as extensions */
+@import "modules/helpers";
+@import "modules/dialog";
+@import "modules/emoticons";
+@import "modules/edusharing";
+@import "modules/qti21content";
+
+// finally add the real content styles
+@import "modules/content";
+
+@import "modules/print";

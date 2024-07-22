@@ -1,0 +1,30 @@
+The library JQuery UI (http://jqueryui.com/download/) is a custom build with these settings:
+
+UI Core: all
+Interactions: all
+Widgets: remove accordion, progressbar, slider, spinner, tabs
+Effects: need only Effects Core and Pulsate Effect
+Theme: Smoothness
+
+To compile js.plugins.min.js and js.plugins.min.css check the readme file in the root directory
+	 
+It contains the following minified javascripts:
+  functions.js
+  jshashtable-2.1_src.js
+  jquery.translator.js
+  jquery.periodic.js
+  jquery.tinymce.min.js
+  
+it minified the 5 olat plugins for tinymce 4
+  olatmatheditor
+  olatmovieviewer
+  quotespliter
+  olatedusharing
+  
+and minified css:
+  bootstrap-tagsinput.css
+  layout-default-latest.min.css
+  fullcalendar.min.css
+  dataTables.css
+  
+

@@ -1,0 +1,63 @@
+<fieldset class="o_sel_passkey_new">
+	<div class="o_hint">$off_info $r.contextHelpAdditionalInfo($off_info_help_url)
+	#if($r.isNotEmpty($off_info_later))<br>$off_info_later#end
+	</div>
+	#if ($off_error) <div class="o_error">$off_error</div> #end
+	<div class="o_button_group">
+		$r.render("new.passkey")
+		$r.render("later")
+		$r.render("cancel")
+	</div>
+#if($r.isTrue($credentialCreate))
+	<script>
+"use strict";
+(function () {
+	var publicKeyCredentialCreationOptions = {
+		challenge: base64urlToBuffer("$challenge"),
+		timeout: $timeout,
+		rp: {
+			name:"$rpName",
+			id: "$rpId"
+		},
+		user: {
+			name: "$userName",
+			displayName: "$userDisplayName",
+			id: base64urlToBuffer("$userId")
+		},
+		excludeCredentials: [],
+		pubKeyCredParams: [
+			{ alg:-7,   type:"public-key"},
+			{ alg:-8,   type:"public-key"},
+			{ alg:-35,  type:"public-key"},
+			{ alg:-36,  type:"public-key"},
+			{ alg:-257, type:"public-key"},
+			{ alg:-258, type:"public-key"},
+			{ alg:-259, type:"public-key"}
+		],
+		attestation: "$attestation",
+		authenticatorSelection: {
+			requireResidentKey: false,
+			userVerification: "$userVerification"
+	    },
+		extensions: { credProps: true }
+	};
+	
+	var credentialCreationOptions = {
+		publicKey: publicKeyCredentialCreationOptions
+	};
+
+	navigator.credentials.create(credentialCreationOptions).then((publicKeyCredential) => {
+		const response = publicKeyCredential.response;
+		var transports = "";
+		if(response.getTransports) {
+			transports = response.getTransports().toString();
+		}
+		$f.openFfXHREvent(false, false, true), 'type', 'registration', 'attestationObject', bufferToBase64url(response.attestationObject), 'clientDataJSON', bufferToBase64url(response.clientDataJSON), 'transports', transports);
+	}).catch((err) => {
+		$f.openFfXHREvent(false, false, true), 'type', 'request-error', 'error-message', err.message);
+	});
+	
+} ());
+	</script>
+#end
+</fieldset>

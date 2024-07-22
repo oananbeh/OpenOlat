@@ -1,0 +1,1101 @@
+@use "sass:math";
+
+form .o_form, form.o_form {
+	.o_desc {
+		@extend %o_info;
+	}
+	.o_warning {
+		margin-top: 1px;
+		padding: 10px;
+	}
+	.o_hint {
+	
+	}
+
+	/* as of 10.4 the mandatory icon is left from the label to make place for the help o_form_chelp */
+	.o_icon_mandatory {
+		margin-right: 0.25em;
+	}
+
+	/* context help for input element, right from label */
+	.o_form_chelp {
+		padding-left: 0.25em;
+		margin-right: -1.25em;	
+	}
+	
+	/* example, positioned below the input field */	
+	.o_form_example {
+		font-size: 90%;	
+	}
+	
+	.o_form_explained {
+		padding-bottom: 0;
+		margin-bottom: 0;
+	}
+
+	.o_form_explanation {
+		color: $brand-warning;
+	}
+		
+	.o_error {
+		margin-top: 1px;
+		padding: 10px;
+	}
+	
+	.o_error.o_block {
+		margin: 20px 0;
+		padding: 20px;
+	}
+	
+	hr.o_spacer_noline {
+		border-top: 1px solid transparent;
+	}
+
+	hr.o_spacer,
+	hr.o_spacer_noline {
+		&.form {
+			/* there is already enough space in the form by the wrapper divs */
+			margin-top: 0px;
+			margin-bottom: 0px;
+		}
+	}
+	
+	.form-group {
+		/* don't add margin for messages in form groups, margin is already on form-group */
+		&.o_omit_margin,
+		.o_error,
+		.o_warning {
+			margin-bottom: 0;
+		}
+	}
+	
+	/* date chooser */
+	.o_date  {
+		position: relative;
+		padding-right: $input-height-base;
+		display: flex;
+		align-items: center;
+		column-gap: 20px;
+		row-gap: 15px;
+		flex-wrap: wrap;
+	}
+	
+	.o_date.form-inline  {
+		.form-group {
+			margin-left: 0;
+			display: inline-block;
+			vertical-align: middle;
+		}
+		.form-control {
+			display: inline-block;
+		}
+		.form-group.o_date_ms.o_time_only {
+			margin-left: 0;
+		}
+	}
+	
+	.btn-group .o_date {
+		display: inline-block;
+	}
+
+	input.o_date_ms {
+		width: 3em;
+	}
+	
+	// Prevent irregular focus ring
+	&.form-horizontal .form-group {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	
+	.col-sm-9, .col-sm-10 {
+		padding-right: 0;
+	}
+	
+	.o_inline_cont.form-inline {
+		> * {
+			display: inline-block;
+		}
+	}
+	
+	.has-feedback .o_date.form-inline .form-control.o_date_ms {
+		padding-right: 0;
+	}
+	
+	.o_form_element.form-inline .o_form_element.form-group {
+		margin-left: 25px;
+	}
+	
+	.input-group.o_date_picker {
+		width: 11em;
+	}
+	
+	.o_date_bloc {
+		white-space: nowrap;
+		.o_first_date, .o_second_date {
+			padding-right: 1em;
+		}
+	}
+	
+	.has-feedback .o_date_picker .form-control {
+		padding-right: 0;
+	}
+	
+	.form-control.textarea.o_fixed_font_with {
+		resize: vertical;
+		font-family: $font-family-monospace;
+	}
+	
+	.form-control.textarea.o_original_line_breaks {
+		white-space: pre;
+		word-wrap: normal;
+		overflow-x: auto;
+	}
+	
+	.form-control.textarea_disabled.o_fixed_font_with {
+		white-space: pre-wrap;
+		height: auto;
+		font-family: $font-family-monospace;
+		color: $input-color !important;
+		background: $input-bg-disabled;
+	}
+	
+	/* disabled text areas are rendered in div's for improved printing and layouting features */
+	.form-control.textarea_disabled {
+		resize: both;
+		overflow: auto;	
+		white-space: pre-wrap;
+		background: $input-bg-disabled;
+	}
+	
+	/*
+	currently not working in Safari and Firefox, therefore deactivated
+	.form-control.textarea.o_striped_background {
+		background-image: linear-gradient(#F1F1F1 50%, #F9F9F9 50%);
+ 		background-size: 100% #{2*$line-height-base}em;
+		background-attachment: local;
+	}*/
+	
+	.o_textarea_line_numbers_container {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+	}
+	
+	.o_textarea_line_numbers_input, .o_textarea_line_numbers_wrapper, .o_textarea_line_numbers_row {
+		box-sizing: border-box;
+		vertical-align: middle;
+	}
+	
+	.o_textarea_line_numbers_input {
+		display: inline-block;
+		padding: 0 0.3em;
+		width: 100%;
+		height: 100%;
+		overflow-x: scroll;
+		resize: none !important;
+	}
+	
+	.o_textarea_line_numbers_wrapper {
+		padding: 1px 0.3em 0 0;
+		height: 100%;
+		overflow: hidden;
+	}	
+	
+	.o_textarea_line_numbers_row {
+		width: 100%;
+		display: flex;		
+		align-items: center;
+	}
+	
+	.o_textarea_line_numbers_row span {
+		font-family: $font-family-monospace;
+		text-align: right;
+		margin-left: auto;
+	}
+	
+	.o_textarea_line_numbers_row i {
+		text-align: left;
+		margin-right: 0.2em;
+	}
+	
+	.o_static_list {
+		padding-left: 15px;
+	}
+	
+	.o_markdown_element {
+		.form-control.ProseMirror {
+			height: unset;
+			min-height: 10em;
+		}
+	}
+	
+	.o_form_two_cols, &.o_form_two_cols {
+		@media (min-width: $screen-sm-max) {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+		}
+	}
+	.o_form_button_right {
+		display: grid;
+		grid-template-columns: 100fr 1fr;
+		gap: 10px;
+	}
+	
+	input.o_show_hide_eye + i.o_icon {
+		cursor: pointer;
+		color: grey !important;
+		pointer-events: auto;
+	}
+
+	
+/* Card Radio Buttons */
+/* Markup:
+	<div class="form-inline o_radio_cards_wrapper">
+		<div class="o_radio_cards">
+			<label class="radio-inline">
+				<input type="radio" name="guidemo.form.card2" value="advanced_form.yes">
+				<span class="o_radio_card">
+					<span class="o_radio_text_wrapper">
+						<span class="o_radio_label">Ja </span> 
+						<span class="o_radio_desc">Yes means yes, really! </span>
+					</span> 
+					<span class="o_radio_icon o_icon_yes"> </span>
+				</span> 
+			</label>
+			<label .... >
+		</div>
+	</div>
+*/
+.o_radio_cards_wrapper {
+	.o_radio_cards {
+		display: flex;
+		flex-flow: column wrap;
+		align-items : stretch;
+		gap: 10px;
+	
+		&:is(.form-inline *) { /* for vertical alignment style */
+			flex-flow: row wrap;
+		}
+		.radio {
+			flex-grow: 0;
+			flex-shrink: 0;
+			display: flex;
+		}				
+		label {
+			flex-grow: 0;
+			flex-shrink: 0;
+			flex-basis: $o-radio-card-width;
+			margin: 0;
+			padding: 0;
+		 	position: relative;
+		 	display: inline-block;
+		 	
+		 	.o_radio_card {		 	
+		 		display: flex;
+				flex-flow: row no-wrap;
+		 		width: 100%;
+		 		height: 100%;
+			 	padding: 10px 10px 10px 30px;
+			 	border-radius: $o-radio-card-border-radius;
+			 	border: 1px solid $o-radio-card-border-color;			  			 	
+				background-color: $o-radio-card-bg;			 	
+			  	&:hover {
+					background-color: $o-radio-card-bg-hover;
+				 	border: 1px solid $o-radio-card-border-color-hover;			  
+				 	.o_radio_label {
+				 		color: $o-radio-card-label-color-hover;
+					}
+			  	}
+			}		  	
+		  	input {
+				margin: auto;
+				left: 10px;
+				top: calc(50% - 6px);	
+		  	}		  	
+		  	.o_radio_text_wrapper {		  	
+		  		flex-grow: 1;
+				flex-shrink: 1;
+		  	}
+		  	.o_radio_label {
+		  		font-weight: bold;
+		  		display: block;
+				word-wrap: anywhere;
+		  	}
+		  	.o_radio_desc {
+		  		font-size: 90%;
+		  		display: block;
+				word-wrap: anywhere;
+		  	}
+		  	.o_radio_icon {
+		  		display: inline-block;
+		  		flex-grow: 0;
+				flex-shrink: 0;
+				margin: auto 0 auto 10px;
+				height: (math.div(math.div($o-radio-card-width, 3), 3) * 2);
+				&:not(.o_icon) {
+					width: clamp(40px, math.div($o-radio-card-width, 3), 95%);
+					border: 1px solid $o-radio-card-image-border-color;
+					border-radius: $o-radio-card-image-border-radius;
+					background-position: 50% 50%;
+					background-size: contain;
+				}
+				&.o_icon {
+					width: ($o-radio-card-width * 0.25);
+					text-align: center;
+					font-size: $o-radio-card-icon-font-size;
+					padding: (((math.div(math.div($o-radio-card-width, 3), 3) * 2) - $o-radio-card-icon-font-size - 4px) * 0.5) 0px;
+				}
+		 }
+
+			/* Checked and disabled states */		  	
+		  	input:checked {
+		  		~ .o_radio_card {		  		
+					background-color: $o-radio-card-bg-checked;
+				 	border: 1px solid $o-radio-card-border-color-checked;	
+				 	.o_icon,
+					.o_radio_label {
+						color: $o-radio-card-label-color-checked;
+					}	  		  	
+				}
+		  	}
+		  	input:disabled {
+		  		~ .o_radio_card {		  		
+		  			cursor: not-allowed;
+					background-color: $input-bg-disabled;
+				 	border: 1px solid $o-radio-card-border-color;	
+					.o_radio_label, .o_radio_desc {
+						color: $text-muted;
+					}	  		  	
+				}
+		  	}
+		  	
+		}
+	}
+	
+	// Display show more button only if needed.
+	.o_show_more_radios {
+		display: none;
+	}
+	&.o_radio_card_top_to_bottom {
+		container-type: inline-size;
+		display: flex;
+		flex-direction: column; // Show more button below the cards
+		
+		.o_radio_cards {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+			
+			label {
+				display: flex;
+				flex-direction: column-reverse;
+				.o_radio_card {
+					padding: 10px 10px 30px 10px;
+					 flex-direction: column-reverse;
+					align-items: center;
+				}
+				.o_radio_text_wrapper {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					.o_radio_label {
+						text-align: center;
+					}
+				}
+				.o_radio_icon {
+					margin: 0px auto 10px auto;
+					&.o_icon {
+						margin: -5px auto 5px auto;
+						font-size: 42px;
+					}
+				}
+				input {
+					top: initial;
+					bottom: 10px;
+					left: calc(50% - 6px);
+				}
+			}
+		}
+		&.o_radio_cards_unwrapped {
+			// Show the more button only if not all cards are displayed.
+			.o_show_more_radios {
+				display: block;
+			}
+			
+			.o_radio_cards {
+				label {
+					display: none;
+				}
+				label:nth-child(-n+1) {
+					display: flex;
+				}
+				
+				// Hide the "show more" button if all cards are visible
+				// use :has() num elements if firefox supports it: https://stackoverflow.com/a/31922865
+				&:is(.o_radio_card_num_0, .o_radio_card_num_1) + .o_show_more_radios {
+					display: none;
+				}
+				@container (width >= 340px) {
+					label:nth-child(-n+2) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 515px) {
+					label:nth-child(-n+3) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 690px) {
+					label:nth-child(-n+4) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3, .o_radio_card_num_4) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 865px) {
+					label:nth-child(-n+5) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3, .o_radio_card_num_4, .o_radio_card_num_5) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 1040px) {
+					label:nth-child(-n+6) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3, .o_radio_card_num_4, .o_radio_card_num_5, .o_radio_card_num_6) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 1250px) {
+					label:nth-child(-n+7) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3, .o_radio_card_num_4, .o_radio_card_num_5, .o_radio_card_num_6) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 1390px) {
+					label:nth-child(-n+8) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3, .o_radio_card_num_4, .o_radio_card_num_5, .o_radio_card_num_6, .o_radio_card_num_7) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 1565px) {
+					label:nth-child(-n+9) {
+						display: flex;
+					}
+					&:is(.o_radio_card_num_0, .o_radio_card_num_1, .o_radio_card_num_2, .o_radio_card_num_3, .o_radio_card_num_4, .o_radio_card_num_5, .o_radio_card_num_6, .o_radio_card_num_7, .o_radio_card_num_8) + .o_show_more_radios {
+						display: none;
+					}
+				}
+				@container (width >= 1740px) {
+					display: flex;
+					+.o_show_more_radios {
+						display: none;
+					}
+				}
+			}
+		}
+	}
+}
+
+	/* Small and large rendering styles */
+	.o_radio_cards_sm label {
+		flex-basis: $o-radio-card-width-sm;
+		.o_radio_icon {
+			height: (math.div(math.div($o-radio-card-width-sm, 3), 3) * 2);
+			&:not(.o_icon) {
+				width: math.div($o-radio-card-width-sm, 3);
+			}
+			&.o_icon {
+				width: ($o-radio-card-width-sm * 0.25);
+				padding: (((math.div(math.div($o-radio-card-width-sm, 3), 3) * 2) - $o-radio-card-icon-font-size - 4px) * 0.5) 0px;
+			}
+		}
+	}
+	.o_radio_cards_lg label {
+		flex-basis: $o-radio-card-width-lg;
+		.o_radio_icon {
+			height: (math.div(math.div($o-radio-card-width-lg, 3), 3) * 2);
+			&:not(.o_icon) {
+				width: math.div($o-radio-card-width-lg, 3);
+			}
+			&.o_icon {
+				width: ($o-radio-card-width-lg * 0.25);
+				padding: (((math.div(math.div($o-radio-card-width-lg, 3), 3) * 2) - $o-radio-card-icon-font-size - 4px) * 0.5) 0px;
+			}
+		}
+	}
+	
+	.o_radio_cards_vcenter label .o_radio_card {
+		align-items: center;
+	}
+
+	/* Example Image for GUI demo */
+	.o_icon_yes { 
+		background-image:url('#{$o-images-path}no_preview.png');
+	}
+	.o_icon_no { 
+		background-image:url('#{$o-images-path}no_preview_bg.png');
+	}
+}
+	
+
+
+/* Button group single selection */
+.o_radio_buttons {
+	.radio label {
+		padding-left: 0;
+	}
+	
+	.btn.active {
+		&.o_primary {
+			color: $btn-primary-color;
+			background-color: $btn-primary-bg;
+		}
+		&.o_dark_blue {
+			background-color: $o-selection-dark-blue;
+		}
+		&.o_light_blue {
+			background-color: $o-selection-light-blue;
+		}
+		&.o_purple {
+			background-color: $o-selection-purple;
+		}
+		&.o_red {
+			background-color: $o-selection-red;
+		}
+		&.o_orange {
+			background-color: $o-selection-orange;
+		}
+		&.o_yellow {
+			background-color: $o-selection-yellow;
+		}
+		&.o_light_green {
+			background-color: $o-selection-light-green;
+		}		
+		&.o_dark_green {
+			background-color: $o-selection-dark-green;
+		}
+	}
+}
+
+
+/* file chooser */
+.o_filepreview {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+	
+	img {
+		@extend .img-thumbnail;
+	}
+}
+/* uploaded file with delete button */
+.o_filemeta {
+  	padding-top: ($padding-base-vertical + 1);
+  	padding-bottom: ($padding-base-vertical + 1);
+	
+	>div {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+	}
+
+	.o_filesize {
+		margin-left: 0.5em;
+		margin-right: 2em;
+	}
+	.o_fileinput {
+		display: inline-block;
+		margin-right: 1em;
+	}
+	
+	.o_filemeta_row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+		align-items: center;
+	}
+}
+.o_fileinput {
+	position: relative;
+	/* the fake chooser is what the user sees. this is on layer 1, only for display */
+	.o_fakechooser {
+		position: relative;
+		z-index: 1; 		
+	}
+	/* real file chooser is transparent but on layer 2, click events trigger realchooser, not fakechooser */
+	.o_realchooser { 
+		cursor: pointer;
+		position: absolute; 
+		height: 100%;
+		width: 100%;
+		top: 0; right: 0;
+		z-index: 2; 
+		@include opacity(0); /* this is the magic: visually don't show the input element, but nevertheless catch click events */
+		
+		/* same highlight style as in bootstrap form-control-focus mixin */
+		&:focus +.o_fakechooser {	
+			$color-rgba: rgba(red($input-border-focus), green($input-border-focus), blue($input-border-focus), .6);
+			outline: 0;
+			@include box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px $color-rgba);
+			input {
+				border-color: $input-border-focus;
+			}
+		}	
+
+	}
+	/* the fake drag&drop area */	
+	&.o_area {
+		padding: 5px 20px ;
+		border-style: dashed;
+		margin-bottom: 3px;
+		
+		.o_dnd {
+			text-align: center;
+		}
+		.o_dnd_icon {
+			font-size: 1.5em;
+			color: $o-panel-placeholder-color;
+		}
+		.o_dnd_info {
+			color: $o-panel-placeholder-color;
+			font-size: 0.9em;
+		}
+		.o_dnd_select {
+			margin: 0.5em;
+		}			
+		&.o_dnd_over {
+			border-color: $o-panel-placeholder-border-active-color;
+			background: $o-panel-placeholder-bg-active;
+			.o_dnd_icon {
+				color: $o-panel-placeholder-border-active-color;
+			}
+		}	
+		
+		&.o_preview {
+			background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='90px'><text transform='translate(20, 80) rotate(-45)' fill='rgb(230,230,230)' font-size='22'>Preview</text></svg>");
+		}
+	}
+	
+	&.o_replace,
+	&.o_area {
+		/* button hover not triggered because realchooser catches the hover event, manually apply btn hover style */
+		.o_realchooser {
+			&:hover,
+			&:focus {
+					&+script+.o_dnd .btn {
+					color: $btn-default-color;
+				    background-color: darken($btn-default-bg, 5%);
+				}
+			}
+			/* same highlight style as in bootstrap form-control-focus mixin */
+			&:focus+script+.o_dnd .btn {
+				$color-rgba: rgba(red($input-border-focus), green($input-border-focus), blue($input-border-focus), .6);
+				border-color: $input-border-focus;
+				outline: 0;
+				@include box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px $color-rgba);
+			}
+		}
+	}
+	&.panel-placeholder:hover {
+		border-color: darken($o-panel-placeholder-border-color, 10%);
+		.o_dnd .btn {
+			$color-rgba: rgba(red($input-border-focus), green($input-border-focus), blue($input-border-focus), .6);
+			border-color: $input-border-focus;
+			outline: 0;
+			@include box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px $color-rgba);
+		}
+	}
+}
+/* hide error icon for file element - clash with file element controls */
+.o_fileElement.has-error .o_icon_error.form-control-feedback {
+	display: none;
+}
+
+form.o_dnd_over {
+	border: 2px dashed $o-panel-placeholder-border-active-color;
+	border-radius: $o-panel-placeholder-border-radius;
+	background: $o-panel-placeholder-bg-active;
+	margin: -2px;
+}
+
+.o_form_inline_mandatory_compact {
+	i {
+		width: 20px;
+	}
+	select.form-control {
+		width: calc(100% - 25px);
+	}
+}
+
+/* day chooser with previous next */
+.o_day_chooser {
+	.o_day_previous {
+		display: inline-block;
+		a {
+			border-bottom-right-radius: 0;
+			border-top-right-radius: 0;
+			border-right: 0;
+		}
+	}
+	.o_day_date {
+		display: inline-block;
+		border-radius: 0;
+		input, .input-group-addon {
+			border-radius: 0;
+		}
+	}
+	.o_day_next {
+		display: inline-block;
+		a {
+			border-bottom-left-radius: 0;
+			border-top-left-radius: 0;
+			border-left: 0;
+		}
+	}
+}
+
+/* centered form labels are still left aligned */
+.o_centered_form {
+	text-align: center;
+	fieldset.o_form {
+		display: inline-block;
+		text-align: left;
+	}
+}
+
+/* checkbox */
+.checkbox label.o_checkbox_error {
+	color: $state-danger-text;
+}
+
+.checkbox label.o_checkbox_warning {
+	color: $state-warning-text;
+}
+.o_checkbox_h_aligned {
+	display: flex;
+	align-items: center;
+	input[type="checkbox"] {
+		margin-top: 0;
+	}
+}
+
+legend.control-label {
+	display: inline-block;
+	margin-bottom: 5px;
+	font-size: $font-size-base;
+	font-weight: 700;
+	line-height: inherit;
+	color: $legend-color;
+	border: none;
+}
+
+/* choice element */
+.o_choice_checkrow,
+.o_choice_textrow {
+	vertical-align: text-top;
+	padding-bottom: 2px;
+}
+.o_choice_textrow {
+	padding-left: 1em;
+}
+.o_togglecheck a {
+	white-space: nowrap;
+}
+
+.o_catalog {
+	.o_catalog_delete_img {
+		position: relative; 
+		top: -0.5em;
+	}
+}
+
+.o_button_dirty {
+	@include button-variant($o-button-dirty-color, $o-button-dirty-bg, $o-button-dirty-border);
+}
+
+/* TOGGLE SWITCH */
+.o_button_toggle {
+	border: 1px solid $o-toggle-border-color;
+	@include border-top-radius($o-toggle-size*0.5 + 2px);
+	@include border-bottom-radius($o-toggle-size*0.5 + 2px);
+	background: $o-toggle-bg;
+	display: inline-block;
+	&.o_toggle_block {
+		display: block;
+	}
+	&.o_toggle_disabled {
+		opacity: 0.5;
+	}
+	height: $o-toggle-size + 4px;
+	line-height: $o-toggle-size - 1px;
+	font-size: $o-toggle-size;
+	text-align: left;
+	margin: 0;
+	@extend %o_undecorated;
+	white-space: nowrap;
+	
+	i {
+		color: $o-toggle-color;
+		text-shadow: 1px 0 2px rgba(0,0,0,.25);		
+	}	
+	span {
+		line-height: $o-toggle-size;
+		vertical-align: top;		
+		font-size: 60%;
+		color: $o-toggle-text-color;
+		text-transform: uppercase;
+	}
+	&[aria-checked="true"] {
+		text-align: right;
+		padding: 0 1px 0 0.5em;
+		background: $o-toggle-on-bg;
+		border-color: $o-toggle-on-border-color;
+		i {
+			color: $o-toggle-on-color;
+			text-shadow: -1px 0 2px rgba(0,0,0,.25);
+		}
+		span {
+			color: $o-toggle-on-text-color;
+		}
+	}
+	&[aria-checked="false"] {
+		padding: 0 0.5em 0 1px;
+	}
+	
+	&[aria-checked="true"]>span.o_off {
+		display: none;
+	}
+	
+	&[aria-checked="false"]>span.o_on {
+		display: none;
+	}
+}
+
+.o_form_cell .o_button_toggle {
+	margin-top: 8px;
+}
+
+.o_feedback_right {
+	margin-left: -25px;
+	padding-right: 12px;
+}
+
+/* TOGGLE CHECK */
+.o_toggle_check {
+	padding: 0;
+	display: block;
+	
+	// font-size of the icon
+	font-size: 18px;
+	// size of the button => 1.5x as big as the icon
+	height: 1.5em;
+	width: 1.5em;
+	border-radius: 1.5em;
+	
+	&:hover {
+		.o_icon_toggle_check_off { @include o-add-icon('check');}
+	}
+	
+	&:is(.o_table_flexi *) {
+		font-size: 15px;
+	}
+}
+
+/* TOGGLE BUTTON */
+.o_toggle_button {
+	display: flex;
+	align-items: center;
+	
+	padding-top: 4px;
+	padding-bottom: 4px;
+	>.o_toggle_button_text {
+		display: grid;
+		span {
+			grid-area: 1/1;
+			&[aria-hidden="true"] {
+				visibility: hidden;
+			}
+		}
+	}
+	>.o_icon {
+		margin-right: 6px;
+	}
+	>i {
+		font-size: 20px;
+	}
+	&.btn-lg {
+		>i {
+			font-size: 24px;
+		}
+	}
+	&.btn-sm,
+	&.btn-xs {
+		>i {
+			font-size: 18px;
+		}
+		>.o_toggle_button_text {
+			margin-left: 3px;
+		}
+	}
+	
+	&:hover {
+		.o_icon_toggle_button_off { @include o-add-icon('circle-check', false);}
+	}
+	
+	&.o_toggle_link {
+		color: $link-color;
+		background-color: transparent;
+	}
+}
+
+/* STATIC TEXTELEMENT */
+.o_static_textelement_bold {
+	font-weight: bold;
+}
+
+/* input indentation */
+.checkbox .o_checkbox_indented {
+	padding-left: 3em;
+	
+	&.level_2 {
+		padding-left: 5em;
+	}
+}
+
+/* Multi selection filter element */ 
+.o_msf_button {
+	text-align: left;
+	display: flex;
+	&>span {
+		@extend %o_nowrap;
+		width: 100%;
+	}
+	.o_icon {
+		margin: auto 0 auto auto;
+	}
+	&:is(.form-group *) {
+		width: 100%;
+		max-width: 100%;
+		min-height: $input-height-base;
+	}
+}
+
+/* Color Picker, Icon Selector */
+
+.o_color_picker_icon, .o_icon_selector_caret {
+	position: absolute;
+	right: 5px;
+	top: 10px;
+}
+
+.o_color_picker_button, .o_icon_selector_button {
+	width: 100%;
+	text-align: left;
+	position: relative;
+	padding-right: 26px;
+	padding-left: 32px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-height: 34px;
+}
+
+.o_color_picker_colored_area {
+	display: inline-block;
+	position: absolute;
+	top: 6px;
+	left: 6px;
+	width: 20px;
+	height: 20px;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 4px;
+	color: white;
+	line-height: 18px;
+	text-align: center;
+}
+
+.o_icon_selector_icon {
+	display: inline-block;
+	position: absolute;
+	top: 6px;
+	left: 6px;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+}
+
+ul.o_color_picker_dropdown, ul.o_icon_selector_dropdown {
+	width: 100%;
+	height: auto;
+	top: unset;
+	overflow-x: hidden;
+	margin-left: 0;
+	margin-right: 0;
+
+	&.o_drop_up {
+		bottom: 34px;
+	}
+
+	li {
+		cursor: pointer;
+
+		a.o_color_picker_link, a.o_icon_selector_link {
+			width: 100%;
+			text-align: left;
+			position: relative;
+			padding: 6px 15px 6px 32px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		&.o_selected {
+			a, a:hover {
+				background-color: $brand-primary;
+				color: $o-bright-text-and-border;
+			}
+		}
+
+		&.o_compact {
+			display: inline-block;
+
+			a {
+				padding: 0;
+				width: 32px;
+				height: 32px;
+			}
+		}
+	}
+}
+
+/* Selection Display Element */
+
+.o_selection_display {
+	display: flex;
+	.o_icon {
+		margin: auto 0 auto auto;
+	}
+	&:is(.form-group *) {
+		width: 100%;
+		max-width: 100%;
+		min-height: $input-height-base;
+	}
+}
+

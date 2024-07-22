@@ -1,0 +1,13 @@
+<div style="position: relative;" class="o_video_by_url $blockLayoutClass">
+	#if($r.available("videoViaUrl"))
+	$r.render("videoViaUrl")
+	#end
+	#if($r.available("meta"))
+	<div class="panel panel-default o_artefact_metadata">
+		$r.render("meta")
+	</div>
+	#end
+	#if(!$editMode)
+	<div class="o_iframe_cover"></div>
+	#end
+</div>

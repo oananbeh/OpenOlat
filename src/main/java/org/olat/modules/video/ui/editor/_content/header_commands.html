@@ -1,0 +1,14 @@
+<ul class="o_dropdown list-unstyled">
+	#if ($r.available("import"))
+	<li>$r.render("import")</li>
+	#end
+	#if ($r.available("export"))
+	<li>$r.render("export")</li>
+	#end
+	#if ($r.available("exportAll"))
+	<li>$r.render("exportAll")</li>
+	#end
+	#if ($r.available("delete"))
+	<li>$r.render("delete")</li>
+	#end
+</ul>
