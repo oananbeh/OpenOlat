@@ -1,0 +1,40 @@
+<style>
+	#o_cal_config_table_wrapper table {
+		margin-bottom: ${marginBottomInPixels}px;
+	}
+	#o_cal_config_table_wrapper table td {
+		vertical-align: middle;
+	}
+	#o_cal_config_table_wrapper table td .o_color_picker_wrapper {
+		margin-top: -2px;
+		margin-bottom: -2px;
+	}
+	#o_cal_config_table_show_buttons {
+		margin-top: 1.5%;
+		margin-bottom: -2.5%;
+		margin-right: 1%;
+	}
+</style>
+<div class="o_button_group_right">
+	#if($r.available("cal.import.type.file") || $r.available("cal.synchronize.type.url"))
+	<div class="btn-group">
+		#if($r.available("cal.import.type.file"))
+			$r.render("cal.import.type.file")
+		#end
+		#if($r.available("cal.synchronize.type.url"))
+			$r.render("import.type.dropdown")
+		#end
+	</div>
+	#end
+	$r.contextHelpWithWrapper("manual_user/personal_menu/Calendar/")
+</div>
+<div class="o_button_group_right" id="o_cal_config_table_show_buttons">
+		<div class="btn-group">
+			$r.render("cal.show.all")
+			$r.render("cal.hide.all")
+		</div>
+</div>
+
+<div id="o_cal_config_table_wrapper">
+	$r.render("table")
+</div>

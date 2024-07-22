@@ -1,0 +1,10 @@
+<fieldset>
+	<legend>
+		$r.contextHelpWithWrapper("manual_user/personal_menu/Calendar/")
+	</legend>
+	#if ($hasLinkProvider)
+		$r.render("linkprovider")
+	#else
+		<i>$r.translate("cal.links.noprovider")</i>
+	#end
+</fieldset>

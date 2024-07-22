@@ -1,0 +1,62 @@
+<div class="o_card o_folder_card">
+	#if($row.isOpenable())
+		#if($row.isOpenInNewWindow())
+			<div class="o_folder_card_thumbnail o_folder_openable" onClick="$f.openFfXHREvent(false, false, false), 'oo-opennewwindow-oo', 'true', 'oo-opennewwindow-target', '_blank', 'open','$row.key');" role="link">
+		#else
+			<div class="o_folder_card_thumbnail o_folder_openable" onClick="$f.ffXHREvent("open","$row.key");" role="link">
+		#end
+	#else
+		<div class="o_folder_card_thumbnail">
+	#end
+		<div class="o_folder_card_img #if($row.getThumbnailCss())$row.getThumbnailCss()#end">
+			#if($row.isThumbnailAvailable())
+				#if(${row.isExternalItem()})
+					<img src="$row.getLargeThumbnailUrl()" draggable="false" alt=""/>
+				#else
+					## 2x the max viewport (344 = 2 x $o-folder-card-thumbnail-height)
+					<img src="$row.getThumbnailUrl()/412/344" draggable="false" alt=""/>
+				#end
+			#else
+				<div class="o_folder_row_thumbnail">
+					<div class="o_folder_icon_container">
+						<div class="o_folder_row_thumbnail_icon"><i class="o_icon $row.iconCssClass"></i></div>
+							#if($row.getElementsLabel())
+							<div class="o_folder_elements_labels">
+								$row.getElementsLabel()
+							</div>
+						#end
+					</div>
+				</div>
+			#end
+		</div>
+	</div>
+	#if($row.getNewLabel())
+		<div class="o_folder_new_labels">
+			$row.getNewLabel()
+		</div>
+	#end
+	#if($row.getLabels())
+		<div class="o_folder_labels">
+			$row.getLabels()
+		</div>
+	#end
+	<div class="o_folder_card_meta">
+		<div class="o_flex_first_grow_base">
+			<div class="o_nowrap">
+				<h5 class="o_folder_card_title o_card_title o_nowrap">$r.render("$row.getSelectionItemName()")</h5>
+			</div>
+			#if($row.getToolsLinkName())
+				$r.render($row.getToolsLinkName())
+			#end
+		</div>
+		<div class="o_folder_card_modified o_flex_block_one_line_left">
+			<div class="o_nowrap o_muted">
+				#if($row.modified)
+					$r.escapeHtml($row.modified)
+				#else
+					&nbsp;
+				#end
+			</div>
+		</div>
+	</div>
+</div>

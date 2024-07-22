@@ -1,0 +1,11 @@
+$r.contextHelpWithWrapper("manual_admin/usermanagement/")
+	
+$r.render("segments")
+<div class="o_segments_content">
+#if ($r.available("quickSearch"))
+	$r.render("quickSearch")
+#end
+#if($r.available("usersearch"))
+	$r.render("usersearch")
+#end
+</div>

@@ -1,0 +1,91 @@
+#set($responseIdentifier = $r.responseUniqueId($interaction))
+#set($isBadResponse = $r.isBadResponse($interaction.responseIdentifier))
+#set($isInvalidResponse = $r.isInvalidResponse($interaction.responseIdentifier))
+#set($responseDeclaration = $r.getResponseDeclaration($interaction.responseIdentifier))
+#set($responseInput = $r.getResponseValue($interaction.responseIdentifier))
+#set($responseInputString = $r.toString($responseInput))
+#set($inputMatchesSolution = $r.escapeHtml($responseInputString) == $solutions[${responseIdentifier}])
+#set($answerCorrectnessClass = "")
+#if($isPageMode && $isResponded && $inputMatchesSolution && !$isPageModeSolution)
+	#set($answerCorrectnessClass = "o_correct")
+#end
+#if($isPageMode && $isResponded && !$inputMatchesSolution && !$isPageModeSolution)
+	#set($answerCorrectnessClass = "o_incorrect")
+#end
+#if($isPageModeSolution)
+	#set($isBadResponse = false)
+#end
+
+#set($checkJavaScript = $r.checkJavaScript($responseDeclaration,$interaction.patternmask))
+<input name="qtiworks_presented_${responseIdentifier}" type="hidden" value="1"/>
+<span class="$answerCorrectnessClass $localName #if($r.isTrue($isCorrectionHelp)) has-feedback #if($r.isCorrectTextEntry($interaction)) has-success #else has-error #end #end">
+
+	#if($isPageMode)
+		#set($disabled = ($r.isItemSessionEnded() || $isShowPageModeSolution || $isResponded))
+		#set($placeholder = (!$r.isItemSessionEnded() && !$isShowPageModeSolution))
+		#set($value = "")
+		#if($responseInputString && !$responseInputString.isEmpty())
+			#set($value = "$r.escapeHtml($responseInputString)")
+		#end
+		#if($isPageModeSolution)
+			#set($value = "$solutions[${responseIdentifier}]")
+		#end
+		<input id="od_${responseIdentifier}"
+			   type="text"
+			   class="$answerCorrectnessClass $r.textEntryType($interaction)"
+			   name="qtiworks_response_${responseIdentifier}"
+			   value="$value"
+			   #if($placeholder) $r.placeholder($interaction) #end
+			   #if($disabled) disabled #end
+			   #if($isBadResponse) class='badResponse' #end
+			   #if($interaction.expectedLength) size='$interaction.expectedLength' #end
+			   #if($checks && $checks.size() > 0) onchange='$checkJavaScript' #end
+			   autocomplete="off"
+			   required="required" />
+	#else
+		<input id="od_${responseIdentifier}" type="text" class="$r.textEntryType($interaction)" name="qtiworks_response_${responseIdentifier}" #if($responseInputString && !$responseInputString.isEmpty()) value="$r.escapeHtml($responseInputString)" #else value="" #end #if(!$r.isItemSessionEnded()) $r.placeholder($interaction) #end #if($r.isItemSessionEnded()) disabled #end #if($isBadResponse) class='badResponse' #end #if($interaction.expectedLength) size='$interaction.expectedLength' #end #if($checks && $checks.size() > 0) onchange='$checkJavaScript' #end autocomplete="off" required="required"/>
+	#end
+
+	#if($r.isTrue($isCorrectionHelp))<span class="o_icon #if($r.isCorrectTextEntry($interaction)) o_icon_qti_summary_correct #else o_icon_error #end o_feedback_right"> </span> #end
+
+	#if(!$isPageMode)
+	#if($isBadResponse)
+        <span class="badResponse">
+		#if($responseDeclaration.cardinality.toQtiString() == "record")
+			$r.translate("error.textEntry.invalid.record")
+		#elseif($responseDeclaration.baseType == "FLOAT")
+			$r.translate("error.textEntry.invalid.float")
+		#else
+			$r.translate("error.textEntry.invalid")
+		#end
+        </span>
+	#end
+	#end
+
+	#if($isInvalidResponse)
+	<span class="badResponse">$r.translate("error.required.format")</span>
+	#end
+	$r.renderScorePerInteraction($interaction)
+	#if($r.isTrue($isCorrectionSolution) || $r.isTrue($isSolutionMode))
+		#set($alternativesString = $r.renderTextEntryAlternatives($interaction))
+		#if($r.isNotEmpty($alternativesString))
+			<span class="o_qti_gaptext_alternatives" title='$r.translate("correction.alternatives")'>$alternativesString</span>
+		#end
+	#end
+</span>
+
+#if($isPageMode)
+	#if($isBadResponse)
+	<span class="badResponse">
+		#if($responseDeclaration.cardinality.toQtiString() == "record")
+			$r.translate("error.textEntry.invalid.record")
+		#elseif($responseDeclaration.baseType == "FLOAT")
+			$r.translate("error.textEntry.invalid.float")
+		#else
+			$r.translate("error.textEntry.invalid")
+		#end
+	</span>
+	#end
+#end
+
+$r.appendFlexiFormDirtyAndStopKeyboardsEvent("od_${responseIdentifier}")

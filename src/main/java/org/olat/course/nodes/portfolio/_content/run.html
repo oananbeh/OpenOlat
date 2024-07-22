@@ -1,0 +1,158 @@
+$r.render("assessmentInfos")
+#if ($r.available("highScore"))
+	$r.render("highScore")
+#end
+<fieldset class="o_block_top o_start_info_box">
+	<legend>$r.translate("info.coach.title")</legend>
+	<div class="o_note">
+		#if ($instructions)
+			<h4>$r.translate("instructions.title")</h4>
+			<p>$instructions</p>
+		#end
+		<h4>$r.translate("info.box.title")</h4>
+		#if ($maxScore)
+			<p><i class="o_icon o_icon-fw o_icon_assessment_tool"> </i> $maxScore</p>
+		#end
+		<div class="o_portfolio_cn_preview o_rendertype_custom">
+			<div class="panel panel-default o_portfolio_assignments panel-imagebg o_portfolio_entry" style="background-image:url('$image/$imageName');">
+				<div class="panel-heading">
+					<h4 class="panel-title">$portfolioTitle</h4>
+				</div>
+				<div class="panel-body">
+					#if($portfolioDesc)
+						<span>$portfolioDesc</span>
+					#else
+						<ul>
+							<li><span>$r.translate("binder.last.update"): $r.formatDateAndTime($binderLastUpdate)</span></li>
+							<li><span>$r.translate("binder.num.sections.pages", $numSections)</span></li>
+							<li><span>$r.translate("binder.num.comments", $numComments)</span></li>
+						</ul>
+					#end
+				</div>
+			</div>
+			#if ($r.available("select"))
+				$r.render("select")
+			#elseif ($r.available("map.new"))
+				$r.render("map.new")
+			#end
+		</div>
+	</div>
+</fieldset>
+
+#if ($accessRights)
+	<fieldset class="o_block_top o_start_info_box">
+		<legend>$r.translate("portfolio.review")</legend>
+		<h4 onclick="jQuery('#collapse_sharedby_${r.getCId()}').collapse('toggle')">
+			<i id="collapse_sharedby_${r.getCId()}_toggler" class="o_icon o_icon-fw #if($sharedByOpen) o_icon_close_togglebox #else o_icon_open_togglebox #end"> </i>$r.translate("shared.by.me")
+		</h4>
+		<div id="collapse_sharedby_${r.getCId()}" class="o_portfolio_publication collapse #if($sharedByOpen) in #end">
+			#if (!$isSharedWithCoach)
+				<div class="o_warning_with_icon">$r.translate("portfolio.access.no.coach")</div>
+			#end
+			<div class="pull-right">
+				$r.render("access.rights")
+			</div>
+			<br>
+			<br>
+			#if(!${binderRow.getAccessRights().isEmpty()})
+				<div class="o_portfolio_ac o_portfolio_ac_binder" >
+					<h6>$r.translate("access.binder")</h6>
+					<table class="table table-striped table-condensed">
+						<tbody>
+							#foreach($binderRights in $binderRow.accessRights)
+								<tr>
+									<td><i class="$binderRights.cssClass"> </i> $r.escapeHtml($binderRights.fullName)</td>
+									<td class="text-muted">$binderRights.explanation</td>
+									<td>#if($r.isNotNull($binderRights.editLink)) $r.render($binderRights.editLink) #end</td>
+								</tr>
+							#end
+						</tbody>
+					</table>
+				</div>
+			#end
+			<ul class="list-unstyled">
+				#foreach($section in $binderRow.children)
+				<li>
+					<h4><i class="o_icon o_icon_pf_section o_icon-fw"> </i> $r.escapeHtml($section.title) <small><i class="o_icon $section.cssClassStatus"> </i> #if($section.assessable) ${section.getFormattedResult()} #end</small></h4>
+
+					#if(!${section.getAccessRights().isEmpty()})
+					<div class="o_portfolio_ac o_portfolio_ac_section">
+						<table class="table table-striped table-condensed">
+							<tbody>
+							#foreach($sectionRights in $section.accessRights)
+							<tr>
+								<td><i class="$sectionRights.cssClass"> </i> $r.escapeHtml($sectionRights.fullName)</td>
+								<td class="text-muted">$sectionRights.explanation</td>
+								<td>#if($r.isNotNull($sectionRights.editLink)) $r.render($sectionRights.editLink) #end</td>
+							</tr>
+							#end
+							</tbody>
+						</table>
+					</div>
+					#end
+
+					#if(${section.getChildren().size()} > 0)
+					<ul class="list-unstyled">
+						#foreach($page in $section.children)
+						<li>
+							<h5><i class="o_icon o_icon_pf_entry o_icon-fw"> </i> $r.escapeHtml($page.title)</h5>
+							#if(!${page.getAccessRights().isEmpty()})
+							<div class="o_portfolio_ac o_portfolio_ac_entry">
+								<table class="table table-striped table-condensed">
+									<tbody>
+									#foreach($pageRights in $page.accessRights)
+									<tr>
+										<td><i class="$pageRights.cssClass"> </i> $r.escapeHtml($pageRights.fullName)</td>
+										<td class="text-muted">$pageRights.explanation</td>
+										<td>#if($r.isNotNull($pageRights.editLink)) $r.render($pageRights.editLink) #end</td>
+									</tr>
+									#end
+									</tbody>
+								</table>
+							</div>
+							#end
+						</li>
+						#end
+					</ul>
+					#end
+				</li>
+				#end
+			</ul>
+		</div>
+		#if ($r.available("shareBinder"))
+			#if ($shareBinderSize.size() > 0)
+				<br>
+				<h4 onclick="jQuery('#collapse_sharedme_${r.getCId()}').collapse('toggle')">
+					<i id="collapse_sharedme_${r.getCId()}_toggler" class="o_icon o_icon-fw #if($sharedMeOpen) o_icon_close_togglebox #else o_icon_open_togglebox #end"> </i>$r.translate("shared.with.me")
+				</h4>
+				<div id="collapse_sharedme_${r.getCId()}" class="collapse #if($sharedMeOpen) in #end">
+					$r.render("shareBinder")
+				</div>
+			#end
+		#end
+		<script>
+			"use strict";
+			jQuery(function() {
+				jQuery('#collapse_sharedme_${r.getCId()}').on('hide.bs.collapse', function () {
+					jQuery('#collapse_sharedme_${r.getCId()}_toggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+					$f.openFfXHREvent(false, false, true), "sharedMeOpen","false");
+				})
+				jQuery('#collapse_sharedme_${r.getCId()}').on('show.bs.collapse', function () {
+					jQuery('#collapse_sharedme_${r.getCId()}_toggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+					$f.openFfXHREvent(false, false, true), "sharedMeOpen","true");
+				})
+			});
+
+			jQuery(function() {
+				jQuery('#collapse_sharedby_${r.getCId()}').on('hide.bs.collapse', function () {
+					jQuery('#collapse_sharedby_${r.getCId()}_toggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+					$f.openFfXHREvent(false, false, true), "sharedByOpen","false");
+				})
+				jQuery('#collapse_sharedby_${r.getCId()}').on('show.bs.collapse', function () {
+					jQuery('#collapse_sharedby_${r.getCId()}_toggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+					$f.openFfXHREvent(false, false, true), "sharedByOpen","true");
+				})
+			});
+		</script>
+	</fieldset>
+#end

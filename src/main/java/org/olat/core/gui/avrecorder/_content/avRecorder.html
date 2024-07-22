@@ -1,0 +1,162 @@
+<div id="avRecorder" class="o_video_recorder">
+	#if($audioRendererActive)
+	<div class="o_audio_canvas_wrapper">
+		<canvas id="$r.getCId()_canvas" class="o_audio_canvas"></canvas>
+		<div id="o_start_recording_info">$r.translate("click.to.start.recording")</div>
+	</div>
+	#end
+	<div class="o_centered_panel">
+		<div id="avContainer" class="o_av_container">
+			<video id="videoElement" autoplay playsinline disablePictureInPicture></video>
+			<audio id="audioElement" autoplay></audio>
+			<div class="o_video_overlay">
+				<div class="o_video_feed_dimensions"></div>
+				<div id="recording-container" class="recording-container #if($audioRendererActive)o_audio_visualization#end">
+					<div class="recording-circle"></div>
+					<div class="recording-text">$r.translate("recording")</div>
+				</div>
+				<div class="controls mejs__controls">
+					<div id="time-container" class="mejs__time mejs__currenttime-container" role="timer"
+						 aria-live="off">
+						<span id="current-time" class="mejs__currenttime">0:00</span>
+						<span id="total-time">/0:00</span>
+						<span id="recording-length-limit">/0:00</span>
+					</div>
+					<div id="volume-button-container" class="mejs__button mejs__volume-button mejs__unmute">
+						<button id="volume-button" type="button" aria-controls="mep_15" tabindex="0"></button>
+						<div id="volume-slider" class="mejs__volume-slider" aria-label="Volume Slider"
+							 aria-valuemin="0" aria-valuemax="100" role="slider" aria-orientation="vertical">
+							<div class="mejs__volume-total">
+								<div id="current-volume" class="mejs__volume-current"
+									 style="bottom: 0; height: 100%;"></div>
+								<div id="volume-handle" class="mejs__volume-handle"
+									 style="bottom: 100%; margin-bottom: -3px;"></div>
+							</div>
+						</div>
+					</div>
+					<div id="time-rail" class="mejs__time-rail">
+                        <span id="time-slider" class="mejs__time-total mejs__time-slider">
+                            <span class="mejs__time-loaded"></span>
+                            <span id="current-time-rail" class="mejs__time-current"></span>
+                        </span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="o_commands row">
+			<div class="col-xs-12 col-sm-5 o_quality_file_size_container">
+				<div class="o_quality_dropdown_container">
+					#if ($r.available("video.audio.quality"))
+					$r.render("video.audio.quality")
+					#end
+				</div>
+				<div class="o_file_size" id="file-size"></div>
+			</div>
+			<div class="col-xs-12 col-sm-2 o_one_button_container">
+				<button id="one-button" class="btn btn-default" type="button" role="button" tabindex="0"
+						aria-label="Record, play, stop">
+					<svg class="o_one_button_icon" viewBox="0 0 80 80">
+						<circle cx="40" cy="40" r="30" stroke-width="5" class="decoration"/>
+						<circle id="start-recording-symbol" cx="40" cy="40" r="15" class="strong-symbol"/>
+						<g id="stop-recording-symbol">
+							<circle cx="40" cy="40" r="30" stroke-width="5" class="decoration-recording"/>
+							<rect x="28" y="28" width="24" height="24" class="symbol"></rect>
+						</g>
+						<polygon id="play-symbol" points="31,28 31,52 55,40" class="symbol"/>
+						<rect id="stop-symbol" x="28" y="28" width="24" height="24" class="symbol"></rect>
+					</svg>
+					<span style="margin-left: 24px;"></span>
+					<span id="start-recording-text">$r.translate("oneButton.start.recording")</span>
+					<span id="stop-recording-text">$r.translate("oneButton.stop.recording")</span>
+					<span id="play-text">$r.translate("oneButton.play")</span>
+					<span id="stop-text">$r.translate("oneButton.stop")</span>
+				</button>
+			</div>
+			<div class="col-xs-12 col-sm-5 o_button_container">
+				<div class="o_button">
+					<div>
+						<button id="retry-button" type="button" name="retry-button" class="btn btn-default"
+								role="button" tabindex="0" aria-label="Retry">
+							<span>$r.translate("retryButton")</span>
+						</button>
+					</div>
+				</div>
+				#if ($r.available("confirmButton"))
+				<div class="o_button">
+					<div>
+						$r.render("confirmButton")
+					</div>
+				</div>
+				#end
+			</div>
+		</div>
+		<div>
+			#if ($r.available("avRecording"))
+			$r.render("avRecording")
+			#end
+		</div>
+		<div id="yes-no-dialog" class="o_dialog" role="alertdialog">
+			<div class="modal-content">
+				<div class="modal-header" role="alert">
+					<h4>$r.translate("dialog.retry.title")</h4>
+				</div>
+				<div class="modal-body" role="alert">
+					<p>$r.translate("dialog.retry.text")</p>
+				</div>
+				<div class="modal-footer">
+					<a id="yes-button" class="btn btn-default" role="button" tabindex="0" aria-label="Yes">$r.translate("yes")</a>
+					<a id="no-button" class="btn btn-default" role="button" tabindex="0" aria-label="No">$r.translate("no")</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	"use strict";
+	jQuery().ready(function() {
+		var audioElement = document.querySelector('#audioElement');
+		jQuery(audioElement).hide();
+
+		var videoElement = document.querySelector('#videoElement');
+		jQuery(videoElement).hide();
+
+		#if($isAudio)
+			#if($audioRendererActive)
+				var canvas = document.querySelector('#$r.getCId()_canvas');
+			#else
+				var canvas = null;
+			#end
+
+			var audioRecorder = new AudioRecorder(audioElement, {
+				firstName: '$firstName',
+				lastName: '$lastName',
+				recordingLengthLimit: $recordingLengthLimit,
+				compact: true,
+				audioRendererActive: $audioRendererActive,
+				canvas: canvas
+			});
+			audioRecorder.stateInit();
+		#else
+			var videoRecorder = new VideoRecorder(videoElement, $qualities, {
+				firstName: '$firstName',
+				lastName: '$lastName',
+				recordingLengthLimit: $recordingLengthLimit,
+				userCanChangeVideoQuality: $userCanChangeVideoQuality,
+				compact: false,
+				generatePosterImage: $generatePosterImage
+			});
+			videoRecorder.stateInit();
+
+			var controllerDiv = jQuery('#avRecorder');
+			var videoPreviewDiv = jQuery('#avContainer');
+			function updateSizes() {
+				if ((videoPreviewDiv.width() > (controllerDiv.width() + 30)) ||
+					(videoPreviewDiv.width() < (controllerDiv.width() - 100))) {
+					videoRecorder.sizeVideoElement(videoPreviewDiv.width(), videoPreviewDiv.height());
+				}
+			}
+			new ResizeObserver(updateSizes).observe(controllerDiv[0]);
+		#end
+	});
+</script>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="$r.getLanguageCode()">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="robots" content="nofollow">
+<meta name="google" content="notranslate">
+<meta name="description" content="$r.translate("meta.description")">
+<meta name="keywords" content="$r.translate("meta.keywords")"> 
+<meta name="generator" content="OpenOlat $buildversion - https://www.openolat.org">
+<meta name="dcterms.type" content="Interactive Resource">
+## hide toolbar on ios with minimal-ui
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<script>
+var o_info = new Object();
+o_info.initialPageLoadFinished = false;
+o_info.version = '$buildversion';
+o_info.o_winid = '$o_winid';
+window.name  = '$o_winid';
+#if($userJSON)o_info.o_user = $userJSON; #end 
+o_info.uriprefix="$r.relWinLink()";
+o_info.bc="$o_bc";
+o_info.businessPath="";
+o_info.startBusinessPath="$startBusinessPath";
+o_info.serverUri="$o_serverUri"
+o_info.serverContext="$o_serverContext"
+## Legacy form-dirty message displayed by o2cl()
+o_info.dirty_form = "$r.escapeDoubleQuotes($r.translate("form.dirty"))";
+o_info.locale = "$r.getLanguageCode()";
+o_info.lastClickTime = new Date().getTime();
+o_info.drop = true;
+## olat layout specific
+o_info.o_baseURI = "$r.staticLink("")";
+o_info.oo_noresponse_title = "$r.escapeJavaScript($r.translateWithPackage("org.olat.login","timeout.title"))";
+o_info.oo_noresponse = "$r.escapeJavaScript($r.translateWithPackage("org.olat.login","timeout.message"))";
+o_info.oo_noresponse_unsaved_data = "$r.escapeJavaScript($r.translateWithPackage("org.olat.login","timeout.message.unsaved.data"))";
+## edu-sharing
+#if($edusharingEnabled)
+o_info.edusharing_enabled = true;
+#end
+## Initialize zindex manager
+o_info.zseed = 0;
+o_info.newWindow=null;
+o_info.submit=null;
+o_info.preventOnchange=false;
+o_info.latexit=false;
+#if($enforceTopFrame)
+if (top!=self){top.location=self.location+"?o_winrndo=1";}
+#end
+function o_start() {
+	o_init();
+	## js E
+	## Set flag that bodyOnLoad has already been called and the page is fully loaded. 
+	## Needed to identify if call like Ext.onRead() makes any sense (often not the case in AJAX mode)
+	o_info.initialPageLoadFinished = true;
+}
+
+
+## Analytics code, if available
+$!analytics
+##
+
+try{
+	if(o_info.startBusinessPath != null && o_info.startBusinessPath.length > 0
+			&& window.history && !(typeof window.history === "undefined") && window.history.pushState) {
+		window.history.pushState('', document.title, o_info.startBusinessPath);
+		o_info.startBusinessPath = null;
+	}
+	if (document.location.href.indexOf('oow') != -1) {
+		window.history.replaceState(window.history.state, document.title, window.location.href.split("?")[0]);
+	}
+} catch(e) { }
+</script>
+
+#if($r.isTrue($forPrint))
+<script>
+$r.mathJaxJavascriptConfig();
+</script>
+<script src='${r.mathJaxCdn()}tex-mml-chtml.js'></script>
+#else
+<script>
+function o_mathjax(fct_success) {
+	if(window.MathJax === undefined) {
+		$r.mathJaxJavascriptConfig();
+		jQuery.ajax("${r.mathJaxCdn()}tex-mml-chtml.js", {
+			cache: true,
+			dataType: "script",
+			crossDomain: true,
+			success: function() {
+		    	if(typeof fct_success !== "undefined") {
+		    		fct_success();
+		    	}
+				o_info.latexit = false;
+			}
+		});
+	}
+}
+</script>
+#end
+
+## jQuery libraries
+<script src='$r.staticLink("js/jquery/jquery-3.7.0.min.js")'></script>
+#if ($r.available("guidebug"))
+	## Are compressed as js/js.plugins.min.js in non-debug mode
+	<script src='$r.staticLink("js/jquery/periodic/jquery.periodic.js")'></script>
+	<script src='$r.staticLink("js/jshashtable-2.1_src.js")'></script>
+	<script src='$r.staticLink("js/jquery/openolat/jquery.translator.js")'></script>
+	<script src='$r.staticLink("js/jquery/openolat/jquery.navbar.js")'></script>
+	<script src='$r.staticLink("js/jquery/openolat/jquery.bgcarrousel.js")'></script>
+	<script src='$r.staticLink("js/tinymce4/tinymce/jquery.tinymce.min.js")'></script>
+	<script src='$r.staticLink("js/functions.js")'></script>
+	<script src='$r.staticLink("js/jquery/transit/jquery.transit.js")'></script>
+	<script src='$r.staticLink("js/iframeResizer/iframeResizer.min.js")'></script>
+	<script src='$r.staticLink("js/openolat/textarea.js")'></script>
+	## Bootstrap js
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/alert.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/button.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/collapse.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/dropdown.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/tab.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/transition.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/modal.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/tooltip.js")'></script>
+	<script src='$r.staticLink("bootstrap/javascripts/bootstrap/popover.js")'></script>
+	## The OpenOLAT video player. In separate file as it is also used in content iframes
+	<script src='$r.staticLink("movie/player.js")'></script>	
+#else
+	<script src='$r.staticLink("js/js.plugins.min.js")'></script>
+	<script src='$r.staticLink("movie/player.min.js")'></script>
+	<script src='$r.staticLink("js/iframeResizer/iframeResizer.min.js")'></script>
+#end
+
+#if($r.available("guidebug"))
+	<link href='$r.staticLink("js/fullcalendar/main.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/datepicker/datepicker.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/jquery/cropper/cropper.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/jquery/sliderpips/jquery-ui-slider-pips.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/jquery/ui/jquery-ui-1.13.2.custom.min.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/dragula/dragula.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/swiper/swiper-bundle.min.css")' rel="stylesheet">
+	<link href='$r.staticLink("js/tagify/tagify.css")' rel="stylesheet">
+#else
+	<link href='$r.staticLink("js/js.plugins.min.css")' rel="stylesheet">
+#end
+<script>
+jQuery.noConflict();
+
+## Initialize js translator factory with the js translator mapper path
+jQuery(document).ooTranslator().initialize("$jsTranslationMapperPath");
+o_info.oo_translator = jQuery(document).ooTranslator();
+## History and back button support
+jQuery(window).on("popstate", function(e) {
+	if(e.originalEvent.state && e.originalEvent.state.businessPath) {
+		if (e.originalEvent.state.businessPath.indexOf('oow') == -1) {
+			var windowedPath = e.originalEvent.state.businessPath + '?oow=' + window.name;
+			window.history.replaceState(e.originalEvent.state, document.title, windowedPath);
+			window.location.reload();
+		} else {
+			window.location.href = e.originalEvent.state.businessPath;
+		}
+	}
+});
+	
+var closing = function(e) {
+	if(navigator.sendBeacon) {
+		var beaconUrl = '$r.formURI("close-window")';
+		if(beaconUrl.indexOf("${r.getPathDefault()}") == -1) {
+			navigator.sendBeacon(beaconUrl, null);
+		}
+	}
+};
+window.onbeforeunload = closing;
+window.onunload = closing;
+
+## same configuration in 
+jQuery(function() {
+	if ((window.unsafeWindow == null ? window : unsafeWindow).MathJax == null) {
+		var count = jQuery('div.math,span.math,math,div.mathEntryInteraction').length;
+		if (count > 0 || o_info.latexit) {
+			o_mathjax();
+		}
+	}
+});
+</script>
+
+## LAYOUT
+## 1) Dynamic component CSS included by components
+$r.render("jsCssRawHtmlHeader", "pre-theme")
+## 2) CSS theme inclusion, theme JavaScript, favicons and appicons
+$theme.renderHTMLHeaderElements()
+## 3) Insert IE specific class names
+<script>
+"use strict";
+jQuery(document).ready(function() {
+	// Detect IE below version 11
+	if (window.navigator.userAgent.indexOf('MSIE ') > 0) {
+		jQuery('body').addClass('o_browser_ie10');
+	}
+});
+</script>
+## 5) Dynamic overriding of CSS rules
+$r.render("jsCssRawHtmlHeader", "post-theme")
+## 6) Add user font size (id o_fontSize_css used to place on demand css)
+<style id="o_fontSize_css"></style>
+<style>
+	#if($logoInfos.logo)
+		.o_custom_navbar-brand { background-image: url('$logoInfos.logoUri'); }
+	#else
+		.o_custom_navbar-brand { background-image: none; }
+	#end
+</style>
+
+## Page title
+<title>$windowTitle.getValue()</title>
+</head>
+
+<body onload="o_start();" id="o_body" class="#foreach($cssClass in $bodyCssClasses)$cssClass #end o_lang_$r.getLanguageCode() $pageSizeCss">
+<div id="o_bg"></div>
+## if in debug mode, it is a invisible component which is only visible by wrapping debug information around all other
+## components.
+<!-- START guiDebug -->
+$r.renderForce("guidebug")
+<!-- END guiDebug -->
+## - include javascript for window and ajax control
+<!-- START jsServer -->
+$r.render("jsServer")
+<!-- END jsServer -->
+## controller for development
+<div aria-hidden="true">
+$r.renderForce("development")
+</div>
+## the content comes here
+<!-- START olatContentPanel -->
+
+<a href="#o_main_container" class="sr-only" data-nosnippet>$r.translate("access.skip.to.content")</a>
+#if($screenMode.standardScreen)
+	<div id="o_beta_logo"></div>
+#end
+
+## ---- START #o_messages
+## Messages are absolute positioned using EXT, thus it's ok to have them at the end of the page. 
+## This prevents an ugly IE bug that appears when the messages are at the top of the page.
+## IE can't render empty div's properly which results in an ugly white bar.
+<div id="o_messages" class="hidden-print" data-nosnippet>$r.renderForce("guimessage")</div>
+## ---- END #o_messages ---
+<a id='o_top' aria-hidden="true" data-nosnippet></a>	
+## ---- START #o_header ---
+#if($screenMode.standardScreen)
+<div id="o_header_wrapper" data-nosnippet> 
+	<div id="o_header_container" class="o_container_offcanvas container-fluid"> 
+		<div id="o_logo" aria-hidden="true"></div>
+		<div id="o_right_logo" aria-hidden="true"></div>
+		
+		## something to be displayed in the header, a logo, some ads, whatever
+		#if($r.available("headerComponent"))
+			$r.render("headerComponent")
+		#end
+	</div>
+</div>
+#end
+## ---- END #o_header ---	
+
+## ---- START #o_navbar ---
+#if($screenMode.standardScreen)
+<div id="o_offcanvas_right" class="o_navbar o_navbar-offcanvas " role="navigation" aria-label="$r.translate("accesskey.side")" data-nosnippet>
+	<a href="javascript:;" class="o_offcanvas_close" title="$r.translate("close")"><i class='o_icon o_icon_close o_icon-lg'> </i> <span class="visually-hidden">$r.translate("close.dialog")</span></a>
+	<div id="o_offcanvas_right_container" class="o_navbar-collapse">
+		#if($r.available("menuComponent"))
+			$r.render("menuComponent")
+		#end
+	</div>
+</div>
+<div id="o_navbar_wrapper" class="o_navbar" role="navigation" aria-label="$r.translate("accesskey.nav")" data-nosnippet>
+	<div id="o_navbar_container" class="o_container_offcanvas container-fluid">
+		#set($logoLinkUri = $logoInfos.logoLinkUri)
+		<a class="o_navbar-brand #if($logoInfos.logo) o_custom_navbar-brand #end" href="$logoLinkUri.uri" title="$logoInfos.logoAlt" #if($logoLinkUri.target) target="$logoLinkUri.target" #end rel="noopener noreferrer" aria-hidden="true"></a>
+		
+		<div class="o_collapse o_navbar-collapse">
+			## sites and tabs
+			$r.render("sitesComponent")
+			$r.render("tabsComponent")
+			## Empty more menu, filled dynamically by jquery.navbar.js if sites or tabs don't fit into navbar
+			<ul id="o_navbar_more" class="nav o_navbar-nav o_dropdown_toggle" style="display: none" role="presentation" >
+				<li>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">$r.escapeDoubleQuotes($r.translate("header.topnav.more")) <b class="caret"> </b></a>
+					<ul class="dropdown-menu dropdown-menu-right"></ul>
+				</li>
+			</ul>
+			## tools
+			#if($r.available("topnavComponent"))
+				$r.render("topnavComponent")
+			#end	
+		</div>
+		
+	</div>
+</div>
+<div id="o_container_page_width_toggler" aria-hidden="true" data-nosnippet>
+	<div id="o_go_standard_width" title="$r.translateInAttribute("content.width.standard")" class="btn btn-primary btn-xs o_noprint" role="button"><i class="o_icon o_icon_width_collapse o_icon-fw"> </i></div>
+	<div id="o_go_full_width" title="$r.translateInAttribute("content.width.standard")" class="btn btn-default btn-xs o_noprint" role="button"><i class="o_icon o_icon_width_expand o_icon-fw"> </i></div>
+</div>
+<div><script>
+jQuery(document).ready(function() {
+	jQuery("#o_go_standard_width").click(function() { OPOL.setContainerFullWidth(0); $r.openNoResponseJavaScriptCommand("width.standard")); });
+	jQuery("#o_go_full_width").click(function() { OPOL.setContainerFullWidth(1); $r.openNoResponseJavaScriptCommand("width.full")); });
+});
+</script></div>
+#end
+## ---- END #o_navbar ---
+$r.render("stickymsg")
+
+## ------ START #o_page -----
+<div id="o_main_wrapper">
+	<div id="o_main_container" class="o_container_offcanvas container-fluid">
+		$r.render("main")
+		<a id="o_toplink" href="#o_top" onclick="o_scrollTop();" title="$r.translateInAttribute("top.alt")" aria-hidden="true">
+			<i class="o_icon o_icon_top"></i> 
+			$r.translate("top")
+		</a>	
+	</div>
+</div>
+## END #o_main -----
+
+## ----- START #o_footer_wrapper ----------
+#if($screenMode.standardScreen && $r.available("footerComponent"))
+<div id="o_footer_wrapper">
+	<div id="o_footer_container" class="o_container_offcanvas container-fluid">
+		$r.render("footerComponent")
+	</div>
+</div>
+#end
+## ---- END #o_footer_wrapper ---
+
+## ---- START #o_modal
+## Modal dialog is absolute positioned, thus it's ok to have it at the end of the page. 
+## This prevents an ugly IE bug that appears when the modal dialog is at the top of the page.
+## IE can't render empty div's properly which results in an ugly white bar.
+$r.render("modalpanel")
+$r.render("topmodalpanel")
+$r.render("instantmessagepanel")
+## ---- END #o_modal ---
+
+## ----- START #o_form_dirty_message ----------
+<dialog class="dialog modal" tabindex="-1" aria-modal="true" aria-labelledby="$r.getId('o_md_')" id="o_form_dirty_message" data-nosnippet>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" onclick="o_guiCloseModal('#o_form_dirty_message').classList.remove('show');"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="$r.getId('o_md_')">$r.translate("form.dirty.title")</h4>
+      </div>
+      <div class="modal-body">
+      	<p class="o_warning">
+			$r.escapeDoubleQuotes($r.translate("form.dirty.intro"))
+		</p>
+      	<p>
+			$r.escapeDoubleQuotes($r.translate("form.dirty.ignore"))
+		</p>
+      	<p>
+			$r.escapeDoubleQuotes($r.translate("form.dirty.back"))
+		</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary pull-left o_form_dirty_back" onclick="o_guiCloseModal('#o_form_dirty_message').classList.remove('show');"><i class="o_icon o_icon-fw o_icon_back"> </i>$r.translate("form.dirty.button.back")</button>
+        <button type="button" class="btn btn btn-danger o_form_dirty_ignore"><i class="o_icon o_icon-fw o_icon_clear_all"> </i>$r.translate("form.dirty.button.ignore")</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+## ---- END #o_form_dirty_message ---
+
+## the div for the busy-wait animated-gif
+<dialog id="o_ajax_busy" data-nosnippet>
+	<i class="o_icon o_icon_busy o_icon-5x o_icon-spin"></i>	
+	<div id="o_ajax_progress">
+		<div class="o_label">$r.translate("ajax.busy.progress")</div>
+		<div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div></div>
+		<div class="o_progress_info text-muted small"> </div>
+		<div class="o_progress_buttons">
+			<button id="o_progress_cancel" class="btn btn-default">$r.translate("cancel")</button>
+		</div>
+	</div>
+</dialog>
+
+## hidden div for EM-PX factor readout 
+<div id="o_width_1em" style="width:1em; position: absolute; left: -1000px;" aria-hidden="true"></div>
+<div><script>
+// init size and listen to text resize events
+"use strict";
+jQuery(function() {
+	o_initEmPxFactor();
+});
+</script></div></body></html>

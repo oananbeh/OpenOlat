@@ -1,0 +1,95 @@
+<div class="o_cl_run">
+#if($r.available("assessment"))
+	$r.render("assessment")
+#end
+
+#if($infoTextUser)
+	<div class="panel panel-default o_disclaimer">
+	  	<div class="panel-heading" data-toggle="collapse" data-target="#collapseDisclaimer">
+	  		<h4 class="panel-title">
+				<i id="collapseDisclaimerToggler" class="o_icon o_icon-fw #if($r.isTrue($indisclaimer)) o_icon_close_togglebox #else o_icon_open_togglebox #end"> </i>	  		
+	  			$r.translate("info.title")
+	  		</h4>	
+	  	</div>
+		<div id="collapseDisclaimer" class="panel-collapse collapse #if($r.isTrue($indisclaimer)) in #end"><div class="panel-body">
+			$r.formatLatexFormulas($infoTextUser)
+  		</div></div>
+	</div>
+	<script>
+	jQuery('#collapseDisclaimer').on('hide.bs.collapse', function () {
+		jQuery('#collapseDisclaimerToggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+		$f.backgroundCommand("hide","panel","disclaimer")
+	})
+	jQuery('#collapseDisclaimer').on('show.bs.collapse', function () {
+		jQuery('#collapseDisclaimerToggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+		$f.backgroundCommand("show","panel","disclaimer")
+	})
+	</script>
+#end
+
+#if($dueDate)
+	<div class="panel panel-default o_duedate #if($afterDueDate) o_duedate_passed #end">
+	  	<div class="panel-heading" data-toggle="collapse" data-target="#collapseDuedate">
+	  		<h4 class="panel-title">
+				<i id="collapseDuedateToggler" class="o_icon o_icon-fw #if($r.isTrue($in-due-date)) o_icon_close_togglebox #else o_icon_open_togglebox #end"> </i>	  		
+	  			$r.translate("config.due.date")
+	  		</h4>
+	  	</div>
+		<div id="collapseDuedate" class="panel-collapse collapse #if($r.isTrue($in-due-date)) in #end"><div class="panel-body">
+			<p>$r.translate("run.due.date.desc")</p>
+			<p class="#if($afterDueDate) o_failed #else o_passed #end">
+				<i class="o_icon o_icon_calendar o_icon-fw"></i>
+				$r.translate("run.due.date", $r.formatDateAndTime($dueDate))
+			</p>
+  		</div></div>
+	</div>
+	<script>
+	jQuery('#collapseDuedate').on('hide.bs.collapse', function () {
+		jQuery('#collapseDuedateToggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+		$f.backgroundCommand("hide","panel","due-date")
+	})
+	jQuery('#collapseDuedate').on('show.bs.collapse', function () {
+		jQuery('#collapseDuedateToggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+		$f.backgroundCommand("show","panel","due-date")
+	})
+	</script>
+#end
+
+#if ($r.available("highScore"))
+	$r.render("highScore")
+#end
+
+<div class="o_cl o_block_large">
+	<div class="o_cl_header hidden-xs row">
+		<div class="col-sm-3"><h4>$r.translate("run.mark")</h4></div>
+		<div class="col-sm-6"><h4>$r.translate("run.info")</h4></div>
+	</div>
+	<hr class="hidden-xs" />
+	#foreach($checkbox in $checkboxList)
+		<div class="o_cl_line row clearfix #if($foreach.count %2 == 0) o_even #else o_odd #end">
+			<div class="col-xs-12 col-sm-3">
+				$r.render($checkbox.checkboxElName)
+			</div>
+			<div class="col-xs-12 col-sm-9">
+				<h4 class="o_cl_title">
+					$r.escapeHtml($checkbox.title )
+					#if($withScore && $checkbox.pointsAvailable) 
+						#if ($checkbox.score)
+							#set($params = [$checkbox.score,$checkbox.points])
+							<small>$r.translate("box.points.info.score", $params)</small>
+						#else 
+							<small>$r.translate("box.points.info", $checkbox.points)</small>
+						#end
+					#end
+				</h4>
+				#if($checkbox.description)
+					<div class="o_cl_desc">$checkbox.description</div>
+				#end
+				#if(${checkbox.hasDownload()})
+					<div class="o_cl_file">$r.render($checkbox.downloadName)</div>
+				#end
+			</div>
+		</div>
+	#end
+</div>
+</div>

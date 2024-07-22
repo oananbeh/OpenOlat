@@ -1,0 +1,27 @@
+<div class="o_reminder_rules_view">
+#if($r.isNotNull($mainRule))
+	<table>
+	<tr>
+		<td><div class="o_marker">$r.translate("rule.if")</div></td>
+		<td colspan="2"><div>$mainRule</div></td>
+	</tr>
+	#if($r.isNotEmpty($additionalRules))
+		#foreach($rule in $additionalRules)
+		<tr>
+			<td></td>
+			<td class="o_additional"><div class="o_marker">$r.translate("rule.additional")</div></td>
+			<td><div>$rule</div></td>
+		</tr>
+		#end
+	#end
+	<tr>
+		<td><div class="o_marker">$r.translate("rule.then")</div></td>
+		<td colspan="2"><div>$r.translate("rule.then.instruction")</div></td>
+	</tr>
+	</table>
+#else
+	<div class"o_warning">
+		$r.translate("error.no.rules")
+	</div>
+#end
+</div>

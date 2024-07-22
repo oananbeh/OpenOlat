@@ -1,0 +1,41 @@
+<script>
+o_info.course_id="$courserepokey";
+#if($oInfoCourse)
+	o_info.course=$oInfoCourse;
+#else
+	delete o_info.course;
+#end
+#if($oInfoCourseNode)
+	o_info.course_node=$oInfoCourseNode;
+#else
+	delete o_info.course_node;
+#end
+## o_activateCourseNode is called from functions.js gotonode() method and implements 
+## the activation of the given node id in the course run structure
+function o_activateCourseNode(nodeid) {
+	if (!o_info.linkbusy) {
+		window.focus();
+		${r.openJavaScriptCommand("activateCourseNode")},"nodeid",nodeid);
+		o_scrollTop();
+	}
+}
+function o_activateCourseTool(toolname) {
+	if (!o_info.linkbusy) {
+		window.focus();
+		${r.openJavaScriptCommand("activateCourseTool")},"toolname",toolname);
+		o_scrollTop();
+	}
+}
+</script>
+#if($r.available("courseProgress"))
+<div class="o_course_progress container-fluid">
+	$r.render("courseProgress")
+</div>
+#end
+
+<div class="o_course_run" data-nodeid="$initNodeId">
+	#if($learningPath)
+		<div class="o_lp_spacer"></div>
+	#end
+	$r.render("coursemain")
+</div>

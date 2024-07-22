@@ -1,0 +1,21 @@
+#foreach ($mode in $modes)
+    #if($foreach.count > 1)
+        <hr>
+    #end
+    <div class="o_qti_assessment_mode o_assessment_mode_details">
+        <div class="o_nowrap">
+            <h4 class="o_nowrap">
+                <i class='o_icon o_icon_assessment_mode'></i>&nbsp;$r.escapeHtml($mode.name)
+            </h4>
+        </div>
+        <div class="text-muted o_assessment_mode_detail_date">
+            $helper.getModeState($mode)
+        </div>
+    </div>
+    <div class="text-muted">$helper.getBeginEndTooltip($mode)</div>
+    <div class="text-muted">$helper.getLeadFollowupTime($mode)</div>
+    <br>
+    #if($r.isNotNull($mode.getKey()))
+        <p>$r.render($mode.getKey().toString())</p>
+    #end
+#end

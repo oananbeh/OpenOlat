@@ -1,0 +1,119 @@
+<div id="$r.getCId()" class="o_course_run o_course_iq">
+#if ($enableScoreInfo && $r.isNotNull($attempts) && $attempts > 0 && $r.available("assessment"))
+	$r.render("assessment")
+#end
+
+#if ($r.available("highScore"))
+	$r.render("highScore")
+#end
+
+#if($showResultsOnHomePage && $r.isNotNull($attempts) && $attempts > 0)	
+	<div class="panel panel-default o_results o_msg_panel">
+	  	<div class="panel-heading">
+	  		<h4 class="panel-title">
+				#if ($showResults && $r.available("command.hideResults"))
+					$r.render("command.hideResults")
+				#elseif($showResultsVisible && $r.available("command.showResults"))
+					$r.render("command.showResults")
+				#else
+					$r.translate("showResults.title")
+				#end
+			</h4>
+	  	</div>
+	  	#if($showResultsVisible)				
+	       	#if($showResults)
+	       	<div class="panel-collapse collapse in"><div class="panel-body">
+				<div id="o_qti_results">$r.render("resultReport")</div>
+			</div></div>
+	       	#end
+		#elseif($r.isNotNull($visibilityStatus))
+			<div class="panel-collapse collapse in"><div class="panel-body o_note">$visibilityStatus</div></div>
+		#elseif($r.isNotNull($visibilityPeriod))
+			<div class="panel-collapse collapse in"><div class="panel-body o_note">
+				<i class="o_icon o_icon-fw o_icon_time"> </i> $visibilityPeriod
+			</div></div>
+		#end
+	</div>
+#end
+
+#set($nomoreattempts = (($attemptsConfig && $attemptsConfig > 0 && $r.isNotNull($attempts) && ($attemptsConfig <= $attempts)) || $blockAfterSuccess))
+$r.render("disclaimer")
+
+#if($infobox)	
+	#if($type == "test")
+	<fieldset class="o_block_top o_start_info_box">
+		<legend>$r.translate("assessment.run.title")</legend>
+		<div class="o_note">
+			<h4>$r.translate("assessment.infos.title")</h4>
+			#if($r.visible("assessment.messages"))
+				$r.render("assessment.messages")
+			#end
+			#if($r.isNotNull($cutValueMsg))
+			<p><i class="o_icon o_icon-fw o_icon_success_status"> </i> $cutValueMsg</p>
+			#end
+			#if($r.isNotNull($minMaxScoreMsg))
+			<p><i class="o_icon o_icon-fw o_icon_score"> </i> $minMaxScoreMsg</p>
+			#end
+			#if($r.isNotNull($scoreScalingMsg))
+			<p><i class="o_icon o_icon-fw o_icon_score_unbalanced"> </i> $scoreScalingMsg</p>
+			#end
+			#if($r.isNotNull($startDateMessage))
+			<p><i class="o_icon o_icon-fw o_icon_time"> </i> $startDateMessage</p>
+			#end
+			#if($r.isNotEmpty($timeLimitMessage))
+			<p><i class="o_icon o_icon-fw o_icon_timelimit_start"> </i> $timeLimitMessage</p>
+			#end
+			#if($r.isNotEmpty($disadvantageCompensationMessage))
+			<p><i class="o_icon o_icon-fw o_icon_disadvantage_compensation"> </i> $disadvantageCompensationMessage </p>
+			#end
+			#if($r.isNotEmpty($maxAttemptsMsg))
+			<p><i class="o_icon o_icon-fw o_icon_attempts"> </i> $maxAttemptsMsg #if($r.isNotEmpty($attemptsMsg))| $attemptsMsg#end</p>
+			#end
+			<p><i class="o_icon o_icon-fw o_icon_eye"> </i> $r.translate("info.assessment")</p>
+			#if ($hasChatWindowOpen)
+			<p>$r.translate("close.chat.windows.for.test")</p>
+			#end
+			
+			<div class="o_button_group">
+			#if($nomoreattempts || $blockDate)
+				<button class="btn btn-default o_button_call_to_action" disabled>$r.translate("start.test")</button>
+			#else
+				$r.render("start")
+			#end
+			</div>
+		</div>
+	</fieldset>
+	#elseif($type == "self")
+	<div class="o_note">
+		<p>$r.translate("Intro.self")</p>
+		<p>$r.translate("info.selfassessment")</p>
+		<div class="o_button_group">
+			#if($nomoreattempts || $blockDate)
+				<button class="btn btn-default o_button_call_to_action" disabled>$r.translate("start.test")</button>
+			#else
+				$r.render("start")
+			#end
+		</div>
+	</div>
+	#end
+#else	
+	<div class="o_button_group">
+	#if($nomoreattempts || $blockDate)
+		<button class="btn btn-default" disabled>$r.translate("start.test")</button>
+	#else
+		$r.render("start")
+	#end
+	</div>
+#end
+
+#if($changelogconfig)
+	#if($r.isNotNull($log) && $r.isNotNull($showChangeLog) && $showChangeLog)
+	<div class="o_box">
+	    #o_togglebox_start("o_course_run_log" $r.translate("log.title"))
+	    <pre class="small">$log</pre>
+	    #o_togglebox_end()
+	</div>    
+	#end
+#end
+
+</div>  ## END of o_course_run o_course_iq container

@@ -1,0 +1,24 @@
+#if($r.isTrue($scoreWarning))
+	<div class="o_warning" role="alert">$r.translate("warning.correct.answer.score")</div>
+#end
+<table class="table o_table_middle o_sel_choices_scores">
+	<thead><tr>
+		<th scope="col">$r.translate("form.score.answer.correct")</th>
+		<th scope="col">$r.translate("form.score.answer.summary")</th>
+		<th scope="col">$r.translate("form.score.answer.points")</th>
+	</tr></thead>
+	<tbody>
+	#foreach($choice in $choices)
+	<tr class="#if(${choice.isCorrect()}) success #end">
+		<td>#if(${choice.isCorrect()}) <span class="o_icon o_icon-lg o_icon_qti_summary_correct"> </span> #end</td>
+		<td>#if($r.isNotNull($choice.summaryEl))
+			$r.render($choice.summaryEl)
+		#else
+			$choice.summary
+		#end</td>
+		#set($hasError = $f.hasError($choice.getPointsEl().getComponent().getComponentName()))
+		<td class="#if($hasError) has-feedback has-error #end">$r.render($choice.getPointsEl().getComponent().getComponentName(), "tablecell")</td>
+	</tr>
+	#end
+	</tbody>
+</table>

@@ -1,0 +1,63 @@
+<div class="o_cn_styled o_cn_peekview o_colcat_top #if($item.colorCategoryCss) $item.colorCategoryCss #end #if($r.isNotEmpty($teaserImageUrl)) o_$item.getTeaserImageStyle() #end" data-nodeid="$item.nodeIdent">
+	<div class="o_top #if($teaserImageBgCss) $teaserImageBgCss #end" #if($cover) style="background-image:url($teaserImageUrl)" #end>
+		<div class="o_text">
+			<div class="o_text_block">
+				<div>
+					<div class="o_title">
+						<h4>$r.render("nodeLink")#if($r.isNotEmpty($item.subTitle)) <small>$r.escapeHtml($item.subTitle)</small>#end</h4>
+					</div>
+					#if($r.isNotEmpty($item.learningPathStatus) || $r.isNotEmpty($noAccessMessage) || $r.isNotEmpty($handlingRange))
+						<div class="o_assessment">
+							#if($r.isNotEmpty($item.learningPathStatus))
+								<div>
+									<span class='o_labeled $item.learningPathStatus.cssClass'><i class='o_icon $item.learningPathStatus.cssClass'> </i> $r.translate("$item.learningPathStatus.i18nKey")</span>
+								</div>
+							#end
+								#if($r.isNotEmpty($noAccessMessage))
+								<div>
+									<span><i class="o_icon o_icon-fw o_icon_warning"> </i> $noAccessMessage #if($r.isNotEmpty($noAccessMessageInfos))<i id="${r.getCId()}_more_infos" class="o_icon o_icon-fw o_icon_info_ap"> </i>#end</span>
+									#if($r.isNotEmpty($noAccessMessageInfos))
+									<div id="${r.getCId()}_more_infos_content" style="display:none;">$r.xssScan($noAccessMessageInfos)</div> 
+									<script>
+									"use strict";
+									jQuery('#${r.getCId()}_more_infos').each(function(index, el) {
+										jQuery(el).tooltip({
+											html: true,
+											container: 'body',
+											delay: { "show": 0, "hide": 1000 },
+											title: function(){ return jQuery('#${r.getCId()}_more_infos_content').html(); }
+										});
+									});
+									</script>
+									#end
+								</div>
+								#end
+							#if($r.isNotEmpty($handlingRange))
+								<div>
+									<span><i class="o_icon o_icon-fw o_icon_time"> </i> $handlingRange</span>
+								</div>
+							#end
+						</div>
+					#end
+				</div>
+				<div></div>
+			</div>
+		</div>
+		#if($r.isNotEmpty($teaserImageUrl) && !$cover)
+			<div class="o_image" aria-hidden="true"><img #if($teaserImageBgCss) class="$teaserImageBgCss" #end src="$teaserImageUrl"></div>
+		#end
+	</div>
+	#if($r.isNotEmpty($item.description))
+		<div class="o_expanded o_text">
+			<div class="o_text_block">
+				<div>
+					<div>$r.formatLatexFormulas($item.description)</div>
+				</div>
+				<div></div>
+			</div>
+		</div>
+	#end
+	#if ($r.available("peekView"))
+		<div class="o_peekview">$r.render("peekView")</div>
+	#end
+</div>

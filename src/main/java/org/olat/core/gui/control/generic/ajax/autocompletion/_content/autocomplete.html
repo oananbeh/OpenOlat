@@ -1,0 +1,87 @@
+<div class="o_form_auto_completer">
+	#if($flexi)
+		<div id='$r.getId("aj_ac_f")'>
+	#else
+		<form id='$r.getId("aj_ac_f")' action="javascript:;">
+	#end
+    #if ($autocompleter_label)
+		$autocompleter_label 
+	#end
+	<div class="$formElementClass">
+	    <input type="text" size="$inputWidth" value="$inputValue" class="form-control" name='$r.getId("o_autocomplete_input")' id='$r.getId("o_autocomplete_input")' placeholder="$!placeholder">
+	</div>	
+	#if($flexi)
+		</div>
+	#else
+		</form>
+	#end
+</div>
+<script>
+"use strict";
+jQuery(function(){
+	var fullNameTypeahead = new Bloodhound({
+		datumTokenizer: function (d) {
+			return Bloodhound.tokenizers.whitespace(d.value);
+		},
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		remote: {
+			url: '${mapuri}/?place=holder&term=%QUERY',
+			wildcard: '%QUERY',
+			filter: function ( response ) {
+				return jQuery.map(response, function (object) {
+					return {
+						cssClass: object.cssClass,
+						value: '' + object.key,
+						#if($showDisplayKey)
+						fullName: object.displayKey + ": " + object.value
+						#else
+						fullName: object.value
+          				#end
+					};
+				});
+			}
+		}
+	});
+	fullNameTypeahead.initialize();
+	jQuery('#$r.getId("o_autocomplete_input")').typeahead({
+		hint: false,
+		highlight: false,
+		minLength: $minChars,
+		limit: 15
+	},{
+		minLength: $minChars,
+		limit: 15,
+		displayKey: 'fullName',
+		source: fullNameTypeahead.ttAdapter(),
+		templates: {
+	        #if ($autocompleter_emptymessage)
+			empty: [
+		    		'<div>','$autocompleter_emptymessage','</div>' 
+	        ].join('\n'),
+	    	#end
+	    	suggestion: function(obj) {
+	    		var s = "<div>";
+	    		if(obj.cssClass !== "undefined" && obj.cssClass != null && obj.cssClass.length > 0) {
+	    			s += "<i class='o_icon " + obj.cssClass + "'> </i> ";
+	    		}
+	    		s += obj.fullName + "</div>";
+	    		return s;
+	    	}
+		}
+	}).on('typeahead:render', function (e) {
+		// disabled and error items should not be selectable
+		jQuery("div.o_disabled.tt-selectable, div.o_icon_error.tt-selectable").removeClass("tt-selectable");
+	}).on('typeahead:selected', function (e, object) { 
+		$r.openJavaScriptCommand("select"),'key',object.value,
+			'$r.getId("o_autocomplete_input")',jQuery('#$r.getId("o_autocomplete_input")').val());
+	}).on('typeahead:change', function(e, value) {
+		$r.openJavaScriptCommand("change"),'key','',
+			'$r.getId("o_autocomplete_input")',jQuery('#$r.getId("o_autocomplete_input")').val());
+	}).on('keyup', this, function (e) {
+        if (e.keyCode == 13) {
+        	$r.openJavaScriptCommand("select"),'$r.getId("o_autocomplete_input")',jQuery('#$r.getId("o_autocomplete_input")').val());
+            return true;
+        }
+    });
+});
+</script>

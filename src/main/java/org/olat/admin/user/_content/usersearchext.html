@@ -1,0 +1,19 @@
+#if ($showButton == "true")
+	#if($r.available("btn.back"))
+		$r.render("btn.back")
+	#end
+	$r.render("userTable")
+#else
+	#if ($r.available("autocompletionsearch"))
+	<fieldset class="o_sel_usersearch_autocompletion">
+		<legend>$r.translate("header.autocompletion")</legend>
+		<p><i>$r.translate("autocompletion.info")</i></p>
+		<p>$r.render("autocompletionsearch")</p>
+	</fieldset>
+	#end
+	#if ($r.available("quicksearchPanel"))
+		$r.render("quicksearchPanel")
+	#end
+	$r.render("usersearchPanel")
+#end
+

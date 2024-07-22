@@ -1,0 +1,12 @@
+<fieldset>
+	<legend>
+	#if ($r.available("accountManagementController"))
+		$r.contextHelpWithWrapper("manual_user/learningresources/Course_Element_Topic_Assignment/")
+	#end
+	$r.translate("form.accountmanagement.title")</legend>
+	#if ($r.available("accountManagementController"))
+		$r.render("accountManagementController")
+	#else
+		$r.translate("form.accountmanagement.no.account.manager.group")
+	#end
+</fieldset>

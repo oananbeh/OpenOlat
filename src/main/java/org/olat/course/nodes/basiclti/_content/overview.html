@@ -1,0 +1,18 @@
+#if ($isassessable)	
+	#if($attempts > 0)
+		$r.render("assessment")
+	#else 
+		<div class="o_no_scoreinfo">$r.translate("score.noscoreinfoyet")</div>
+	#end
+#end
+#if ($r.available("highScore"))
+	$r.render("highScore")
+#end
+
+#if($r.available("contentItemsStarter"))
+	$r.render("contentItemsStarter")
+#else
+	<div class="o_button_group">
+		$r.render("start")
+	</div>
+#end

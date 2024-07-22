@@ -1,0 +1,29 @@
+<div class="o_sel_edit_permissions">
+#if($r.available("repoRights"))
+	<fieldset>
+		<legend>$editTitle</legend>
+		$r.render("repoRights")
+	</fieldset>
+#end
+#if($r.visible("groupList"))
+	<fieldset>
+		<legend>$r.translate("edit.member.groups")</legend>
+		<div class="o_button_group o_button_group_right">
+			$r.render("group.bulk.actions")
+		</div>
+		$r.render("groupList")
+	</fieldset>
+#end
+#if($r.visible("curriculumList"))
+	<fieldset>
+		<legend>$r.translate("edit.member.curriculums")</legend>
+		<div class="o_button_group o_button_group_right">
+			$r.render("curriculum.bulk.actions")
+		</div>
+		$r.render("curriculumList")
+	</fieldset>
+#end
+</div>
+#if($r.available("buttonLayout"))
+	<div class="o_button_group">$r.render("buttonLayout")</div>
+#end

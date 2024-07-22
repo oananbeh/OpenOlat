@@ -1,0 +1,36 @@
+<div class="o_onlyoffice">
+	#if($r.notNull($warning))
+		<div class="o_warning">
+			$warning
+		</div>
+	#else
+		<div id="$id"></div>
+		<script src="$apiUrl"></script>
+		<script>
+		/* <![CDATA[ */
+		## Make sure the OnlyOffice JS-Library is loaded and ready.
+		function loadEditor() {
+			var waitForLoad = function() {
+				if (typeof DocsAPI != "undefined") {
+					var apiConfig = $apiConfig;
+					if ($mobileEnabled) {
+						var mobile = window.matchMedia("$mobileQuery").matches;
+						if (mobile) {
+							apiConfig.type = 'mobile';
+						}
+					}
+					new DocsAPI.DocEditor("$id", apiConfig);
+				} else {
+					window.setTimeout(waitForLoad, 500);
+				}
+			};
+			window.setTimeout(waitForLoad, 500);
+		}
+
+		jQuery("$id").ready(function() {
+			loadEditor();
+		});
+		/* ]]> */
+		</script>
+	#end
+</div>

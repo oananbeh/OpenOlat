@@ -1,0 +1,24 @@
+#if($r.available("upload") && $r.visible("upload"))
+	<div class="o_block_large_bottom">
+		<fieldset>
+			<legend>$uploadTitle</legend>
+			<div>$r.render("upload")</div>
+		</fieldset>
+	</div>
+#end
+#if($r.available("vfsSources") && $r.visible("vfsSources"))
+	<div class="o_block_large_bottom">
+		<fieldset>
+			<legend>$storageTitle</legend>
+			<div>$r.render("vfsSources")</div>
+		</fieldset>
+	</div>
+#end
+#if($r.available("libraries") && $r.visible("libraries"))
+	<div class="o_block_large_bottom">
+		<fieldset>
+			<legend>$librariesTitle</legend>
+			<div>$r.render("libraries")</div>
+		</fieldset>
+	</div>
+#end

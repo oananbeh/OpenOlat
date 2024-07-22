@@ -1,0 +1,16 @@
+<table>
+	<tbody>		
+		#foreach ($synonym in $glossItemSynonyms)
+			<tr>
+				<td>$r.render("synonym.$foreach.count")</td>
+				<td>$r.render("delete.synonym.$foreach.count")</td>
+			</tr>
+		#end
+			<tr>
+				<td>$r.render("synonym.inputfield")</td>
+				<td></td>
+			</tr>
+	</tbody>
+</table>
+<br/>
+$r.render("form.submit")

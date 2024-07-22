@@ -1,0 +1,23 @@
+<div id="$r.getCId()" class="o_iframedisplay">
+	#if ($r.available("command.download"))
+		$r.render("command.download")
+	#end
+	
+	## NOTE:  allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" is necessary for the mediaelement video player to play videos in fullscreen
+	#if ($isAbsoluteURI)
+		<iframe name="$frameId" id="$frameId" src="${currentURI}" frameborder="0" title="$r.translateInAttribute("iframe.content")" height="$iframeHeight" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
+	#else
+		<iframe name="$frameId" class="o_iframe_rel" id="$frameId" src="${baseURI}/${currentURI}" frameborder="0" height="$iframeHeight" style="min-height:${iframeHeight}px" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
+	#end
+	
+	#if($r.isTrue($adjustAutoHeight))
+		<script>
+		## Init the iFrame to the max height possible.
+		jQuery(function() {b_resizeIframeToMainMaxHeight("$frameId");});
+	
+		registerIFrameAndObserve("$frameId", $debug);
+		</script>
+	#end
+	$r.render("newUriEvent")
+</div>
+

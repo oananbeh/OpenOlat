@@ -1,0 +1,22 @@
+#if($r.available("evaluationForm"))
+	<div class="panel panel-default o_disclaimer">
+		<div class="panel-heading" data-toggle="collapse" data-target="#collapseForm">
+			<h4 class="panel-title">
+				<i id="collapseFormToggler" class="o_icon o_icon-fw o_icon_close_togglebox"> </i>
+				$r.translate("result.details.form")
+			</h4>
+		</div>
+		<div id="collapseForm" class="panel-collapse collapse in"><div class="panel-body">
+			$r.render("evaluationForm")
+		</div></div>
+	</div>
+	<script>
+	"use strict";
+	jQuery('#collapseForm').on('hide.bs.collapse', function () {
+		jQuery('#collapseFormToggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+	})
+	jQuery('#collapseForm').on('show.bs.collapse', function () {
+		jQuery('#collapseFormToggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+	})
+	</script>
+#end

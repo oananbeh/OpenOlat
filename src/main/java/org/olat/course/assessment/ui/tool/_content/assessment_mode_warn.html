@@ -1,0 +1,23 @@
+#if($r.isNotEmpty($message))
+	<div class="o_toolbar_message">
+		<div class=" o_qti_assessment_mode o_mode_frame_outer">
+			<div class="o_mode_frame_inner o_assessment_status_${modeStatus} o_assessment_mode_warn">
+				#if($title)
+					<div class="o_assessment_status_badge">$status</div>
+					<div class="o_assessment_title">$title&nbsp;$r.render("infoLink")&nbsp;$message</div>
+				#else
+					$message
+						$r.render("infoLink").
+					$message2
+				#end
+				<div style="display: flex;">
+					#if($r.visible("assessment.start"))
+						&ensp;$r.render("assessment.start")
+					#elseif($r.visible("assessment.stop"))
+						&ensp;$r.render("assessment.stop")
+					#end
+				</div>
+			</div>
+		</div>
+	</div>
+#end

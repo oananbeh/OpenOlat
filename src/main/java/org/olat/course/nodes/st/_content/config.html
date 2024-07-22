@@ -1,0 +1,17 @@
+$r.render("nodeDisplayConfigFormController")
+
+
+#if ($r.available("combiCtr")) 
+<fieldset>
+	<legend>
+		$r.contextHelpWithWrapper("manual_user/learningresources/Course_Element_Single_Page/")
+		$r.translate("fieldset.chosecreateeditfile")
+	</legend>
+	$r.render("combiCtr")
+</fieldset>
+	
+	#if ($editorEnabled)
+		$r.render("allowRelativeLinksForm")
+	#end
+#end
+

@@ -1,0 +1,17 @@
+<div class="o_hint"><p>$message</p></div>
+
+#o_togglebox_start("o_usermanagement_bulkChange" "$r.translate('step0.formatexplanation.link')")
+	$r.translate('step0.formatexplanation.text') 
+	<table class="table table-bordered"><tbody>
+		#foreach( $propertyHandler in $userPropertyHandlers )
+		<tr>
+			<th scope="row">$r.translate($propertyHandler.i18nFormElementLabelKey())</th>
+			<td>
+				#set($so='{')
+				#set($sc='}')
+				$$so$propertyHandler.getName()$sc
+			</td>
+		</tr>
+		#end
+	</tbody></table>	
+#o_togglebox_end()

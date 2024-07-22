@@ -1,0 +1,10 @@
+<div class="o_block clearfix">
+	#if($r.available("certificate"))
+	<div class="pull-right">
+		$r.render("download.button")
+	</div>
+	#end
+</div>
+#if($r.available("certificate"))
+$r.render("certificate")
+#end

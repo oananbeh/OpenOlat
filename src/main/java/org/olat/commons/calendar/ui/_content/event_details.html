@@ -1,0 +1,52 @@
+<div class="o_cal_wv_event_tooltip_content">
+	<h5>$r.escapeHtml($subject)</h5>
+	
+	<div class="o_cal_date text-muted">
+		<i class="o_icon o_icon-fw o_icon_calendar">&nbsp;</i>
+		$date
+	</div>
+	#if($date2 && $date2 != "")
+	<div class="o_cal_time text-muted">
+		<i class="o_icon o_icon-fw ">&nbsp;</i>
+		$date2
+	</div>
+	#end
+	#if($time && $time != "")
+	<div class="o_cal_time text-muted">
+		<i class="o_icon o_icon-fw o_icon_time">&nbsp;</i>
+		$time
+	</div>
+	#end
+	#if($location && !${location.isEmpty()})
+	<div class="o_cal_location text-muted">
+		<i class="o_icon o_icon-fw o_icon_home" title="$r.translateInAttribute("cal.form.location")">&nbsp;</i>
+		$r.escapeHtml($location)
+	</div>
+	#end
+	#if($description && !${description.isEmpty()})
+	<div class="o_cal_description">
+		$r.xssScan($description)
+	</div>
+	#end
+	<div class="o_cal_links">
+		<ul class="list-unstyled">
+			#foreach($link in $links)
+				#if($link.intern)
+					<li class="o_nowrap">$r.render(${link.getLink().getComponentName()})</li>
+				#else
+					<li class="o_nowrap">
+						<a href="$link.uri" title="$link.title" class="o_nowrap" target="_blank">
+							<i class="$link.cssClass"></i>
+							<span>$r.escapeHtml($link.displayName)</span>
+						</a>
+					</li>
+				#end
+			#end
+		</ul>
+	</div>
+	#if($r.available("edit"))
+		<div class="o_cal_tooltip_buttons">
+			$r.render("edit")
+		</div>
+	#end
+</div>

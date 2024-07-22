@@ -1,0 +1,13 @@
+$r.render("remove")
+#if ( $uploadable )
+<fieldset class="clearfix">
+	<legend>$r.contextHelpWithWrapper("manual_user/learningresources/Course_Element_Folder/")
+	$r.translate("condition.accessUploaders.title")</legend>
+	$r.render("uploadCondition")
+</fieldset>
+#end
+<fieldset class="clearfix">
+	<legend>
+	$r.translate("condition.accessDownloaders.title")</legend>
+	$r.render("downloadCondition")<br />
+</fieldset>

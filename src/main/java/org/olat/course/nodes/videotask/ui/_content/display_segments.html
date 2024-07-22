@@ -1,0 +1,187 @@
+<div class="o_videotask_layer">
+	<div id="o_videotask_messages" #if($r.isNotEmpty($messageTimerId)) data-timer-id="${messageTimerId}" #end class="o_videotask_messages #if($r.isNotEmpty($message)) show #else hide #end">
+		<span class="$messageCssClass">$message</span>
+		#if($r.isNotEmpty($messageTimerId))
+		<script>
+		"use strict";
+		jQuery(function() {
+			setTimeout(function(){
+				jQuery(".o_videotask_messages[data-timer-id='${messageTimerId}']").addClass('hide').removeClass('show');
+			}, 5000);
+		});
+		</script>
+		#end
+	</div>
+	#if($r.isTrue($enableDisableCategories))
+	<div id="o_videotask_start_message" class="o_videotask_messages hide">
+		<span class="o_note">$r.translate("feedback.start.segment")</span>
+	</div>
+	#end
+	<div id="o_videotask_categories" class="o_videotask_categories">
+	#foreach ($category in $categories)
+		<button class='btn btn-default $category.color #if($r.isNotEmpty($category.status) && "incorrect" == $category.status) o_videotask_category_incorrect #end' href="javascript:;" role="button" onclick="$f.openFfXHREvent(false, false, true),'cid','category','category-id','${category.id}','position',jQuery('#o_so_vid${videoElementId}').data('player').media.currentTime);">
+			#if($r.isNotEmpty($category.status) && "correct" == $category.status) <i class="o_icon o_icon_correct_answer"> </i> #end${category.labelAndTitle}</button>
+	#end
+	</div>
+	<div id="o_videotask_segments" class="o_videotask_segments $segmentsCssClass">
+		#foreach ($segment in $segments)
+		<div class="o_video_me_segment o_video_me_colored_area ${segment.color()}" style="left: ${segment.left()}; width: ${segment.width()};" data-index="${foreach.count}" data-start="${segment.start()}" data-duration="${segment.duration()}">
+			${segment.label()}
+		</div>
+		#end
+		#foreach ($segmentMarker in $segmentsSelections)
+			#if(${segmentMarker.visible()})
+			<div id="vt-marker-${foreach.count}" data-label-title="${segmentMarker.getCategoryLabelAndTitle()}" data-start="${segmentMarker.start()}" data-duration="${segmentMarker.duration()}" data-duration-string="${segmentMarker.durationString()}" data-index="${foreach.count}" data-category-color="${segmentMarker.categoryColor}" class="o_vt_marker ${segmentMarker.resultCssClass()} ${segmentMarker.categoryColor}" style="#if($r.isNotEmpty($segmentMarker.width())) width: ${segmentMarker.width()}; #end left: ${segmentMarker.left()};">
+				<span>${segmentMarker.categoryLabel}</span>
+			</div>
+			#end
+		#end
+	</div>
+	
+	#if($r.isTrue($showTooltips))
+	<script>
+	"use strict";
+	jQuery(function() {
+		function findSolutionSegment(time) {
+			var segment = null;
+			jQuery('#o_videotask_segments>.o_vt_marker').each(function(i, el) {
+				const jEl = jQuery(el); 
+				const start = parseFloat(jEl.attr('data-start'));
+				const duration = parseFloat(jEl.attr('data-duration'));
+				if(start >= 0 && time >= start && time <= (start + duration)) {
+					segment = el; 
+				}
+			});
+			return segment;
+		}
+		
+		jQuery('#o_videotask_segments>.o_vt_marker').each(function(index, el) {
+			const jEl = jQuery(el);
+			const title = '<strong>' + jEl.attr('data-label-title') + '</strong><br>' + jEl.attr('data-duration-string');
+			const categoryCssClass = jEl.attr('data-category-color');
+			jEl.tooltip({
+				html: true,
+				container: false,
+				delay: { "show": 0, "hide": 5000 },
+				title: title
+			}).on('show.bs.tooltip', function () {
+				jEl.tooltip().data('bs.tooltip')
+					.tip()
+					.addClass('o_videotask_tooltip')
+					.addClass(categoryCssClass);
+			})
+		});
+
+		const videoElement = jQuery('#o_so_vid${videoElementId}');
+		const player = videoElement.data('player');
+		if(player.currentSegmentSolution == undefined) {
+			player.currentSegmentSolution = findSolutionSegment(player.media.currentTime);
+		}
+
+		player.media.addEventListener('timeupdate', function() {
+			const segment = findSolutionSegment(player.media.currentTime);
+			if(segment != null && (player.currentSegmentSolution == null
+					|| segment.getAttribute("data-index") != player.currentSegmentSolution.getAttribute("data-index"))) {
+				player.currentSegmentSolution = segment;
+				jQuery(segment).tooltip("show");
+				setTimeout(function() {
+					jQuery(segment).tooltip("hide");
+				}, 5000);
+			}
+		});
+	});
+	</script>
+	#end
+	
+	#if($r.isTrue($enableDisableCategories))
+	<script>
+	"use strict";
+	jQuery(function() {
+		function findCorrectCategory() {
+			const correctButtons = jQuery('#o_videotask_categories>button>i.o_icon_correct_answer');
+			return correctButtons.length > 0;
+		}
+		
+		function findSegmentIndex(time) {
+			var segmentIndex = -1;
+			jQuery('#o_videotask_segments>.o_video_me_segment').each(function(i, el) {
+				const jEl = jQuery(el); 
+				const start = parseFloat(jEl.attr('data-start'));
+				const duration = parseFloat(jEl.attr('data-duration'));
+				const index = parseInt(jEl.attr('data-index'));
+				if(start >= 0 && time >= start && time <= (start + duration)) {
+					segmentIndex = index;
+				}
+			});
+			return segmentIndex;
+		}
+		
+		const videoElement = jQuery('#o_so_vid${videoElementId}');
+		const player = videoElement.data('player');
+		if(window.startMessageTimeout && window.startMessageTimeout != null) {
+			clearTimeout(window.startMessageTimeout);
+		} else {
+			window.startMessageTimeout = null;
+		}
+		if(player.currentSegment == "undefined") {
+			player.currentSegment = findSegmentIndex(player.media.currentTime);
+		}
+
+		player.media.addEventListener('timeupdate', function() {
+			const segmentIndex = findSegmentIndex(player.media.currentTime);
+			const hasCorrectAnswer = findCorrectCategory();
+			const findSegment = segmentIndex >= 0;
+			
+			var startSegment = false;
+			var endSegment = false;
+			var changeSegment = false;
+			if(findSegment && player.currentSegment >= 0 && segmentIndex != player.currentSegment) {
+				changeSegment = true;
+			} else if(findSegment && player.currentSegment != segmentIndex) {
+				startSegment = true;
+			} else if(!findSegment) {
+				endSegment = true;
+			}
+
+			jQuery('#o_videotask_categories>button').each(function(index, el) {
+				const jEl = jQuery(el);
+				if(startSegment || changeSegment || !findSegment) {
+					jEl.removeClass("o_videotask_category_incorrect");
+				}
+				const disabled = !findSegment || hasCorrectAnswer || jEl.hasClass("o_videotask_category_incorrect");
+				el.disabled = disabled;
+				if(disabled) {
+					jEl.addClass("o_disabled").addClass("disabled");
+				} else {
+					jEl.removeClass("o_disabled").removeClass("disabled");
+				}
+			});
+			
+			if(startSegment) {
+				jQuery('#o_videotask_messages').addClass('hide').removeClass('show');
+			} else if(endSegment || changeSegment) {
+				jQuery('#o_videotask_messages').addClass('hide').removeClass('show');
+				jQuery('#o_videotask_categories>button>i').remove();
+			}
+			
+			if(startSegment || changeSegment) {
+				jQuery('#o_videotask_start_message').addClass('show').removeClass('hide');
+				startMessageTimeout = setTimeout(function() {
+					jQuery('#o_videotask_start_message').addClass('hide').removeClass('show');
+				}, 5000);
+			} else if(endSegment) {
+				jQuery('#o_videotask_start_message').addClass('hide').removeClass('show');
+				if(window.startMessageTimeout != null) {
+					clearTimeout(window.startMessageTimeout);
+					window.startMessageTimeout = null;
+				}
+			}
+			
+			if(segmentIndex >= 0) {
+				player.currentSegment = segmentIndex;
+			}
+		});
+	});
+	</script>
+	#end
+</div>

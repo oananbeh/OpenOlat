@@ -1,0 +1,24 @@
+#if($showTitle)
+<h2><i class="o_icon $courseNodeCssClass"> </i> $r.escapeHtml($courseNodeTitle)#if($r.isNotEmpty($businessGroupName)) <small><i class="o_icon o_icon_group"> </i> $r.escapeHtml($businessGroupName)</small>#end</h2>
+#end
+<div class="o_button_group o_button_group_right">
+	#if($r.available("tool.grade.scale"))
+		$r.render("tool.grade.scale")
+	#end
+	#if($r.available("button.stats"))
+		$r.render("button.stats")
+	#end
+	#if($r.available("play.all"))
+		$r.render("play.all")
+	#end
+	#if($r.available("button.export"))
+		$r.render("button.export")
+	#end
+	#if($r.available("tool.reset.data"))
+		$r.render("tool.reset.data")
+	#end
+	#if($r.available("more.menu"))
+	$r.render("more.menu")
+	#end
+</div>
+$r.render("table")

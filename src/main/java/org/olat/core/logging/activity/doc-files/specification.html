@@ -1,0 +1,1035 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>User Activity Logging</title>
+</head>
+<body>
+ 
+<div>
+
+  <h1>User Activity Logging</h1>
+  <h2>Specification &amp; Architecture</h2>
+  <h2>
+    1 Introduction
+  </h2>
+  This document summarizes a year long discussion between UZH and BPS about how to do Activity Logging in OLAT and describes the next steps necessary to finish the implementation.<br>
+  <br>
+  <h3>
+    Terminology
+  </h3>
+  There will still be two different kinds of logging:<br>
+  <br>
+  <ul>
+    <li>
+      <strong>user activity logging</strong> for auditing and user-, group-, course-level statistics<br>
+    </li>
+    <li>
+      <strong>technical logging</strong> for errors, warns and debugging.
+    </li>
+  </ul>
+  <br>
+  This document only affects user activity logging<br>
+  <br>
+  <h2>
+    2 Architecture
+  </h2>
+  <h3>
+    IUserActivityLogger, ThreadLocalUserActivityLoggerInstaller and ThreadLocalUserActivityLogger
+  </h3>
+  <ul>
+    <li>
+      All logging happens via an interface I<code>UserActivityLogger</code> via the Method(s) <code>log(..)</code>
+    </li>
+    <li>
+      An <code>UserActivityLogger</code> can be created via <code>ThreadLocalUserActivityLoggerInstaller</code>
+    </li>
+    <li>
+      Also, a <code>ThreadLocalUserActivityLogger</code> is introduced to pass <code>UserActivityLogger</code>s from <code>Controller</code> to <code>Controller</code> during event handling (which is the most common use case of doing user activity logging)
+    </li><li>
+    <ul style=FONT-FAMILY:Verdana>
+      <li>
+        When <code>ThreadLocalUserActivityLogger.log()</code> is accessed and no <code>IUserActivityLogger</code> is set, it falls back to the minimum set of informations available which is the user and the session.
+      </li>
+   </ul></li> 
+  </ul>
+  <h3>
+    User Activity Logging During Event Handling
+  </h3>
+  <ul>
+    <li>
+      Each <code>Controller</code> has an (optional) I<code>UserActivityLogger</code> which is initialized usually at constructor time.<br>
+      <strong>PS:</strong>&nbsp; Controllers should set the <code>IUserActivityLogger </code>as early as possible when they have knowledge of olat resourceable that would be important to have for logging (incl. <code>ForumController</code>, <code>CourseGroupManagementMainController</code>). Not always are Controllers created from within an event() method<br>
+    </li>
+    <li>
+      In the event loop where <code>Window.event()</code> calls <code>Controller.event()</code> the Framework grabs the <code>Controller</code>'s <code>IUserActivityLogger </code>and sets it as the <code>ThreadLocalUserActivityLogger</code>. (setting the minimal I<code>UserActivityLogger </code>if the <code>Controller </code>one is <code>null</code>)
+    </li><li>
+    <ul>
+      <li>
+        Similarly, the <code>EventAgency.fireEvent()</code> - through which all <code>MultiUserEvent </code>for both singleVM and cluster mode are passed through - sets the <code>ThreadLocalUserActivityLogger </code>to the Controller's <code>IUserActivityLogger</code>. If the listener is not a <code>Controller </code>then the <code>ThreadLocalUserActivityLogger </code>is set to <code>null</code><br>
+      </li>
+    </ul></li>
+    <li>
+      This allows for any code which is executed within the scope of <code>Controller.event()</code> to be able to simply access the <code>ThreadLocalUserActivityLogger.log()</code> method to do user activity logging.<br>
+    </li>
+    <li>
+      Similarly to <code>Controller.event()</code> there is a bit of logging done within the scope of <code>Window.dispose()</code>. The framework also sets the <code>ThreadLocal</code><code>User</code><code>ActivityLogger</code> to simplify user activity logging during <code>dispose()</code>.<br>
+    </li>
+    <li>
+      For cases where logging is done outside of the scope of the <code>Controller.event()/Window.dispose()</code> the <code>ThreadLocalUserActivityloggerInstaller </code>can be used to create an <code>User</code><code>ActivityLogger</code>
+    </li>
+    <li>
+      Special care needs to be taken during multi user session event handling: There we should not pass on the <code>UserActivityLogger </code>object via ThreadLocal
+    </li>
+  </ul>
+  <h3>
+    Initialization of IUserActivityLogger
+  </h3>
+  <ul>
+    <li>
+      As a minimum fallback there will always be an <code>IUserActivityLogger </code>which knows about the user and the session - therefore minimal user activity logging within an event handler is always possible.
+    </li>
+    <li>
+      The goal though is to pass more specific information to the <code>IUserActivityLogger</code>:
+    </li>
+    
+    <li>
+    <ul>
+      <li>
+        the <em>business path</em> - which we should be able to retrieve via <code>WindowControl</code>/<code>BusinessControl </code>- attribute <code>"BUSPATH"</code>
+      </li>
+      <li>
+        and derived thereof the following (duplicate) information to simplify logging analysis later:
+      <ul>
+        <li>
+          target resource (ID &amp; Type)
+        </li>
+        <li>
+          course
+        </li>
+        <li>
+          group
+        </li>
+        <li>
+          node<br>
+        </li>
+      </ul></li>
+    </ul></li>
+    <li>
+      The framework sets the <code>IUserActivityLogger </code>in the <code>DefaultController </code>to the one currently set in <code>ThreadLocalUserActivityLogger </code>(as part of passing <code>IUserActivityLogger</code>s from <code>Controller </code>to <code>Controller</code>)
+    </li>
+  </ul>
+  <br>
+  <h3>
+    Logging Targets: distributed, into OLAT DB or Separate DB
+  </h3>
+  Logging is done into a database - this can either be the olat database or a separate one.<br>
+  <br>
+  Each OLAT node logs directly into the (logging) DB - i.e. logging happens distributed. This is better performance-wise - as sending an event to a central-single-service which would then do the DB transaction is an overhead. The main reason for the RemoteAuditLogger (which did logging into a log file from a singleton service) was to make sure the log file was not garbled. With the DB this is no longer an issue and we can now log distributed. Hence the<code> RemoteAuditLogger</code> will no longer be used.<br>
+  <br>
+  Regarding logging into the OLAT DB or a separate DB: This comes down to lifecycling logging data. As this table grows constantly and rather rapidly, one needs to plan how this big logging table is handled. Two or three different concepts could be considered:<br>
+  <ol>
+    <li>
+      Logging happens into the OLAT DB - with replication configured to <em>forward</em> the <code>o_loggingtable</code> to a separate, <em>long-term-logging-db</em>. The latter can then do periodic compressing, normalization etc.
+    </li>
+    <li>
+      Logging happens into a separate DB which does periodic compressing, normalization etc.
+    </li>
+    <li>
+      Logging happens into a separate DB which is configured with replication and forwards its logging table to a separate, <em>long-term-logging-db</em> which then does compressing and normalization
+    </li>
+  </ol>
+  The decision on which setup to implement is a deployment choice.<br>
+  <br>
+  <h3>
+    Logged Information
+  </h3>
+  The following is the complete list of information which is logged. As shown above, the logging can happen to the usual OLAT DB or to a separate <em>logging DB</em>.<br>
+  <br>
+  Note that not all of below fields are mandatory<br>
+  <br>
+  <h4>
+    Technical Fields
+  </h4>
+  <table>
+    <tbody>
+    <tr>
+      <th scope="row">ID</th>
+      <th scope="row">Type</th>
+      <th scope="row">Length</th>
+      <th scope="row">Mandatory</th>
+      <th scope="row">Description</th>
+    </tr>
+    <tr>
+      <td>
+        log_id<br>
+      </td>
+      <td>
+        bigint<br>
+      </td>
+      <td>
+        20<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        globally unique id of this log entry<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        creationdate<br>
+      </td>
+      <td>
+        timestamp<br>
+      </td>
+      <td>
+        <br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        date and time when this log happened<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        sourceclass<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        512<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        the class which triggered this log<br>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <br>
+  <h4>
+    Session and User Fields
+  </h4>
+  <table>
+    <tbody>
+    <tr>
+      <th scope="row">ID</th>
+      <td scope="row">Type</td>
+      <th scope="row">Length</th>
+      <th scope="row">Mandatory</th>
+      <th scope="row">Description</th>
+    </tr>
+    <tr>
+      <td>
+        sessionid<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        255<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        JSessionID<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        user_id<br>
+      </td>
+      <td>
+        bigint<br>
+      </td>
+      <td>
+        20<br>
+      </td>
+      <td>
+        false
+      </td>
+      <td>
+        o_user.user_id<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        username<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        255<br>
+      </td>
+      <td>
+        false
+      </td>
+      <td>
+        <br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        userproperty1<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        255<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        customizable property 1<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        ..<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        255<br>
+      </td>
+      <td>
+        false
+      </td>
+      <td>
+        ..<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        userproperty12<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        255<br>
+      </td>
+      <td>
+        false
+      </td>
+      <td>
+        customizable property 12
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <br>
+  <h4>
+    Action
+  </h4>
+  <table>
+    <tbody>
+    <tr>
+      <th scope="row">ID</th>
+      <th scope="row">Type</th>
+      <th scope="row">Length</th>
+      <th scope="row">Mandatory</th>
+      <th scope="row">Description</th>
+    </tr>
+    <tr>
+      <td>
+        actionCRUDType<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        1<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        CRUD: (C)reate, (R)etrieve, (U)pdate, (D)elete, (E)xit<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        actionVerb<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        16<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        verb describing this action. This comes from a limited, olat-wide defined enum. e.g.:<br>
+        add,remove,edit,launch,denied,move,copy,view...<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        actionObject<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        32<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        object of this action. usually corresponds to targetrestype but the latter might not always exist. e.g.:<br>
+        course,node,editor,groupmanagement,forumthread,<br>
+        owner,participant...<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        resourceadminaction<br>
+      </td>
+      <td>
+        boolean<br>
+      </td>
+      <td>
+        1<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        formerly known as logStream - true for ADMIN, false for USER<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        simpleDuration<br>
+      </td>
+      <td>
+        bigint<br>
+      </td>
+      <td>
+        20<br>
+      </td>
+      <td>
+        true<br>
+      </td>
+      <td>
+        -1 by default, otherwise the time between the next and this log action in this session<br>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <br>
+  <h4>
+    Scope
+  </h4>
+  <table>
+    <tbody>
+    <tr>
+      <th scope="row">ID</th>
+      <th scope="row">Type</th>
+      <th scope="row">Length</th>
+      <th scope="row">Mandatory</th>
+      <th scope="row">Description</th>
+    </tr>
+    <tr>
+      <td>
+        businesspath<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        2048<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        REST-like, full business path<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        targetrestype<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        32<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        target olat resourceable type (e.g. forum,wiki)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        targetresid<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        64<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        target olat resourceable id<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        targetresname<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        256<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        target olat resourceable name<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        parentrestype<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        32<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the parent olat resourceable type (e.g. node)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        parentresid<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        64<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the parent olat resourceable id<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        parentresname<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        256<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the parent olat resourceable name<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        grandparentrestype<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        32<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the grand parent olat resourceable type (e.g. course)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        grandparentresid<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        64<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the grand parent olat resourceable id<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        grandparentresname<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        256<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the grand parent olat resourceable name<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        greatgrandparentrestype<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        32<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the great grand parent olat resourceable type (e.g. course)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        greatgrandparentresid<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        64<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the great grand parent olat resourceable id<br>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        greatgrandparentresname<br>
+      </td>
+      <td>
+        varchar<br>
+      </td>
+      <td>
+        256<br>
+      </td>
+      <td>
+        false<br>
+      </td>
+      <td>
+        the great grand parent olat resourceable name<br>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <br>
+  <strong>A note on olat resourceables:<br>
+  </strong>
+  <ul>
+    <li>
+      Not all information stored in the scope/resource columns are of type OLATResourceable. Within Olat this concept of OLATResourceable is not implemented consequently - e.g. a Course Node is not an OLATResouceable, yet we want to log this information
+    </li>
+    <li>
+      Also, sometimes we want to store information which has nothing to do with an OLATResourceable, such as a user or the number of qti attempts - in short, in these cases we want to store a plain old String.
+    </li>
+    <li>
+      To support all of the above cases (a proper OLATResourceable, an almost OLAT Resourceable and a plain String) we introduce a new interface called ILoggingResourceable under which there are two concrete implementations, one for OLATResourceable and one <em>for the rest</em>. Hence the type and id of the above fields do not always match to something in the DB or in the filesystem and are therefore -1 in those cases<br>
+    </li>
+  </ul>
+  <strong>A note on target, parent, grandparent, greatgrandparent<br>
+  </strong>
+  <ul>
+    <li>
+      The User Activity Logging framework collects ILoggingResourceables which it then stores into the DB. This <em>collection</em> happens at constructor creator time, is magically available during event handling and dispose via the ThreadLocal concept and can also be provided to the IUserActivityLogger at log() call time.
+    </li>
+    <li>
+      All of these resourceables are then checked against what the LoggingAction expects there to be - plus also checked against the businessPath.
+    </li>
+    <li>
+      The result - or to be precise at max 4 of them - are then stored in those target/parent/grandparent/greatgrandparent fields, starting with the most specific one, which is target.
+    </li>
+    <li>
+      Hence target should rather never be null, but greatgrandparent/greatparent are often null.<br>
+    </li>
+  </ul>
+  <br>
+  <h3>
+    Example 'Log-Line'
+  </h3>
+  <code>*************************** 2. row ***************************</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; log_id: 1703939</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; creationdate: 2009-11-03 09:54:51</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sourceclass: org.olat.course.run.navigation.NavigationHandler</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sessionid: CF2F6ABEEBD1CC3112196ABB3699E07A</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_id: 229376</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; username: administrator</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty1: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty2: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty3: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty4: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty5: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty6: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty7: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty8: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty9: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty10: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty11: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userproperty12: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; actioncrudtype: r</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; action: NODE_ACCESS</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simpleduration: 2404</code>
+  <code>&nbsp;&nbsp;&nbsp; resourceadminaction: 0</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; businesspath: [RepositoryEntry:393222][CourseNode:70448659388630]</code>
+  <code>greatgrandparentrestype: NULL</code>
+  <code>&nbsp; greatgrandparentresid: NULL</code>
+  <code>greatgrandparentresname: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp; grandparentrestype: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; grandparentresid: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp; grandparentresname: NULL</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parentrestype: CourseModule</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parentresid: 80387775267358</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parentresname: Course template small</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; targetrestype: st</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; targetresid: 70448659388630</code>
+  <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; targetresname: Course template small</code>
+  <br>
+  <h3>
+    Duration Estimation
+  </h3>
+  In order to estimate the duration which a user spent on a particular page we can use the following algorithm:<br>
+  <ul>
+    <li>
+      initially a log entry is written to the DB with duration=-1
+    </li>
+    <li>
+      if a subsequent the above written log entry's duration value is overwritten with the measured delta value.<br>
+    </li>
+  </ul>
+  <br>
+  Note that a session timeout will set the duration of the user's last click to <em>session_timeout</em> by default. This must be taken into account when doing reports. Also, large values of duration might not be useful since the user could have done something else in the meantime.<br>
+  <br>
+</div>
+<h3>
+  <strike>Configuration</strike>
+</h3>
+<strike>The following is an overview of what and how to configure user activity logging<br>
+<br>
+</strike>
+<ol>
+  <li>
+    <strike>hibernate configuration of the database in spring (a la <code>DBModule</code>)</strike>
+  </li>
+  <li>
+    <strike>configuration of the user properties</strike>
+  </li><li>
+  <ul>
+    <li>
+      <strike>either via<br>
+      <code>UserManager um = UserManager.getInstance();</code>
+      <code>um.getAllUserPropertyHandlers()</code></strike>
+    </li>
+    <li>
+      <strike>or via something pluggable (TBD)<br>
+      </strike>
+    </li>
+  </ul></li>
+</ol>
+<br>
+<br>
+<h2>
+  3 Deployment @ UZH
+</h2>
+Early measurements of log traffic to the o_loggingtable have resulted in an estimate of 15-20GB log-data per month (down from an original 100GB/month). With the requirement of keeping a backlog of about 2 years worth of logging data this results in quite a big database table.<br>
+<br>
+When doing statistical analysis - i.e. select statements on the loggingtable - this can generate quite some, albeit only temporary, load on the database.<br>
+<br>
+This brought up the need to look for alternative database setups - especially having a separate database specifically for logging. While it would be possible to have two databases configurable in OLAT, such a setup would mean having to deal with two sets of configurations, two sets of database connection pools, fixing the DBImpl/DBInstance singleton as well as making commits on two connections (not that we have strict transactional requirements on logging as much as we have on the other data).<br>
+<br>
+With the above in mind we came up with the following draft of deployment which we'll aim for @UZH:<br>
+<br>
+<div>
+  <img src="images/dkt7x72_181c6qb9pg2_b.png">
+</div>
+<br>
+<br>
+<h3>
+  A few notes on the logging DB setup
+</h3>
+All <em>normal OLAT instances</em> are still configured with only 1 database connection - nothing changes on that front.<br>
+<br>
+There are now two databases used in this setup:<br>
+<h4>
+  Main OLAT DB
+</h4>
+<ul>
+  <li>
+    This database stores all data locally except the o_loggingtable which is configured as BLACKHOLE - hence no logging entries exist on this DB
+  </li>
+  <li>
+    This database has the o_statistics table 'mounted' i.e. federated from the logging DB in read-only mode - hence it can access statistics information generated on the logging DB.
+  </li>
+</ul>
+<h4>
+  Logging DB
+</h4>
+<ul>
+  <li>
+    The logging DB is configured to be a Replication Slave to the Main OLAT DB. That means it will retrieve all updates from the Main OLAT DB, especially including the o_loggingtable which now only exists here.
+  </li>
+  <li>
+    The logging DB is equiped with scripts which montly compress the o_loggingtable, store the resulting table in a (read-only) o_loggingtable_200910 and 'mount' it back into the logging DB via a so called Merge Table. That means that in any event it can access as much logging data as required or kept in those monthly compress snapshots and at the same time save space using compression.
+  </li>
+</ul>
+<br>
+<h3>
+  OLAT Log(-Reporting)&amp;Statistics node
+</h3>
+<h4>
+  Generating Statistics
+</h4>
+There will be functionality - implemented by BPS - which processes logging data into some form of statistics. This data will be stored in a table - let's call it o_statistics. This table is configured to exist in the Logging DB and in a read-only-federated mode also back on the Main OLAT DB.<br>
+<br>
+The statistics are triggered via a <strong>Quartz-Job</strong> which is only configured on this <strong>Singleton Statistics Service in the Cluster</strong>.<br>
+<br>
+<h4>
+  Generating the (legacy) log file
+</h4>
+The Log &amp; Statistics node will also take care of extracting filtered logging data from the logging table (it is the only node which is configured to have access to the logging DB) and provides the information in the method required. This could include:<br>
+<ul>
+  <li>
+    store the result in a course resource folder (downside: would require disk space again)<br>
+  </li>
+  <li>
+    send the result via an email (downside: file could be too big for some inboxes)
+  </li>
+  <li>
+    downloadable (downside: complicated mechanism for pass the resulting log file - e.g. via temp directory - to the calling olat node)
+  </li>
+</ul>
+<br>
+<strong>Preferred way to go</strong>: store the result in a course resource folder.<br>
+<br>
+<h3>
+  SimpleDuration Update
+</h3>
+<div>
+  Here is a note about updating simpleDuration. With the setup @ UZH of having BLACKHOLE configured in the o_loggingtable on the Main OLAT DB those logging entries we insert directly 'disappear' (and get replicated to the logging db). That means that doing an updateObject() later would fail because hibernate does a safety check on how many rows were updated. And since it can't find the previous logging object anymore, it fails.<br>
+  <br>
+  To work around this issue, the code now does an update manually via createQuery and executeQuery. This way we don't assume that the log row we're updating actually exists in the database. If it exists, it will update it fine. If it doesn't, nothing happens. Except that our setup with replication will still forward the update command to the slave - hence it still gets updated accordingly in the slave.<br>
+  <br>
+</div>
+<h2>
+  4 Deployment @ BPS
+</h2>
+[OPEN]
+<br>
+<h2>
+  5 Deployment @ Demo Installer
+</h2>
+<br>
+<div>
+  <img src="images/dkt7x72_1834qvbskdz_b.png">
+</div>
+<br>
+In the demo installer case there is only one tomcat node and all services run in that node. Therefore the log &amp; statistics service runs in that one tomcat node as well. The other difference to cluster setups is that there is no JMS used - MultiUserEvents are sent to singleton services internally directly.<br>
+<br>
+With both the log-reporting &amp; statistics services being a singleton service (in OLAT terms) this setup becomes a <em>simple configuration task</em>.<br>
+<br>
+Note that the OLAT DB contains the usual tables as well as the o_loggingtable. The o_loggingtable might grow rapidly and we should add documentation about this fact - and how we deal with this in our installations.<br>
+<br>
+<h2>
+  6 Tasks
+</h2>
+<h3>
+  Design
+</h3>
+<ul>
+  <li>
+    <strike>Finish up the specification and design of the new user activity logging framework. Especially go through existing usage of logging and verify that it fits into the new schema.</strike> [DONE]
+  </li>
+  <li>
+    <strike>Multi user events: analyse what information needs and needs not be passed via <code>ThreadLocalUserActivityLogger </code>(e.g. don't pass the session but pass the course/group?)</strike> [DONE]
+  </li>
+  <li>
+    <strike>Finish review of existing delta in BPS-1229 branch</strike> [DONE]
+  </li>
+  <li>
+    <strike>Decide on any open issue/TBDs</strike> [DONE]
+  </li>
+</ul>
+<h3>
+  BPS-1229 Branch
+</h3>
+<ul>
+  <li>
+    <strike>The BPS-1229 branch - containing a prototype of the new logging - is based on rather old code and the merge into HEAD is probably not worthwhile. Hence we will have to redo this work</strike> [DONE]
+  </li><li>
+  <ul>
+    <li>
+      <strike>There seem to be various changes in the BPS-1229 branch - most of them not related to logging. Hence it would make it rather difficult to extract what is logging and what not. Hence redoing the work</strike> [DONE]
+    </li>
+  </ul></li>
+</ul>
+<h3>
+  Framework
+</h3>
+<ul>
+  <li>
+    <strike><u style="FONT-FAMILY:Courier New">IUser</u><u style="FONT-FAMILY:Courier New">ActivityLogger, </u><u style="FONT-FAMILY:Courier New">ThreadLocalUserActivityLoggerInstaller</u><u style="FONT-FAMILY:Courier New">, </u><u><code>ThreadLocal</code><code>User</code><code>ActivityLogger</code></u>: Implement these main framework parts
+    </strike>
+  </li>
+  <li>
+    <strike><em>activity logging scope</em>: make sure the <code>ThreadLocalUserActivityLogger </code>is set when going into <code>Controller.event()</code>.&nbsp;</strike>
+  </li>
+  <li>
+    <strike>make sure the businessPath is available when doing logging (also in the <code>ThreadLocalUserActivityLogger</code>?)
+    </strike>
+  </li>
+  <li>
+    <strike>Multi user events &amp; <code>ThreadLocalActivityLogger</code>: make sure session information doesn't propagate between sessions via the <code>ThreadLocalUserActivityLogger</code>, instead pass other required information (course, group?)</strike>
+  </li>
+  <li>
+    <strike>Implement the database logging part</strike>
+  </li>
+</ul>
+<br>
+<div>[DONE]</div>
+<h3>
+  Integration into ManagedTransaction
+</h3>
+<ul>
+  <li>
+    User activity logging should be treated transactionally: either the transaction succeeded and hence the logging is written - or the transaction failed and hence the logging should not be written
+  </li>
+  <li>
+    The ManagedTransaction and the new user activity logging classes should cooperate to make sure these logs are treated transactionally. [LATER/6.4]
+  </li>
+</ul>
+<h3>
+  Migration
+</h3>
+<ul>
+  <li>
+    <strike>The migration from the existing <code>AuditManager.log()</code> to <code>ThreadLocalUserActivityLogger.log()</code> will take a while and make the HEAD unstable. Hence there should be a smooth transition. This can be done by allowing the old and the new logging code to co-exist and flag the old one as <strong>deprecated </strong></strike> [DONE]
+  </li>
+  <li>
+    move old logfiles to course folder (use new folder <em>archive</em> and zip the files; bps task) [OPEN]
+  </li>
+</ul>
+<h3>
+  Controllers, Managers
+</h3>
+<ul>
+  <li>
+    <strike>Refactor all occurrences of audit/activity logging by switching to the new <code>UserActivityLogger</code>. Make sure to test each place verifying that either that logging is within the <code>Controller.event()</code> scope or else a specific <code>UserActivityLogger </code>is created via the </strike><code><strike>UserActivityLoggerFactory</strike> </code> [DONE]
+  </li>
+</ul>
+<h3>
+  User Properties
+</h3>
+<ul>
+  <li>
+    Configurable User Properties - incl passing them to the database. [OPEN]
+  </li>
+</ul>
+<h3>
+  User interface
+</h3>
+<ul>
+  <li>
+    <strike>disable tab for log files in course configuration</strike> [DONE] (eglis)
+  </li>
+  <li>
+    clean up user interface (bps task) [OPEN]
+  </li>
+  <li>
+    archive logfiles - previous ui without checkbox "delete after archive" and without choice for log format (bps task) [OPEN]
+  </li>
+  <li>statistics  [OPEN]</li>
+</ul>
+<h3>
+  Review
+</h3>
+<ul>
+  <li>
+    review log entries (bps task) [OPEN]
+  </li>
+</ul>
+<h3>
+  Workflows
+</h3>
+<ul>
+  <li>
+    delete course - create admin and statistic log files and add these to course file (bps task) [OPEN]
+  </li>
+</ul>
+<h2>
+  7 Estimates
+</h2>
+The below estimates require a review further down the road.<br>
+<br>
+<ul>
+  <li>
+    Design requires another 1-2 weeks (in parallel with other<br>
+  </li>
+  <li>
+    Migrating the existing BPS-1229 branch (reuse the reusable parts) requires 3-5 days
+  </li>
+  <li>
+    Finishing up the framework code (which includes parts of the BPS-1229 branch) requires another 3-5 days
+  </li>
+  <li>
+    Going through all controllers and managers can only start once the above work is finished - hence not before early/mid October - and will probably take 1-3 weeks<br>
+  </li>
+</ul>
+<br>
+<br>
+<br></body>
+</html>

@@ -1,0 +1,20 @@
+<div class="o_doceditor $!cssClass">
+	#if($r.available("editor"))
+		$r.render("editor")
+		<script>
+		/* <![CDATA[ */
+			## https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+			var vh = window.innerHeight * 0.01;
+			document.documentElement.style.setProperty('--doceditorvh', `${vh}px`);
+			jQuery(document).on("oo.window.resize.after", () => {
+				var vh = window.innerHeight * 0.01;
+				document.documentElement.style.setProperty('--doceditorvh', `${vh}px`);
+			});
+		/* ]]> */
+		</script>
+	#else
+		<div class="o_warning">
+			$r.translate("error.no.editor")
+		</div>
+	#end
+</div>

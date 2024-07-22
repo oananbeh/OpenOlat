@@ -1,0 +1,71 @@
+<div class="o_assessment_preformance_summary o_block_large">
+	<fieldset>
+		<legend class="o_aps_header">
+			<div class="o_aps_title">
+				$title
+			</div>
+			#if($hasStatusField)
+				<div class="o_aps_status">
+					<span class='o_labeled $statusLabelCss'><i class='o_icon o_icon-fw $statusIconCss'> </i> $statusText</span>
+				</div>
+			#end
+		</legend>
+	</fieldset>
+	$r.render("results")
+</div>
+
+#if($resultsVisible)
+	#if ($r.isNotEmpty($comment))
+		<div class="panel panel-default o_comment">
+			  <div class="panel-heading" data-toggle="collapse" data-target="#collapseComment">
+				  <h4 class="panel-title">
+					  <i id="collapseCommentToggler" class="o_icon o_icon-fw #if($r.isTrue($incomment)) o_icon_close_togglebox #else o_icon_open_togglebox #end"> </i>
+					  $r.translate("comment.title")
+				  </h4>
+			  </div>
+			<div id="collapseComment" class="panel-collapse collapse #if($r.isTrue($incomment)) in #end"><div class="panel-body">
+				$comment
+			  </div></div>
+		</div>
+		<script>
+		"use strict";
+		jQuery('#collapseComment').on('hide.bs.collapse', function () {
+			jQuery('#collapseCommentToggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+			$r.backgroundCommand("hide","panel","comment")
+		})
+		jQuery('#collapseComment').on('show.bs.collapse', function () {
+			jQuery('#collapseCommentToggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+			$r.backgroundCommand("show","panel","comment")
+		})
+		</script>
+	#end
+
+	#if ($r.visible($docs))
+		<div class="panel panel-default o_assessment_docs">
+			  <div class="panel-heading" data-toggle="collapse" data-target="#collapseAssessmentDocuments">
+				  <h4 class="panel-title">
+					  <i id="collapseAssessmentDocumentsToggler" class="o_icon o_icon-fw #if($r.isTrue($inassessmentDocuments)) o_icon_close_togglebox #else o_icon_open_togglebox #end"> </i>
+					  $r.translate("assessment.documents.title")
+				  </h4>
+			  </div>
+			<div id="collapseAssessmentDocuments" class="panel-collapse collapse #if($r.isTrue($inassessmentDocuments)) in #end"><div class="panel-body">
+				$r.render("docs")
+			</div></div>
+		</div>
+		<script>
+		"use strict";
+		jQuery('#collapseAssessmentDocuments').on('hide.bs.collapse', function () {
+			jQuery('#collapseAssessmentDocumentsToggler').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+			$r.backgroundCommand("hide","panel","assessmentDocuments")
+		})
+		jQuery('#collapseAssessmentDocuments').on('show.bs.collapse', function () {
+			jQuery('#collapseAssessmentDocumentsToggler').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+			$r.backgroundCommand("show","panel","assessmentDocuments")
+		})
+		</script>
+	#end
+
+	#if($r.available("download"))
+		$r.render("download")
+	#end
+#end

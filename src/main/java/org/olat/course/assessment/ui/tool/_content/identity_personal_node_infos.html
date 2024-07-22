@@ -1,0 +1,24 @@
+#if($showTitle)
+<h2><i class="o_icon $courseNodeCss"> </i> $r.escapeHtml($courseNode)</h2>
+#end
+
+#if($r.available("identityInfos"))
+	$r.render("identityInfos")
+#end
+
+#if($r.available("details")) 
+	$r.render("details")
+#end
+#if($r.available("assessmentForm"))
+	<div class="o_block_top">
+		$r.render("assessmentForm")
+	</div>
+#end
+
+#if($r.isNotNull($log))
+<div class="o_box">
+    #o_togglebox_start("o_assessment_form_log" $r.translate("log.title"))
+    <pre class="small">$log</pre>
+    #o_togglebox_end()
+</div>    
+#end

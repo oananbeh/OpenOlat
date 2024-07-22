@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+  http://www.springframework.org/schema/beans 
+  http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="cl" class="de.bps.course.nodes.cl.ChecklistCourseNodeConfiguration" scope="prototype">
+		<property name="enabled" value="false" />
+		<property name="deprecated" value="false" />
+		<property name="order" value="220" />
+		<property name="alternativeCourseNodes">
+			<list>
+				<value>checklist</value>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

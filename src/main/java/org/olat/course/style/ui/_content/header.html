@@ -1,0 +1,70 @@
+<div class="o_cn_styled o_cn_header o_colcat_left #if($item.colorCategoryCss) $item.colorCategoryCss #end #if($r.isNotEmpty($teaserImageUrl)) o_$item.getTeaserImageStyle() #end">
+	<div class="o_top #if($teaserImageBgCss) $teaserImageBgCss #end" #if($cover) style="background-image:url($teaserImageUrl)" #end>
+		<div class="o_text">
+			#if($r.isNotEmpty($item.title))
+				<div class="o_text_block">
+					<div class="#if($r.isNotEmpty($handlingRange) && $r.isNotEmpty($teaserImageUrl)) o_title_block #end">
+						<div>
+							<h2>
+								#if($item.iconCss) 
+									<i class="o_icon $item.iconCss"></i>
+								#end
+								<span>$r.escapeHtml($item.title)</span>
+							</h2>
+						</div>
+						#if($r.isNotEmpty($handlingRange))
+							<div class="o_assessment">
+								<div>
+									<span><i class="o_icon o_icon-fw o_icon_time"> </i> $handlingRange</span>
+								</div>
+							</div>
+						#end
+					</div>
+					<div></div>
+				</div>
+			#end
+		</div>
+		#if($r.isNotEmpty($teaserImageUrl) && !$cover)
+			<div class="o_image" aria-hidden="true"><img #if($teaserImageBgCss) class="$teaserImageBgCss" #end src="$teaserImageUrl"></div>
+		#end
+	</div>
+	#if($expanded)
+		<div class="o_expanded o_text">
+			#if($r.isNotEmpty($item.description))
+				<div class="o_text_block">
+					<div>
+						<div>$r.formatLatexFormulas($item.description)</div>
+					</div>
+					<div></div>
+				</div>
+			#end
+			#if($r.isNotEmpty($item.objectives))
+				<div class="o_text_block">
+					<div>
+						<h5><i class="o_icon o_icon_objectives"></i> $r.translate("header.objectives")</h5>
+						<div>$r.formatLatexFormulas($item.objectives)</div>
+					</div>
+					<div></div>
+				</div>
+			#end
+			#if($r.isNotEmpty($item.instruction))
+				<div class="o_text_block">
+					<div>
+						<h5><i class="o_icon o_icon_instruction"></i> $r.translate("header.instruction")</h5>
+						<div>$r.formatLatexFormulas($item.instruction)</div>
+					</div>
+					<div></div>
+				</div>
+			#end
+			#if($r.isNotEmpty($item.instructionalDesign))
+				<div class="o_text_block">
+					<div class="o_instructional_design">
+						<h5><i class="o_icon o_icon_instructional_design"></i> $r.translate("header.instructional.design")</h5>
+						<div>$r.formatLatexFormulas($item.instructionalDesign)</div>
+					</div>
+					<div></div>
+				</div>
+			#end
+		</div>
+	#end
+</div>

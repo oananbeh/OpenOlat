@@ -1,0 +1,16 @@
+<div class="o_pdfjs $modeCss">
+	<iframe id = "$iframeId" src="$url" onload="stylePdfJs()"> </iframe>
+</div>
+<script>
+	function stylePdfJs() {
+		const pdfFrame = document.querySelector('#$iframeId');
+		pdfFrame.contentDocument.body.querySelector('#secondaryOpenFile').remove();
+		#if($hideDownload)
+			pdfFrame.contentDocument.body.querySelector('#download').remove();
+			pdfFrame.contentDocument.body.querySelector('#secondaryDownload').remove();
+		#end
+		#if($pdfBase64)
+			pdfFrame.contentWindow.PDFViewerApplication.open({data: atob("$pdfBase64")});
+		#end
+	}
+</script>

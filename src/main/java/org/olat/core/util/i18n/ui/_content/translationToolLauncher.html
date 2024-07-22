@@ -1,0 +1,31 @@
+#if ($transToolEnabled)
+	<fieldset class="o_block_bottom">
+		<legend>$r.translate("launch.title")</legend>
+		<p>$r.translate("launch.intro")</p>
+		<div class="o_button_group o_button_group_left">
+			$r.render("start")
+		</div>
+	</fieldset>
+#end
+
+#if ($customizingToolEnabled)
+	<fieldset class="o_block_bottom">
+		<legend>$r.translate("launch.customize.title")</legend>
+		<p>$r.translate("launch.customize.intro")</p>
+		<div class="o_button_group o_button_group_left">
+			$r.render("start")
+		</div>
+	</fieldset>
+#end
+
+<fieldset>
+	<legend>$r.translate("cache.title")</legend>
+#if($r.available("cache.flush"))
+	<p>$r.translate("cache.intro")</p>
+	<div class="o_button_group o_button_group_left">
+		$r.render("cache.flush")
+	</div>
+#else
+	<p class="o_warning">$r.translate("cache.disabled")</p>
+#end
+</fieldset>

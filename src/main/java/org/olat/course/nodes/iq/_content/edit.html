@@ -1,0 +1,11 @@
+<fieldset class="o_form form-horizontal o_qti_configuration">
+	<legend>
+	#if ($r.isNotNull($helpUrl))
+		$r.contextHelpWithWrapper($helpUrl)
+	#end
+	$repEntryTitle</legend>
+</fieldset>
+$r.render("reference")
+#if($r.available("iqeditform"))
+	$r.render("iqeditform")
+#end

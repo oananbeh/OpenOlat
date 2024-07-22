@@ -1,0 +1,22 @@
+$r.render("choiceOfTools")
+#if ($newsToolEnabled)
+	$r.render("newsform")
+#end
+#if ($calendarToolEnabled)
+	$r.render("calendarform")
+#end
+#if ($r.isTrue($bigBlueButtonToolEnabled))
+	$r.render("bigbluebuttonform")
+#end
+#if ($r.isTrue($teamsToolEnabled))
+	$r.render("teamsform")
+#end
+#if ($r.isTrue($zoomToolEnabled))
+	$r.render("zoomform")
+#end
+#if ($folderToolEnabled)
+	$r.render("folderform")
+	#if ($isOlatAdmin)
+		$r.render("quota")
+	#end
+#end

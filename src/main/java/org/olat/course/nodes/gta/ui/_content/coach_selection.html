@@ -1,0 +1,33 @@
+<div class="o_gta_coach_selection">
+#if($multipleGroupsWarning && !$multipleGroupsWarning.isEmpty())
+	<div class="o_warning">$r.xssScan($multipleGroupsWarning)</div>
+#end
+#if($r.available("selection"))
+	$r.render("selection")
+
+#elseif($r.available("selectionStack"))
+	$r.render("selectionStack")
+
+#elseif($r.available("list"))
+	#if($r.available("contextualSubscription") || $r.available("bulk.download.title") || $r.available("bulk.coach.assignment"))
+	<div class="o_button_group o_button_group_right">
+		#if($r.available("bulk.coach.assignment"))
+			$r.render("bulk.coach.assignment")
+		#end
+		#if($r.available("bulk.download.title"))
+			$r.render("bulk.download.title")
+		#end
+		#if($r.available("tool.stats"))
+			$r.render("tool.stats")
+		#end
+		#if($r.available("contextualSubscription"))
+			<div style="display:inline-block;">$r.render("contextualSubscription")</div>
+		#end
+	</div>
+	#end
+	$r.render("list")
+#end
+</div>
+#if($r.available("solutionDownload"))
+	$r.render("solutionDownload")
+#end

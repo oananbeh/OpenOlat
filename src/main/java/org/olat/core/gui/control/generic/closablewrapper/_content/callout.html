@@ -1,0 +1,39 @@
+<div id="callout_layer_$r.getCId()" class="o_callout_content $!cssClasses">
+	<div id="callout_layer_content_$r.getCId()">
+		## render close button just for screenreaders
+		<div class="visually-hidden"><a href="#" class="close" onClick="$r.javaScriptCommand('close');">$r.translate("close.dialog")</a></div>
+		$r.render("calloutWindowContent")
+	</div>
+</div>
+#if($closable)
+<script>
+"use strict";
+jQuery(function() {
+	jQuery('#callout_layer_$r.getCId()').each(function(index, el) {
+		jQuery(el).parents('dialog.popover').each(function(index2, el2) {
+			jQuery(el2).click(function(e) {
+				if (e.target.tagName !== 'DIALOG') {//This prevents issues with forms
+				       return;
+				}
+					
+				const rect = e.target.getBoundingClientRect();
+				const clickedInDialog = (
+					rect.top <= e.clientY &&
+					e.clientY <= rect.top + rect.height &&
+					rect.left <= e.clientX &&
+					e.clientX <= rect.left + rect.width
+				);
+
+				if (clickedInDialog === false) {
+					#if($r.isTrue($closeSubmit))
+						jQuery("#callout_layer_${r.getCId()} form").submit()
+					#else
+						$r.javaScriptCommand('close');
+					#end
+				}
+			});
+		});
+	});
+});
+</script>
+#end

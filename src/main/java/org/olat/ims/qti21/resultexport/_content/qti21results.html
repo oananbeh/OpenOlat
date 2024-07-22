@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html lang="$r.getLanguageCode()">
+<head>
+	<title>$rootTitle</title>	
+	<link rel='stylesheet' href='../../../css/offline/qti/theme.css' />
+	<script src='../../../js/jquery/jquery-3.7.0.min.js'></script>
+	<script src='../../../js/jquery/maphilight/jquery.maphilight.js'></script>
+	<script src='../../../js/jquery/qti/jquery.associate.js'></script>
+	<script src='../../../js/jquery/qti/jquery.gapMatch.js'></script>
+	<script src='../../../js/jquery/qti/jquery.graphicAssociate.js'></script>
+	<script src='../../../js/jquery/qti/jquery.graphicGap.js'></script>
+	<script src='../../../js/jquery/qti/jquery.graphicOrder.js'></script>
+	<script src='../../../js/jquery/qti/jquery.hotspot.js'></script>
+	<script src='../../../js/jquery/qti/jquery.hotspot.responsive.js'></script>
+	<script src='../../../js/jquery/qti/jquery.match.js'></script>
+	<script src='../../../js/jquery/qti/jquery.match_dnd.js'></script>
+	<script src='../../../js/jquery/qti/jquery.order.js'></script>
+	<script src='../../../js/jquery/qti/jquery.positionObject.js'></script>
+	<script src='../../../js/jquery/qti/jquery.qtiTimer.js'></script>
+	<script src='../../../js/jquery/qti/jquery.selectPoint.js'></script>
+	<script src='../../../js/jquery/qti/jquery.slider.js'></script>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<script>
+var o_info = new Object();
+o_info.latexit = false;
+
+$r.mathJaxJavascriptConfig();
+
+function setFlexiFormDirtyByListener(e){
+	//
+}
+function o_ffSetFocus() {
+	//
+}
+function o_animateRadialProgress() {
+	//
+}
+
+var BFormatter = {
+	// format on load
+	formatLatexFormulas : function(domId) {}
+};
+	</script>
+	<script src='${r.mathJaxCdnFullUrl()}tex-mml-chtml.js'></script>
+</head>
+<body class="o_page_margins">
+	<div id="o_main">$r.render("results")</div>
+</body>
+</html>

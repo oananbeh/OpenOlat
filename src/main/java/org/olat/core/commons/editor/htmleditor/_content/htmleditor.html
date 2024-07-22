@@ -1,0 +1,33 @@
+<div class="o_htmleditor">
+
+#if($fileToLargeError)
+	<div class="o_cpeditor_message">
+		<div class="o_error">
+			$fileToLargeError
+		</div>
+	</div>
+#end
+
+#if($locked)
+	<p class="o_warning">$r.translate("error.pageeditedby", $lockOwner) #if($r.isTrue($lockOwnerSameUser))$r.translate("lock.same.user.different.window")#end</p>
+#elseif ($r.available("rtfElement"))
+	## script block must be before editor loads
+	<div class="o_editor clearfix">
+		#if ($r.available("metadata"))
+			$r.render("metadata")
+		#end
+		$r.render("rtfElement")
+	</div>
+	<div id="o_save">
+		#if ($f.isVisible("savebuttontext"))
+			<span id="o_button_save">$r.render("savebuttontext")</span>
+		#end
+		#if ($f.isVisible("saveandclosebuttontext"))
+			<span id="o_button_saveclose">$r.render("saveandclosebuttontext")</span>
+		#end
+		#if ($f.isVisible("cancel"))
+			<span id="o_button_close">$r.render("cancel")</span>
+		#end
+	</div>
+#end		
+</div>

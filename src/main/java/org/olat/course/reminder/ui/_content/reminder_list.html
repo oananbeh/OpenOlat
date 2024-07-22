@@ -1,0 +1,16 @@
+<fieldset #if(!$!f.domReplacementWrapperRequired) id="$r.getCId()" #end class="o_form form-horizontal #if ($off_css_class) $off_css_class #end $f.getContainerCssClass()" role="form">
+	<legend>		
+		$r.contextHelpWithWrapper("manual_user/learningresources/Course_Reminders/")
+		<i class="o_icon o_icon_reminder"> </i>
+		$r.translate("reminders")
+	</legend> 
+	<div class="o_hint">
+		$r.translate("reminders.intro")
+	</div>
+	
+	<div class="o_button_group o_button_group_right">
+		$r.render("add.reminder")
+		$r.render("tools")
+	</div>
+	$r.render("table")
+</fieldset>

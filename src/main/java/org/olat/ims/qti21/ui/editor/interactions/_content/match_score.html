@@ -1,0 +1,38 @@
+<table class="table matchInteraction score">
+	<thead>
+		<tr>
+			#if($r.isTrue($sourceLeft)) <th scope="cols"></th> #end
+			#foreach($targetChoice in $targetChoices)
+				<th scope="cols">${r.render($targetChoice.getSummaryEl())}</th>
+			#end
+			#if($r.isFalse($sourceLeft)) <th scope="cols"></th> #end
+		</tr>
+	</thead>
+	<tbody>
+	#foreach($sourceChoice in $sourceChoices)
+		<tr>
+			#if($r.isTrue($sourceLeft)) 
+				<th scope="row">${r.render($sourceChoice.getSummaryEl())}</th>
+			#end
+			#set($sourceIndex = ${foreach.index})
+			#foreach($targetChoice in $targetChoices)
+				#set($hasError = $f.hasError("${sourceChoice.getChoiceIdentifier().toString()}-${targetChoice.getChoiceIdentifier().toString()}"))
+				#set($scoreWrapper = $r.get("${sourceChoice.getChoiceIdentifier().toString()}-${targetChoice.getChoiceIdentifier().toString()}"))
+				<td class="o_sel_match_${sourceIndex}_${foreach.index} has-feedback #if($hasError) has-error #elseif(${scoreWrapper.isCorrect()}) has-success #end">
+					$r.render("${sourceChoice.getChoiceIdentifier().toString()}-${targetChoice.getChoiceIdentifier().toString()}")
+					#if(${scoreWrapper.isCorrect()})
+						<span class="o_icon o_icon_qti_summary_correct o_feedback_right"> </span>
+					#end
+					#if($hasError)
+						<span class="o_icon o_icon_error o_feedback_right"> </span>
+						<div>$r.render("${sourceChoice.getChoiceIdentifier().toString()}-${targetChoice.getChoiceIdentifier().toString()}","error")</div>
+					#end
+				</td>
+			#end
+			#if($r.isFalse($sourceLeft)) 
+				<th scope="row">${r.render($sourceChoice.getSummaryEl())}</th>
+			#end
+		</tr>
+	#end
+	</tbody>
+</table>

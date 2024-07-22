@@ -1,0 +1,47 @@
+<div id="$r.getCId()" class="o_navbar_tools">
+	<ul id="o_navbar_tools_permanent" class="nav o_navbar-nav o_navbar-right">
+	#if(!$locked)
+		#foreach($personalTool in $toolSet)
+			 <li #if($personalTool.shortCutCssId) id="$personalTool.shortCutCssId" #end class="o_navbar_tool #if($personalTool.shortCutCssClass) $personalTool.shortCutCssClass #end">$r.render($personalTool.shortCutComponentName)</li>
+		#end
+		#if($helpPlugins)
+			#if($helpPlugins.size() == 1)
+				#foreach($helpPlugin in $helpPlugins)
+			 		<li #if($helpPlugin.shortCutCssId) id="$helpPlugin.shortCutCssId" #end class="o_navbar_tool #if($helpPlugin.shortCutCssClass) $helpPlugin.shortCutCssClass #end">$r.render($helpPlugin.shortCutComponentName)</li>
+				#end
+			#elseif($helpPlugins.size() > 1) 
+				<li id="o_navbar_help_opener" class="o_navbar_tool dropdown">
+					<a id="o_help_tool_toggler" href="javascript:;" class="dropdown-toggle" aria-expanded="false" data-toggle="dropdown" title="$r.translate("topnav.help.alt")" aria-label="$r.translate("topnav.help")" aria-controls="$r.getCId()_help">
+						<i class="o_icon o_icon_help o_icon-lg"> </i>
+						<span>$r.translate("topnav.help")</span>
+					</a>
+					<ul class="dropdown-menu dropdown-menu-right" id="$r.getCId()_help">          
+						#foreach($helpPlugin in $helpPlugins)
+			 				<li #if($helpPlugin.shortCutCssId) id="$helpPlugin.shortCutCssId" #end class="o_navbar_tool #if($helpPlugin.shortCutCssClass) $helpPlugin.shortCutCssClass #end">$r.render($helpPlugin.shortCutComponentName)</li>
+						#end
+					</ul>
+				</li>
+			#end
+		#end
+	#end
+	#if (!$isGuest)
+		<li id="o_navbar_my_menu" class="o_portrait">
+			<a id="o_sel_navbar_my_menu_caret" href="javascript:;" onclick="OPOL.navbar.toggleRight(); return false;">
+				$r.render("portrait")
+				<span>$myMenuLabel</span>
+				<b class="caret"> </b>
+			</a>
+		</li>
+	#end
+	</ul>
+</div>
+
+## focus search input field whenever search is displayed
+<script>
+"use strict";
+jQuery('#o_help_tool_toggler').click(function () {
+	setTimeout(function() {
+		jQuery('#o_help_tool_toggler[aria-expanded="true"] + .dropdown-menu #o_navbar_help_list input:text').focus();	
+	},0);
+});
+</script>

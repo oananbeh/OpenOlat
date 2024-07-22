@@ -1,0 +1,187 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.course.site;
+
+import org.olat.core.CoreSpringFactory;
+import org.olat.core.gui.UserRequest;
+import org.olat.core.gui.control.WindowControl;
+import org.olat.core.gui.control.navigation.AbstractSiteDefinition;
+import org.olat.core.gui.control.navigation.SiteConfiguration;
+import org.olat.core.gui.control.navigation.SiteDefinitions;
+import org.olat.core.gui.control.navigation.SiteInstance;
+import org.olat.core.gui.control.navigation.SiteSecurityCallback;
+import org.olat.core.util.StringHelper;
+import org.olat.core.util.UserSession;
+import org.olat.course.site.model.CourseSiteConfiguration;
+import org.olat.course.site.model.LanguageConfiguration;
+import org.olat.repository.RepositoryEntry;
+import org.olat.repository.RepositoryManager;
+
+/**
+ * 
+ * Description:<br>
+ * Receives settings by Spring and creates a site depending on configuration.
+ * 
+ * <P>
+ * Initial Date:  12.07.2005 <br>
+ *
+ * @author Felix Jost
+ * @author Roman Haag, roman.haag@frentix.com, www.frentix.com
+ */
+public class CourseSiteDef extends AbstractSiteDefinition {
+	
+	private RepositoryEntryKeyCache cachedKeys;
+	
+	public CourseSiteDef() {
+		//
+	}
+	
+	public String getRepositorySoftKey(UserRequest ureq) {
+		CourseSiteConfiguration config = getCourseSiteconfiguration();
+		if(config != null) {
+			LanguageConfiguration langConfig = getLanguageConfiguration(ureq, config);
+			if(langConfig != null) {
+				return langConfig.getRepoSoftKey();
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		SiteConfiguration config = getSiteConfiguration();
+		return config != null && config.isEnabled();
+	}
+
+	@Override
+	public SiteInstance createSite(UserRequest ureq, WindowControl wControl, SiteConfiguration config) {
+		if(StringHelper.containsNonWhitespace(config.getSecurityCallbackBeanId())) {
+			return createSite(ureq, getCourseSiteconfiguration(), config);
+		}
+		UserSession usess = ureq.getUserSession();
+		if(!usess.getRoles().isInvitee()) {
+			// only for registered users and guests
+			return createSite(ureq, getCourseSiteconfiguration(), config);
+		}
+		return null;
+	}
+	
+	protected CourseSiteConfiguration getCourseSiteconfiguration() {
+		SiteDefinitions siteModule = CoreSpringFactory.getImpl(SiteDefinitions.class);
+		return siteModule.getConfigurationCourseSite1();
+	}
+	
+	protected SiteInstance createSite(UserRequest ureq, CourseSiteConfiguration courseConfig, SiteConfiguration config) {
+		if(courseConfig == null) return null;
+		
+		String secCallbackBeanId = config.getSecurityCallbackBeanId();
+		SiteSecurityCallback siteSecCallback = (SiteSecurityCallback)CoreSpringFactory.getBean(secCallbackBeanId);
+		
+		UserSession usess = ureq.getUserSession();
+		if(usess == null || usess.getRoles() == null) {
+			return null;
+		}
+
+		LanguageConfiguration langConfig = getLanguageConfiguration(ureq, courseConfig);
+		if(langConfig == null) {
+			return null;
+		}
+		String icon = courseConfig.getNavIconCssClass();
+		return createCourseSiteInstance(langConfig, courseConfig.isToolbar(), siteSecCallback, icon);
+	}
+	
+	/**
+	 * Warning: there is no check against null.
+	 * It's only to return the right type, CourseSie or CourseSite2.
+	 */
+	protected CourseSite createCourseSiteInstance(LanguageConfiguration langConfig,
+			boolean showToolController, SiteSecurityCallback siteSecCallback, String icon) {
+		return new CourseSite(this, toRepositoryEntryKey(langConfig.getRepoSoftKey()),
+				showToolController, siteSecCallback, langConfig.getTitle(), icon);
+	}
+	
+	protected final Long toRepositoryEntryKey(String repoSoftKey) {
+		if(repoSoftKey == null) return null;
+		
+		RepositoryEntryKeyCache keys = cachedKeys;
+		if(keys != null && keys.getRepositoryEntrySoftKey().equals(repoSoftKey)) {
+			return keys.getRepositoryEntryKey();
+		} 
+		keys = getCachedValue(repoSoftKey);
+		if(keys != null) {
+			cachedKeys = keys;
+		}
+		return keys == null ? null : keys.getRepositoryEntryKey();
+	}
+	
+	private RepositoryEntryKeyCache getCachedValue(String repoSoftKey) {
+		RepositoryManager rm = CoreSpringFactory.getImpl(RepositoryManager.class);
+		RepositoryEntry entry = rm.lookupRepositoryEntryBySoftkey(repoSoftKey, false);
+		if(entry == null) {
+			return null;
+		}
+		return new RepositoryEntryKeyCache(repoSoftKey, entry.getKey());
+	}
+	
+	protected final LanguageConfiguration getLanguageConfiguration(UserRequest ureq, CourseSiteConfiguration config) {
+		if(config == null || config.getConfigurations() == null) return null;
+		String language = ureq.getUserSession().getLocale().getLanguage();
+		
+		LanguageConfiguration myLangConfig = null;
+		LanguageConfiguration defaultLangConfig = null;
+		for(LanguageConfiguration langConfig:config.getConfigurations()) {
+			if(langConfig.isDefaultConfiguration()) {
+				defaultLangConfig = langConfig;
+			}
+			if(language.equals(langConfig.getLanguage())) {
+				myLangConfig = langConfig;
+			}
+		}
+		
+		if(myLangConfig == null) {
+			myLangConfig = defaultLangConfig;
+		}
+		
+		if(myLangConfig == null && !config.getConfigurations().isEmpty()) {
+			myLangConfig = config.getConfigurations().get(0);
+		}
+		
+		return myLangConfig;
+	}
+	
+	private static class RepositoryEntryKeyCache {
+		
+		private final Long repositoryEntryKey;
+		private final String repositoryEntrySoftKey;
+		
+		public RepositoryEntryKeyCache(String repositoryEntrySoftKey, Long repositoryEntryKey) {
+			this.repositoryEntrySoftKey = repositoryEntrySoftKey;
+			this.repositoryEntryKey = repositoryEntryKey;
+		}
+
+		public Long getRepositoryEntryKey() {
+			return repositoryEntryKey;
+		}
+
+		public String getRepositoryEntrySoftKey() {
+			return repositoryEntrySoftKey;
+		}
+	}
+}

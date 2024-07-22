@@ -1,0 +1,20 @@
+<table>
+	<thead>
+		<tr>
+			<th scope="col">$r.translate("tab.links.extern.url")</th>
+			<th scope="col">$r.translate("tab.links.extern.name")</th>
+			<td></td>
+			<td></td>
+		</tr>
+	</thead>
+	<tbody>
+	#foreach($link in $links)
+		<tr>
+			<td>$r.render("url_$link.id", "minimal")</td>
+			<td>$r.render("displayName_$link.id", "minimal")</td>
+			<td>$r.render("add_$link.id")</td>
+			<td>$r.render("del_$link.id")</td>
+		</tr>
+	#end
+	</tbody>
+</table>

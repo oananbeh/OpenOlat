@@ -1,0 +1,13 @@
+<div class="o_warning_with_icon">
+	<p>$msg</p>
+	#if ($groupMsg)
+		$groupMsg
+		$r.render("group.values")
+	#end
+</div>
+$r.render("options")
+<div class="o_button_group">
+	$r.render("confirm.leave")
+	$r.render("cancel")
+</div>
+

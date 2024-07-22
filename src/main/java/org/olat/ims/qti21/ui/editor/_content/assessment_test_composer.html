@@ -1,0 +1,26 @@
+#if($restrictedEdit || $warningCutValue)
+	<div class="o_no_margin o_warning o_block_small_bottom">
+		#if($restrictedEdit)
+		<p><span class="badge o_midwarn"><i class="o_icon o_midwarn"> </i></span> $r.translate("warning.in.use")</p>
+		#end
+		#if($warningCutValue)
+		<p><span class="badge o_midwarn"><i class="o_icon o_midwarn"> </i></span> $r.translate("warning.cut.value") <a href="javascript:;" class="o_flow_padding_left_large" onclick="$r.javaScriptCommand('warningCutValue');">$r.translate("adapt") <i class="o_icon o_icon_start"> </i></a> </p>
+		#end
+	</div>
+#end
+<section class="o_assessment_test_editor_and_composer">
+	<div class="o_titled_wrapper">
+		<div class="o_title">
+			<h2><i class="$cssClass"> </i> $r.escapeHtml($title)#if($identifier && !${identifier.isEmpty()}) <small>$identifier</small>#end</h2>
+		</div>
+		<div class="o_title_cmds">
+			<div>
+				#if($r.available("tools.change.delete"))
+					<div>$r.render("tools.change.delete")</div>
+				#end
+			</div>
+			<div>$r.render("cmds")</div>
+		</div>
+	</div>
+	$r.render("content")
+</section>

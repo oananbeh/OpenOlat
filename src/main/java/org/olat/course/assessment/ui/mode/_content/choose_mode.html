@@ -1,0 +1,86 @@
+#if($guards.list.empty)
+	<div class="o_hint">$r.translate("current.mode.end.info")</div>
+#else
+	<div class="o_hint">$r.translate("current.mode.desc")</div>
+#end
+
+#foreach($mode in $guards.list)
+	<h2>$r.escapeHtml($mode.name) <small>$r.translate("current.mode.course", $r.escapeHtml($mode.displayName))</small></h2>
+	<p><em>$r.translate("current.mode.datetimes", $mode.begin, $mode.end)</em>
+		#if($mode.leadTime && !$mode.leadTime.empty)
+			<br/><em>$r.translate("current.mode.leadtime", $mode.leadTime)</em>
+		#end
+		#if($mode.followupTime && !$mode.followupTime.empty)
+			<br/><em>$r.translate("current.mode.followuptime", $mode.followupTime)</em>
+		#end
+	</p>
+	#if($mode.description && !$mode.description.empty)
+		<p>$r.xssScan($mode.description)</p>
+	#end
+	
+	#if($mode.status == "leadtime")
+		<div class="o_hint">$r.render($mode.countDown.componentName)</div>
+	#end
+	
+	#if($mode.status == "assessment" || $mode.status == "leadtime")
+		#if($mode.safeExamBrowserHint && !$mode.safeExamBrowserHint.empty)
+			<div class="o_hint">$r.xssScan($mode.safeExamBrowserHint)</div>
+		#end
+		<div class="o_button_group">$r.render($mode.go.componentName)</div>
+	#elseif($mode.status == "followup")
+		<div class="o_hint">$r.translate("current.mode.followuptime.info")</div>
+	#elseif($mode.status == "end")
+		<div class="o_hint">$r.translate("current.mode.end.info")</div>
+		<div class="o_button_group">
+		#if($r.visible($mode.quitSEB.componentName)) 
+			$r.render($mode.quitSEB.componentName)
+		#else
+			$r.render($mode.continue.componentName)
+		#end
+		</div>
+	#else
+		<div class="o_error o_assessment_mode_error">$mode.errors</div>
+		#if($r.visible($mode.downloadSEBButton.componentName) || $r.visible($mode.downloadSEBConfigurationButton.componentName))
+			<div class="o_button_group">
+			#if($r.visible($mode.downloadSEBButton.componentName))
+				$r.render($mode.downloadSEBButton.componentName)
+			#end
+		
+			#if($r.visible($mode.downloadSEBConfigurationButton.componentName))
+				$r.render($mode.downloadSEBConfigurationButton.componentName)
+			#end
+			</div>
+		#end
+	#end
+#end
+
+<div class="o_button_group">
+	$r.render("continue-main")
+	$r.render("quit-main")
+</div>
+
+#if("not-checked" == $checked)
+<script>
+function checkSEBKeys () {
+	// if the SafeExamBrowser.security.updateKeys() function is not defined (for example on login from a normal
+	// browser or with an older SEB version), this will throw an error and not go in the didUpdateSEBKeys() callback
+	// function, so the ajax request to AssessmentModeGuardController will not be sent
+	SafeExamBrowser.security.updateKeys(didUpdateSEBKeys);
+}
+
+function didUpdateSEBKeys () {
+	jQuery("div.o_error.o_assessment_mode_error").addClass("hide");
+	
+	var configKey = SafeExamBrowser.security.configKey;
+	var browserExamKey = SafeExamBrowser.security.browserExamKey;
+	var currentPage = window.location.toString();
+	${r.openJavaScriptCommand('checkSEBKeys')}, 'configKey', configKey, 'browserExamKey', browserExamKey, 'urlForKeyHash', currentPage);
+}
+
+jQuery(function() {
+	if(SafeExamBrowser) {
+		checkSEBKeys();
+	}
+});
+</script>
+#end

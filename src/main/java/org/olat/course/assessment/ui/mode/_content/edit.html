@@ -1,0 +1,8 @@
+<fieldset class="clearfix">
+	<legend>$r.escapeHtml($title)</legend>
+	$r.render("segments")<br>	
+		
+	#if($r.available("segmentCmp"))
+		$r.render("segmentCmp")
+	#end
+</div>

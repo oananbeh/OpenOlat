@@ -1,0 +1,28 @@
+#foreach($previousRevision in $previousRevisions)
+	#if(${previousRevision.hasComment()})
+	<div class="o_note">
+		<h5>$r.translate("run.coach.corrections.revs.comment")</strong> <small>$r.escapeHtml($previousRevision.commentInfos)</small></h5>
+		<p>$r.xssScan($previousRevision.comment)</p>
+	</div> 
+	#end
+	#if($r.available($previousRevision.cmpName))
+		$r.render($previousRevision.cmpName)
+	#end
+#end
+
+#if($r.available("revisions"))
+	$r.render("revisions")
+#end
+#if($revisionMessage && !$revisionMessage.isEmpty())
+	<p>$revisionMessage</p>
+#end
+
+#if($r.available("uploadCorrections"))
+	$r.render("uploadCorrections")
+#elseif($r.visible("coach.collect.revisions"))
+	<h5>$r.translate("coach.collect.confirm.title")</h5>
+	<p>$r.translate("coach.collect.confirm.desc")</p>
+	<div class="o_button_group">
+		$r.render("coach.collect.revisions")
+	</div>
+#end

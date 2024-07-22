@@ -1,0 +1,12 @@
+<fieldset class="o_form form-horizontal o_sel_course_access_condition_form">
+	<legend>$r.contextHelpWithWrapper("manual_user/learningresources/General_Configuration_of_Course_Elements/#access")
+	$r.translate("pane.tab.accessibility")</legend>
+	$r.render("accessCondition")
+</fieldset>
+#if($renderPW)
+	<fieldset class="o_sel_course_node_password_config">
+		<legend>
+		$r.translate("password.field")</legend>
+		$r.render("passwordCondition")
+	</fieldset>
+#end

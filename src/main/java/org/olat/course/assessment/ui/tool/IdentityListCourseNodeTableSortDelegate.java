@@ -1,0 +1,209 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.course.assessment.ui.tool;
+
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.olat.core.commons.persistence.SortKey;
+import org.olat.core.gui.components.date.TimeElement;
+import org.olat.core.gui.components.form.flexible.impl.elements.table.SortableFlexiTableModelDelegate;
+import org.olat.core.gui.translator.Translator;
+import org.olat.core.util.Util;
+import org.olat.course.assessment.ui.tool.IdentityListCourseNodeTableModel.IdentityCourseElementCols;
+import org.olat.modules.assessment.ui.AssessedIdentityElementRow;
+import org.olat.modules.assessment.ui.component.CompletionItem;
+import org.olat.modules.grade.GradeSystemType;
+import org.olat.modules.grade.ui.GradeUIFactory;
+
+/**
+ * 
+ * Initial date: 7 déc. 2017<br>
+ * @author srosse, stephane.rosse@frentix.com, http://www.frentix.com
+ *
+ */
+public class IdentityListCourseNodeTableSortDelegate extends SortableFlexiTableModelDelegate<AssessedIdentityElementRow> {
+	
+	private GradeSystemType gradeSystemType;
+	
+	public IdentityListCourseNodeTableSortDelegate(SortKey orderBy, IdentityListCourseNodeTableModel tableModel, Locale locale, GradeSystemType gradeSystemType) {
+		super(orderBy, tableModel, locale);
+		this.gradeSystemType = gradeSystemType;
+	}
+	
+	@Override
+	protected void sort(List<AssessedIdentityElementRow> rows) {
+		int columnIndex = getColumnIndex();
+		if(columnIndex == IdentityCourseElementCols.score.ordinal()) {
+			Collections.sort(rows, new ScoreComparator());
+		} else if(columnIndex == IdentityCourseElementCols.currentCompletion.ordinal()) {
+			Collections.sort(rows, new CurrentCompletionComparator());
+		} else if(columnIndex == IdentityCourseElementCols.currentRunStart.ordinal()) {
+			Collections.sort(rows, new CurrentRunStartComparator());
+		} else if(columnIndex == IdentityCourseElementCols.grade.ordinal()) {
+			Collections.sort(rows, new GradeComparator());
+		} else {
+			super.sort(rows);
+		}
+	}
+	
+	private class ScoreComparator implements Comparator<AssessedIdentityElementRow> {
+		
+		@Override
+		public int compare(AssessedIdentityElementRow r1, AssessedIdentityElementRow r2) {
+			if(r1 == null || r2 == null) {
+				return compareNullObjects(r1, r2);
+			}
+			
+			BigDecimal s1 = r1.getScore();
+			BigDecimal s2 = r2.getScore();
+			if(s1 == null || s2 == null) {
+				return compareNullObjects(s1, s2);
+			}
+			return s1.compareTo(s2);
+		}
+		
+	}
+	
+	private class CurrentRunStartComparator implements Comparator<AssessedIdentityElementRow> {
+		
+		private final Calendar cal = Calendar.getInstance();
+
+		@Override
+		public int compare(AssessedIdentityElementRow r1, AssessedIdentityElementRow r2) {
+			Date d1 = extractDate(r1);
+			Date d2 = extractDate(r2);
+			
+			int c = 0;
+			if(d1 == null || d2 == null) {
+				c = compareNullObjects(d1, d2);
+			} else {
+				c = compareTime(d1, d2);
+			}
+			if(c == 0) {
+				Long k1 = r1.getIdentityKey();
+				Long k2 = r2.getIdentityKey();
+				c = compareLongs(k1, k2);
+			}
+			return c;
+		}
+		
+		private Date extractDate(AssessedIdentityElementRow r) {
+			if(r == null) {
+				return null;
+			}
+			TimeElement t = r.getCurrentRunStart();
+			return t == null ? null : t.getDate();
+		}
+		
+		private int compareTime(Date d1, Date d2) {
+			Date nd1 = normalize(d1);
+			Date nd2 = normalize(d2);
+			return compareDateAndTimestamps(nd1, nd2);
+		}
+		
+		private Date normalize(Date d) {
+			cal.setTime(d);
+			cal.set(Calendar.YEAR, 2022);
+			cal.set(Calendar.MONTH, 3);
+			cal.set(Calendar.DATE, 5);
+			return cal.getTime();
+		}
+	}
+
+	private class CurrentCompletionComparator implements Comparator<AssessedIdentityElementRow> {
+
+		@Override
+		public int compare(AssessedIdentityElementRow r1, AssessedIdentityElementRow r2) {
+			if(r1 == null || r2 == null) {
+				return compareNullObjects(r1, r2);
+			}
+			
+			CompletionItem i1 = r1.getCurrentCompletion();
+			CompletionItem i2 = r2.getCurrentCompletion();
+			if(i1 == null || i2 == null) {
+				return compareNullObjects(i1, i2);
+			}
+			
+			int c = compareCompletion(i1, i2);
+			if(c == 0) {
+				Long k1 = r1.getIdentityKey();
+				Long k2 = r2.getIdentityKey();
+				c = compareLongs(k1, k2);
+			}
+			return c;
+		}
+		
+		private int compareCompletion(CompletionItem i1, CompletionItem i2) {
+			double d1 = completion(i1);
+			double d2 = completion(i2);
+			return Double.compare(d1, d2);
+		}
+		
+		private double completion(CompletionItem item) {
+			double completion;
+			if(item.isEnded()) {
+				completion = 1.0d;
+			} else if(item.getCompletion() != null) {
+				completion = Math.min(item.getCompletion().doubleValue(), 1.0d);
+			} else {
+				completion = 0.0d;
+			}
+			return completion;
+		}
+	}
+	
+	private class GradeComparator implements Comparator<AssessedIdentityElementRow> {
+		
+		private final Translator gradeTanslator;
+		
+		public GradeComparator() {
+			this.gradeTanslator = Util.createPackageTranslator(GradeUIFactory.class, getLocale());
+		}
+		
+		@Override
+		public int compare(AssessedIdentityElementRow r1, AssessedIdentityElementRow r2) {
+			String s1 = r1 != null && r1.getGrade() != null
+					? GradeUIFactory.translatePerformanceClass(gradeTanslator, r1.getPerformanceClassIdent(), r1.getGrade())
+					: null;
+			String s2 = r2 != null && r2.getGrade() != null
+					? GradeUIFactory.translatePerformanceClass(gradeTanslator, r2.getPerformanceClassIdent(), r2.getGrade())
+					: null;
+			
+			if(s1 == null || s2 == null) {
+				return compareNullObjects(s1, s2);
+			}
+			
+			if (GradeSystemType.numeric == gradeSystemType) {
+				BigDecimal grade1 = new BigDecimal(s1);
+				BigDecimal grade2 = new BigDecimal(s2);
+				return grade1.compareTo(grade2);
+			}
+			
+			return s1.compareTo(s2);
+		}
+		
+	}
+}

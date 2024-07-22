@@ -1,0 +1,80 @@
+#if(!${interactionWrapper.isItemSessionStateFinal()} || $off_warn)
+<div class="o_no_margin o_warning">
+	#if ($off_warn)
+	<p>$off_warn</p>
+	#end
+	#if(!${interactionWrapper.isItemSessionStateFinal()})
+	<p>$r.translate("warning.not.submitted") #if($r.isTrue($autoSaved))<br>$r.translate("warning.not.submitted.autosave")#end</p>
+	#end
+</div>
+#end
+
+#if($r.isNotEmpty($sectionRubrics))
+	<div class='o_assessmentsection_rubrics_correction_wrapper'>
+	#foreach($sectionRubric in $sectionRubrics)
+		<div class='o_assessmentsection_rubric_wrapper'>
+			<a id='$sectionRubric.identifier' href='javascript:;' class='o_toogle_rubrics translated'><i class='o_icon o_icon-fw o_icon_open_togglebox'> </i>
+				<span>$sectionRubric.openLabel</span></a>
+		  	<div id='d${sectionRubric.identifier}' class='o_info o_assessmentsection_rubrics clearfix o_hide'>
+		  		#if($r.isNotEmpty($sectionRubric.title))
+					<h4>$sectionRubric.title</h4>
+				#end
+				#foreach($rubric in $sectionRubric.rubrics)
+					<div class='rubric clearfix'>$r.render($rubric)</div>
+				#end
+				<a id='h${sectionRubric.identifier}' href='javascript:;' class='o_toogle_rubrics o_hide'><span>$r.translate("hide.rubric.short")</span></a>
+			</div>
+			<script>
+			jQuery(function() {
+				jQuery('#${sectionRubric.identifier}, #h${sectionRubric.identifier}').on('click', function(linkIndex, linkEl) {
+					jQuery('#d${sectionRubric.identifier}').each(function(index, el) {
+						var current = jQuery(el).attr('class');
+						if(current.indexOf('o_hide') >= 0) {
+							jQuery(el).removeClass('o_hide').addClass('o_show');
+							jQuery('a#${sectionRubric.identifier}.translated i').removeClass('o_icon_open_togglebox').addClass('o_icon_close_togglebox');
+							jQuery('a#${sectionRubric.identifier}.translated span').html('$r.translate("hide.rubric")');
+							BFormatter.formatLatexFormulas();
+						} else {
+							jQuery(el).removeClass('o_show').addClass('o_hide');
+							jQuery('a#${sectionRubric.identifier}.translated i').removeClass('o_icon_close_togglebox').addClass('o_icon_open_togglebox');
+							jQuery('a#${sectionRubric.identifier}.translated span').html('${sectionRubric.openLabel}');
+						}
+					});
+				});
+			});
+			</script>
+		</div>
+	#end
+	</div>
+#end
+<div id="o_c${f.getFormItem("answer").getComponent().getDispatchID()}" class="o_qti_item_body clearfix">$r.render("answer")</div>
+
+#if($r.visible("solution"))
+	<div class="o_assessmentitem_control_view_solution">$r.render("view.solution")</div>
+	<div id="o_c${f.getFormItem("solution").getComponent().getDispatchID()}" class="o_qti_item_body clearfix">$r.render("solution")</div>
+	#if(!$r.visible("view.correct.solution"))
+	<div class="o_assessmentitem_controls"> </div>
+	#end
+#elseif($r.visible("view.correct.solution"))
+	#if($r.visible("view.solution"))
+		<div class="o_assessmentitem_control_view_solution">$r.render("view.solution")</div>
+	#end
+#elseif($r.visible("view.solution"))
+	<div class="o_assessmentitem_controls">$r.render("view.solution")</div>
+#else
+	<div class="o_assessmentitem_controls"> </div>
+#end
+
+#if($r.visible("view.correct.solution"))
+	#if($r.visible("correctSolution"))
+		<div class="o_assessmentitem_control_view_solution">$r.render("view.correct.solution")</div>
+		<div class="o_qti_item_body clearfix">$r.render("correctSolution")</div>
+		<div class="o_assessmentitem_controls"> </div>
+	#else
+		<div class="o_assessmentitem_controls">$r.render("view.correct.solution")</div>
+	#end
+#end
+
+<div class="o_assessmentitem_scoring">
+	$r.render("score.container")
+</div>

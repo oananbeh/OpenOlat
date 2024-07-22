@@ -1,0 +1,51 @@
+<div class="o_qti_assessment_mode o_mode_frame_outer">
+	<div class="o_mode_frame_inner o_assessment_status_${helper.getStatus($row.assessmentMode).name()}">
+		<div class="o_assessment_header">
+			<h4 class="o_nowrap">
+				<div class="o_nowrap">
+					<i class='o_icon o_icon_assessment_mode'>  </i> $r.escapeHtml($row.name)
+				</div>
+			</h4>
+			#if(!$row.assessmentMode.getStatus().name().equals("none"))
+				<div class="text-nowrap">
+					<small class="text-muted">${helper.getModeState($row.assessmentMode)}</small>
+				</div>
+			#end
+			<div class="text-nowrap" style="margin-left: auto;">
+				<small>$row.getAssessmentModeRendered()</small>
+			</div>
+		</div>
+
+
+		<div class="text-muted">${helper.getBeginEndTooltip($row.assessmentMode)}</div>
+		<div class="text-muted">${helper.getLeadFollowupTime($row.assessmentMode)}</div>
+		<br>
+		#if($r.isNotNull($row.waitBarItem))
+			<p>$r.render($row.waitBarItem)</p>
+		#end
+		<div class="o_assessment_action_button">
+			#if($r.isNotNull($row.actionButtonName))
+				$r.render($row.actionButton)
+			#end
+		</div>
+
+		#set($elementLinks = ${row.getElementLinkNames()})
+		#if($r.isNotEmpty($elementLinks))
+			<ul class="list-unstyled">
+				#foreach($elementLink in $elementLinks)
+				<li>$r.render($elementLink)</li>
+				#end
+			</ul>
+		#end
+
+		#if($r.isNotNull($row) && ${row.getEndInMilliSeconds()} > 300000)
+		<script>
+			jQuery(function() {
+				setTimeout(function() {
+					jQuery('#${row.id}').addClass('o_assessment_end_soon');
+				}, ($row.endInMilliSeconds - 300000));
+			});
+		</script>
+		#end
+	</div>
+</div>

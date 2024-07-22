@@ -1,0 +1,1113 @@
+/**
+ * <a href="http://www.openolat.org">
+ * OpenOLAT - Online Learning and Training</a><br>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License"); <br>
+ * you may not use this file except in compliance with the License.<br>
+ * You may obtain a copy of the License at the
+ * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache homepage</a>
+ * <p>
+ * Unless required by applicable law or agreed to in writing,<br>
+ * software distributed under the License is distributed on an "AS IS" BASIS, <br>
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. <br>
+ * See the License for the specific language governing permissions and <br>
+ * limitations under the License.
+ * <p>
+ * Initial code contributed and copyrighted by<br>
+ * frentix GmbH, http://www.frentix.com
+ * <p>
+ */
+package org.olat.ims.lti13.manager;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.Logger;
+import org.olat.admin.securitygroup.gui.IdentitiesAddEvent;
+import org.olat.basesecurity.Authentication;
+import org.olat.basesecurity.BaseSecurity;
+import org.olat.basesecurity.GroupRoles;
+import org.olat.basesecurity.OrganisationService;
+import org.olat.basesecurity.manager.AuthenticationDAO;
+import org.olat.basesecurity.model.OrganisationRefImpl;
+import org.olat.core.commons.persistence.DB;
+import org.olat.core.helpers.Settings;
+import org.olat.core.id.Identity;
+import org.olat.core.id.IdentityEnvironment;
+import org.olat.core.id.Organisation;
+import org.olat.core.id.Roles;
+import org.olat.core.id.User;
+import org.olat.core.id.UserConstants;
+import org.olat.core.logging.Tracing;
+import org.olat.core.util.CodeHelper;
+import org.olat.core.util.DateUtils;
+import org.olat.core.util.StringHelper;
+import org.olat.core.util.cache.CacheWrapper;
+import org.olat.core.util.coordinate.CoordinatorManager;
+import org.olat.core.util.crypto.CryptoUtil;
+import org.olat.core.util.i18n.I18nManager;
+import org.olat.core.util.mail.MailPackage;
+import org.olat.course.CourseFactory;
+import org.olat.course.ICourse;
+import org.olat.course.assessment.CourseAssessmentService;
+import org.olat.course.assessment.handler.AssessmentConfig;
+import org.olat.course.assessment.handler.AssessmentConfig.Mode;
+import org.olat.course.nodes.BasicLTICourseNode;
+import org.olat.course.nodes.CourseNode;
+import org.olat.course.run.scoring.ScoreEvaluation;
+import org.olat.course.run.userview.UserCourseEnvironment;
+import org.olat.course.run.userview.UserCourseEnvironmentImpl;
+import org.olat.group.BusinessGroup;
+import org.olat.group.BusinessGroupRef;
+import org.olat.group.BusinessGroupService;
+import org.olat.group.DeletableGroupData;
+import org.olat.ims.lti13.LTI13Constants;
+import org.olat.ims.lti13.LTI13Constants.UserSub;
+import org.olat.ims.lti13.LTI13ContentItem;
+import org.olat.ims.lti13.LTI13ContentItemTypesEnum;
+import org.olat.ims.lti13.LTI13Context;
+import org.olat.ims.lti13.LTI13JsonUtil;
+import org.olat.ims.lti13.LTI13Key;
+import org.olat.ims.lti13.LTI13Module;
+import org.olat.ims.lti13.LTI13Platform;
+import org.olat.ims.lti13.LTI13PlatformScope;
+import org.olat.ims.lti13.LTI13Service;
+import org.olat.ims.lti13.LTI13SharedToolDeployment;
+import org.olat.ims.lti13.LTI13SharedToolService;
+import org.olat.ims.lti13.LTI13SharedToolService.ServiceType;
+import org.olat.ims.lti13.LTI13Tool;
+import org.olat.ims.lti13.LTI13Tool.PublicKeyType;
+import org.olat.ims.lti13.LTI13ToolDeployment;
+import org.olat.ims.lti13.LTI13ToolDeploymentType;
+import org.olat.ims.lti13.LTI13ToolType;
+import org.olat.ims.lti13.OIDCApi;
+import org.olat.ims.lti13.model.AccessTokenKey;
+import org.olat.ims.lti13.model.AccessTokenTimed;
+import org.olat.ims.lti13.model.AssessmentEntryWithUserId;
+import org.olat.ims.lti13.model.JwtToolBundle;
+import org.olat.ims.lti13.model.LTI13PlatformImpl;
+import org.olat.ims.lti13.model.LTI13PlatformWithInfos;
+import org.olat.ims.lti13.model.json.LineItem;
+import org.olat.ims.lti13.model.json.Result;
+import org.olat.repository.RepositoryEntry;
+import org.olat.repository.RepositoryEntryDataDeletable;
+import org.olat.repository.RepositoryEntryRef;
+import org.olat.repository.RepositoryManager;
+import org.olat.repository.RepositoryService;
+import org.olat.repository.model.RepositoryEntryLifecycle;
+import org.olat.user.UserManager;
+import org.olat.user.UserModule;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.model.OAuthRequest;
+import com.github.scribejava.core.model.Response;
+import com.github.scribejava.core.model.Verb;
+import com.github.scribejava.core.oauth.OAuth20Service;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jwt.SignedJWT;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+
+/**
+ * 
+ * Initial date: 17 févr. 2021<br>
+ * @author srosse, stephane.rosse@frentix.com, http://www.frentix.com
+ *
+ */
+@Service
+public class LTI13ServiceImpl implements LTI13Service, RepositoryEntryDataDeletable, DeletableGroupData, InitializingBean {
+	
+	private static final Logger log = Tracing.createLoggerFor(LTI13ServiceImpl.class);
+
+	@Autowired
+	private DB dbInstance;
+	@Autowired
+	private UserModule userModule;
+	@Autowired
+	private I18nManager i18nManager;
+	@Autowired
+	private UserManager userManager;
+	@Autowired
+	private LTI13Module lti13Module;
+	@Autowired
+	private LTI13KeyDAO lti13KeyDao;
+	@Autowired
+	private LTI13ToolDAO lti13ToolDao;
+	@Autowired
+	private LTI13IDGenerator idGenerator;
+	@Autowired
+	private BaseSecurity securityManager;
+	@Autowired
+	private LTI13ContextDAO lti13ContextDao;
+	@Autowired
+	private RepositoryManager repositoryManager;
+	@Autowired
+	private RepositoryService repositoryService;
+	@Autowired
+	private AuthenticationDAO authenticationDao;
+	@Autowired
+	private LTI13PlatformDAO lti13SharedToolDao;
+	@Autowired
+	private CoordinatorManager coordinatorManager;
+	@Autowired
+	private OrganisationService organisationService;
+	@Autowired
+	private LTI13ContentItemDAO lti13ContentItemDao;
+	@Autowired
+	private BusinessGroupService businessGroupService;
+	@Autowired
+	private LTI13ToolDeploymentDAO lti13ToolDeploymentDao;
+	@Autowired
+	private LTI13AssessmentEntryDAO lti13AssessmentEntryDao;
+	@Autowired
+	private CourseAssessmentService courseAssessmentService;
+	@Autowired
+	private LTI13SharedToolServiceDAO lti13SharedToolServiceDao;
+	@Autowired
+	private LTI13SharedToolDeploymentDAO sharedToolDeploymentDao;
+	@Autowired
+	private LTI13ContentItemClaimParser lti13ContentItemClaimParser;
+	
+	private CacheWrapper<AccessTokenKey,AccessTokenTimed> accessTokensCache;
+	private CacheWrapper<String,Boolean> nonceCache;
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		accessTokensCache = coordinatorManager.getCoordinator().getCacher().getCache("LTI", "accessTokens");
+		nonceCache = coordinatorManager.getCoordinator().getCacher().getCache("LTI", "nonce");
+	}
+
+	@Override
+	public boolean deleteRepositoryEntryData(RepositoryEntry re) {
+		// shared tool service, shared tool deployment, shared tool,
+		List<LTI13SharedToolDeployment> sharedDeployments = sharedToolDeploymentDao.getSharedToolDeployment(re);
+		for(LTI13SharedToolDeployment sharedDeployment:sharedDeployments) {
+			lti13SharedToolServiceDao.deleteSharedToolServices(sharedDeployment);
+			sharedToolDeploymentDao.deleteSharedDeployment(sharedDeployment);
+		}
+		dbInstance.commit();
+		//TODO lti lti13SharedToolDao.deleteSharedTools(re);
+		return true;
+	}
+
+	@Override
+	public boolean deleteGroupDataFor(BusinessGroup group) {
+		// shared tool service, shared tool deployment, shared tool,
+		List<LTI13SharedToolDeployment> sharedDeployments = sharedToolDeploymentDao.getSharedToolDeployment(group);
+		for(LTI13SharedToolDeployment sharedDeployment:sharedDeployments) {
+			lti13SharedToolServiceDao.deleteSharedToolServices(sharedDeployment);
+			sharedToolDeploymentDao.deleteSharedDeployment(sharedDeployment);
+		}
+		dbInstance.commit();
+		return true;
+	}
+
+	@Override
+	public void deleteToolsDeploymentsAndContexts(RepositoryEntryRef entry, String subIdent) {
+		List<LTI13Tool> localTools = new ArrayList<>();
+		List<LTI13Context> ltiContexts = lti13ContextDao.loadContextsBy(entry, subIdent);
+		for(LTI13Context ltiContext:ltiContexts) {
+			LTI13ToolDeployment deployment = ltiContext.getDeployment();
+			if(deployment.getTool().getToolTypeEnum() == LTI13ToolType.EXTERNAL) {
+				localTools.add(deployment.getTool());
+			}
+			lti13ContextDao.deleteContext(ltiContext);
+			if(deployment.getDeploymentType() == LTI13ToolDeploymentType.SINGLE_CONTEXT) {
+				lti13ToolDeploymentDao.deleteToolDeployment(deployment);
+			}
+		}
+		for(LTI13Tool tool:localTools) {
+			lti13ToolDao.deleteTool(tool);
+		}
+	}
+
+	@Override
+	public String newClientId() {
+		return idGenerator.newId();
+	}
+
+	@Override
+	public LTI13Tool createExternalTool(String toolName, String toolUrl, String clientId, String initiateLoginUrl, String redirectUrls, LTI13ToolType type) {
+		return lti13ToolDao.createTool(toolName, toolUrl, clientId, initiateLoginUrl, redirectUrls, type);
+	}
+
+	@Override
+	public LTI13Platform createTransientPlatform(LTI13PlatformScope type) {
+		LTI13PlatformImpl platform = new LTI13PlatformImpl();
+		platform.setCreationDate(new Date());
+		platform.setLastModified(platform.getLastModified());
+		platform.setKeyId(UUID.randomUUID().toString());
+		platform.setScopeEnum(type);
+		
+		KeyPair keyPair = Jwts.SIG.RS256.keyPair().build();
+		String publicEncoded = CryptoUtil.getPublicEncoded(keyPair.getPublic());
+		publicEncoded = CryptoUtil.getPublicEncoded(publicEncoded);
+		platform.setPublicKey(publicEncoded);
+		String privateEncoded = CryptoUtil.getPrivateEncoded(keyPair.getPrivate());
+		privateEncoded = CryptoUtil.getPublicEncoded(privateEncoded);
+		platform.setPrivateKey(privateEncoded);
+		
+		return platform;
+	}
+
+	@Override
+	public LTI13Platform updatePlatform(LTI13Platform tool) {
+		return lti13SharedToolDao.updatePlatform(tool);
+	}
+
+	@Override
+	public LTI13Platform getPlatform(String issuer, String clientId) {
+		return lti13SharedToolDao.loadByClientId(issuer, clientId);
+	}
+
+	@Override
+	public LTI13Platform getPlatformByKey(Long key) {
+		return lti13SharedToolDao.loadByKey(key);
+	}
+
+	@Override
+	public List<LTI13Platform> getPlatforms() {
+		return lti13SharedToolDao.getPlatforms().stream()
+				.map(LTI13PlatformWithInfos::getPlatform)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<LTI13PlatformWithInfos> getPlatformWithInfos() {
+		return lti13SharedToolDao.getPlatforms();
+	}
+
+	@Override
+	public LTI13SharedToolDeployment createSharedToolDeployment(String deploymentId, LTI13Platform platform,
+			RepositoryEntry repositoryEntry, BusinessGroup businessGroup) {
+		List<LTI13SharedToolDeployment> deployments = sharedToolDeploymentDao.getSharedToolDeployment(deploymentId, platform);
+		if(deployments.isEmpty()) {
+			if(repositoryEntry != null && businessGroup == null) {
+				String groupName = "LTI: " + platform.getName();
+				String groupDescription =  "LTI group for: " + platform.getName();
+				businessGroup = businessGroupService.createBusinessGroup(null, groupName, groupDescription,
+						LTI13Service.LTI_GROUP_TYPE, -1, -1, false, false, repositoryEntry);
+			}
+			LTI13SharedToolDeployment newDeployment = sharedToolDeploymentDao
+					.createDeployment(deploymentId, platform, repositoryEntry, businessGroup);
+			dbInstance.commit();
+			return newDeployment;
+		}
+		if(deployments.size() == 1) {
+			return deployments.get(0);
+		}
+		log.error("Shared tool with same deployments: {} {}", platform.getKey(), deploymentId);
+		return null;
+	}
+
+	@Override
+	public LTI13SharedToolDeployment updateSharedToolDeployment(LTI13SharedToolDeployment deployment) {
+		return sharedToolDeploymentDao.updateDeployment(deployment);
+	}
+
+	@Override
+	public LTI13SharedToolDeployment getSharedToolDeployment(String deploymentId, LTI13Platform platform) {
+		List<LTI13SharedToolDeployment> deployments = sharedToolDeploymentDao.getSharedToolDeployment(deploymentId, platform);
+		if(deployments.size() == 1) {
+			return deployments.get(0);
+		}
+		log.error("Shared tool with problematic deployment: {} {} (num. of deployments: {})", platform.getKey(), deploymentId, deployments.size());
+		return null;
+	}
+	
+	
+
+	@Override
+	public LTI13SharedToolDeployment getSharedToolDeployment(LTI13SharedToolDeployment deployment) {
+		if(deployment == null || deployment.getKey() == null) {
+			return null;
+		}
+		return sharedToolDeploymentDao.loadByKey(deployment.getKey());
+	}
+
+	@Override
+	public List<LTI13SharedToolDeployment> getSharedToolDeployments(LTI13Platform sharedTool) {
+		return sharedToolDeploymentDao.loadSharedToolDeployments(sharedTool);
+	}
+
+	@Override
+	public List<LTI13SharedToolDeployment> getSharedToolDeployments(RepositoryEntryRef entry) {
+		return sharedToolDeploymentDao.getSharedToolDeployment(entry);
+	}
+
+	@Override
+	public void deleteSharedToolDeployment(LTI13SharedToolDeployment deployment) {
+		deployment = sharedToolDeploymentDao.loadByKey(deployment.getKey());
+		if(deployment != null) {
+			lti13SharedToolServiceDao.deleteSharedToolServices(deployment);
+			sharedToolDeploymentDao.deleteSharedDeployment(deployment);
+		}
+	}
+
+	@Override
+	public List<LTI13SharedToolDeployment> getSharedToolDeployments(BusinessGroupRef businessGroup) {
+		return sharedToolDeploymentDao.getSharedToolDeployment(businessGroup);
+	}
+
+	@Override
+	public void updateSharedToolServiceEndpoint(String contextId, ServiceType type, String endpointUrl, LTI13SharedToolDeployment deployment) {
+		List<LTI13SharedToolService> services = lti13SharedToolServiceDao.loadServiceEndpoint(contextId, type, endpointUrl, deployment);
+		if(services.isEmpty()) {
+			lti13SharedToolServiceDao.createServiceEndpoint(contextId, type, endpointUrl, deployment);
+			dbInstance.commit();
+		}
+	}
+	
+	@Override
+	public LTI13ToolDeployment createToolDeployment(String targetUrl, LTI13ToolDeploymentType type, String deploymentId, LTI13Tool tool) {
+		return lti13ToolDeploymentDao.createDeployment(targetUrl, type, deploymentId, tool);
+	}
+
+	@Override
+	public LTI13ToolDeployment updateToolDeployment(LTI13ToolDeployment deployment) {
+		return lti13ToolDeploymentDao.updateToolDeployment(deployment);
+	}
+
+	@Override
+	public List<LTI13Tool> getTools(LTI13ToolType type) {
+		return lti13ToolDao.getTools(type);
+	}
+
+	@Override
+	public LTI13Tool updateTool(LTI13Tool tool) {
+		return lti13ToolDao.updateTool(tool);
+	}
+
+	@Override
+	public LTI13Tool getToolByKey(Long key) {
+		return lti13ToolDao.loadToolByKey(key);
+	}
+
+	@Override
+	public List<LTI13Tool> getToolsByClientId(String clientId) {
+		return lti13ToolDao.loadToolsByClientId(clientId);
+	}
+
+	@Override
+	public LTI13Tool getToolBy(Collection<String> toolUrl, String clientId) {
+		return lti13ToolDao.loadToolBy(toolUrl, clientId);
+	}
+
+	@Override
+	public LTI13Context getContext(RepositoryEntryRef entry, String subIdent) {
+		List<LTI13Context> contexts = lti13ContextDao.loadContextsBy(entry, subIdent);
+		if(contexts.size() == 1) {
+			return contexts.get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public LTI13ToolDeployment getToolDeploymentByKey(Long key) {
+		return lti13ToolDeploymentDao.loadDeploymentByKey(key);
+	}
+	
+	@Override
+	public LTI13ToolDeployment getToolDeploymentByDeploymentId(String deploymentId) {
+		return lti13ToolDeploymentDao.loadDeploymentByDeploymentId(deploymentId);
+	}
+
+	@Override
+	public List<LTI13ToolDeployment> getToolDeploymentByTool(LTI13Tool tool) {
+		return lti13ToolDeploymentDao.loadDeployments(tool);
+	}
+
+	@Override
+	public LTI13Context createContext(String targetUrl, LTI13ToolDeployment deployment, RepositoryEntry entry,
+			String subIdent, BusinessGroup businessGroup) {
+		return lti13ContextDao.createContext(targetUrl, deployment, entry, subIdent, businessGroup);
+	}
+
+	@Override
+	public LTI13Context updateContext(LTI13Context ltiContext) {
+		return lti13ContextDao.updateContext(ltiContext);
+	}
+
+	@Override
+	public LTI13Context getContextByKey(Long key) {
+		return lti13ContextDao.loadContextByKey(key);
+	}
+
+	@Override
+	public LTI13Context getContextByContextId(String contextId) {
+		return lti13ContextDao.loadContextByContextId(contextId);
+	}
+	
+	@Override
+	public LTI13Context getContextBackwardCompatibility(String deploymentKey, RepositoryEntryRef entry,
+			String subIdent) {
+		LTI13ToolDeployment toolDeployment;
+		if(StringHelper.isLong(deploymentKey)) {
+			toolDeployment = lti13ToolDeploymentDao.loadDeploymentByKey(Long.valueOf(deploymentKey));
+		} else {
+			toolDeployment = lti13ToolDeploymentDao.loadDeploymentBy(entry, subIdent);
+		}
+		
+		if(toolDeployment != null
+				&& (toolDeployment.getDeploymentType() == null || toolDeployment.getDeploymentType() == LTI13ToolDeploymentType.SINGLE_CONTEXT)
+				&& StringHelper.containsNonWhitespace(toolDeployment.getContextId())) {
+			List<LTI13Context> contexts = lti13ContextDao.loadContextsByDeploymentKey(toolDeployment.getKey());
+			if(contexts.size() == 1) {
+				return contexts.get(0);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public LTI13Context getContextByToolDeploymentByKey(Long deploymentKey) {
+		List<LTI13Context> contexts = lti13ContextDao.loadContextsByDeploymentKey(deploymentKey);
+		if(contexts.size() == 1) {
+			return contexts.get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public List<LTI13Context> getContextsByTool(LTI13Tool tool) {
+		return lti13ContextDao.loadContexts(tool);
+	}
+
+	@Override
+	public Identity loadIdentity(String sub, String issuer) {
+		Authentication ltiAuth = authenticationDao.getAuthentication(sub, LTI_PROVIDER, issuer);
+		if(ltiAuth != null) {
+			return ltiAuth.getIdentity();
+		}
+		return null;
+	}
+
+	@Override
+	public String subIdentity(Identity identity, String issuer) {
+		Authentication ltiAuth = authenticationDao.getAuthentication(identity, LTI_PROVIDER, issuer);
+		if(ltiAuth == null) {
+			String uuid = UUID.randomUUID().toString();
+			ltiAuth = securityManager.createAndPersistAuthentication(identity, LTI_PROVIDER, issuer, null, uuid, null, null);
+		}
+		
+		if(ltiAuth != null) {
+			return ltiAuth.getAuthusername();
+		}
+		return null;
+	}
+	
+	@Override
+	public Identity matchIdentity(Claims body, LTI13Platform platform) {
+		String issuer = body.getIssuer();
+		String sub = body.getSubject();
+		String givenName = body.get(UserSub.GIVEN_NAME, String.class);
+		String familyName = body.get(UserSub.FAMILY_NAME, String.class);
+		String email = body.get(UserSub.EMAIL, String.class);
+		
+		Identity identity = loadIdentity(sub, issuer);
+		if(identity == null) {
+			String language = body.get(UserSub.LOCALE, String.class);
+			log.debug("sub: {}, given_name: {} family_name: {}", sub, givenName, familyName);
+			
+			if(StringHelper.containsNonWhitespace(email) && lti13Module.isMatchingByEmailEnabled()
+					&& platform.isEmailMatching() && userModule.isEmailUnique()) {
+				List<Identity> currentIdentities = userManager.findIdentitiesByEmail(List.of(email));
+				if(currentIdentities.size() == 1) {
+					identity = currentIdentities.get(0);
+					securityManager.createAndPersistAuthentication(identity, LTI13Service.LTI_PROVIDER, issuer, null, sub, null, null);
+					return identity;
+				}
+			}
+			
+			Locale locale = i18nManager.getLocaleOrDefault(language);
+			Organisation ltiOrganisation = getLTIOrganisation();
+			if(userModule.isEmailUnique() && !userManager.isEmailAllowed(email)) {
+				email = null;
+			}
+			User user = userManager.createUser(givenName, familyName, email);
+			user.getPreferences().setLanguage(locale.toString());
+			String nickName = "l" + CodeHelper.getForeverUniqueID();
+			identity = securityManager.createAndPersistIdentityAndUserWithOrganisation(null, nickName, null, user,
+					LTI13Service.LTI_PROVIDER, issuer, null, sub, null, ltiOrganisation, null);
+		} else if(isLTIOnlyUser(identity) &&
+				(!StringHelper.isSame(identity.getUser().getFirstName(), givenName)
+						|| !StringHelper.isSame(identity.getUser().getLastName(), familyName)
+						|| !StringHelper.isSame(identity.getUser().getEmail(), email))) {
+			User user = identity.getUser();
+			user.setProperty(UserConstants.FIRSTNAME, givenName);
+			user.setProperty(UserConstants.LASTNAME, familyName);
+			user.setProperty(UserConstants.EMAIL, email);
+			userManager.updateUserFromIdentity(identity);
+		}
+		return identity;
+	}
+	
+	private boolean isLTIOnlyUser(Identity identity) {
+		List<Authentication> authentications = securityManager.getAuthentications(identity);
+		return authentications.size() == 1;
+	}
+	
+	@Override
+	public void checkMembership(Identity identity, GroupRoles role, LTI13SharedToolDeployment tool) {
+		if(tool.getBusinessGroup() != null) {
+			BusinessGroup businessGroup = tool.getBusinessGroup();
+			if(!businessGroupService.hasRoles(identity, businessGroup, role.name())) {
+				Roles roles = securityManager.getRoles(identity);
+				if(role == GroupRoles.participant) {
+					businessGroupService.addParticipants(identity, roles, List.of(identity), businessGroup, new MailPackage(false));
+				} else if(role == GroupRoles.coach) {
+					businessGroupService.addOwners(identity, roles, List.of(identity), businessGroup, new MailPackage(false));
+				} else {
+					log.warn("Roles not supported: {}", role);
+				}
+			}
+		} else if(tool.getEntry() != null) {
+			// check if participant, if not
+			RepositoryEntry entry = tool.getEntry();
+			if(!repositoryService.hasRole(identity, entry, role.name())) {
+				Roles roles = securityManager.getRoles(identity);
+				IdentitiesAddEvent iae = new IdentitiesAddEvent(identity);
+				if(role == GroupRoles.participant) {
+					repositoryManager.addParticipants(identity, roles, iae, entry, new MailPackage(false));
+				} else if(role == GroupRoles.coach) {
+					repositoryManager.addTutors(identity, roles, iae, entry, new MailPackage(false));
+				} else {
+					log.warn("Roles not supported: {}", role);
+				}
+			}
+		} 
+	}
+	
+	private Organisation getLTIOrganisation() {
+		Organisation organisation = null;
+		if(StringHelper.isLong(lti13Module.getDefaultOrganisationKey())) {
+			Long organisationKey = Long.valueOf(lti13Module.getDefaultOrganisationKey());
+			organisation = organisationService.getOrganisation(new OrganisationRefImpl(organisationKey));
+		}
+		if(organisation == null) {
+			organisation = organisationService.getDefaultOrganisation();
+		}
+		return organisation;
+	}
+	
+	@Override
+	public String getNonce() {
+		String nextNonce = UUID.randomUUID().toString();
+		nonceCache.put(nextNonce, Boolean.TRUE);
+		return nextNonce;
+	}
+
+	@Override
+	public LTI13Key getLastPlatformKey() {
+		List<LTI13Key> keys = lti13KeyDao.getKeys(lti13Module.getPlatformIss());
+		
+		LTI13Key key = null;
+		if(keys == null || keys.isEmpty()) {
+			key = lti13KeyDao.generateKey(lti13Module.getPlatformIss());
+			dbInstance.commit();
+		} else {
+			key = keys.get(0);
+		}
+		return key;
+	}
+
+	@Override
+	public List<LTI13Key> getPlatformKeys() {
+		return lti13KeyDao.getKeys(lti13Module.getPlatformIss());
+	}
+
+	@Override
+	public LTI13Key getPlatformKey(String algorithm, String keyId) {
+		List<LTI13Key> keys = getPlatformKeys();
+		for(LTI13Key key:keys) {
+			if(key.getKeyId().equals(keyId) && key.getAlgorithm().equals(algorithm)) {
+				return key;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public PublicKey getPlatformPublicKey(String kid) {
+		//kid is unique
+		List<LTI13Platform> platforms = lti13SharedToolDao.loadByKid(kid);
+		if(!platforms.isEmpty()) {
+			String publicKeyText = platforms.get(0).getPublicKey();
+			return CryptoUtil.string2PublicKey(publicKeyText);
+		}
+		List<LTI13Key> keys = lti13KeyDao.getKey(kid, lti13Module.getPlatformIss());
+		if(keys.size() == 1) {
+			return keys.get(0).getPublicKey();
+		}
+		return null;
+	}
+
+	@Override
+	public List<LTI13Key> getKeys(String jwkSetUri, String alg, String kid) {
+		List<LTI13Key> keys = lti13KeyDao.getKeys(jwkSetUri);
+		if(StringHelper.containsNonWhitespace(kid)) {
+			for(LTI13Key key:keys) {
+				if(key.getKeyId().equals(kid)) {
+					return List.of(key);
+				}
+			}
+		} else if(!keys.isEmpty()) {
+			List<LTI13Key> cachedKeys = new ArrayList<>();
+			for(LTI13Key key:keys) {
+				String algorithm = key.getAlgorithm();
+				if(alg == null || alg.equals(algorithm)) {
+					cachedKeys.add(key);
+				}
+			}
+			if(!cachedKeys.isEmpty()) {
+				return cachedKeys;
+			}
+		}
+		
+		dbInstance.commit();
+		try {
+			JWKSet publicKeys = loadJWKSet(jwkSetUri);
+			if(StringHelper.containsNonWhitespace(kid)) {
+				JWK jwk = publicKeys.getKeyByKeyId(kid);
+				LTI13Key key = cacheKey(jwkSetUri, jwk);
+				return List.of(key);
+			}
+			
+			keys = new ArrayList<>();
+			for(JWK publicJwk:publicKeys.getKeys()) {
+				String algorithm = publicJwk.getAlgorithm().toString();
+				LTI13Key key = cacheKey(jwkSetUri, publicJwk);
+				if(alg == null || algorithm == null || alg.equals(algorithm)) {
+					keys.add(key);
+				}
+			}
+			return keys;
+		} catch (Exception e) {
+			log.error("", e);
+			return List.of();
+		} finally {
+			dbInstance.commit();
+		}
+	}
+	
+	private JWKSet loadJWKSet(String jwkSetUri) throws IOException, ParseException {
+		URI uri = URI.create(jwkSetUri);
+		String scheme = uri.getScheme();
+		JWKSet publicKeys;
+		if("file".equals(scheme) && Settings.isJUnitTest()) {
+			publicKeys = JWKSet.load(new File(uri));
+		} else {
+			publicKeys = JWKSet.load(new URL(jwkSetUri));
+		}
+		return publicKeys;
+	}
+	
+	private LTI13Key cacheKey(String jwkSetUri, JWK jwk) throws JOSEException {
+		String pkid = jwk.getKeyID();
+		String algorithm = jwk.getAlgorithm().toString();
+		PublicKey publicKey = jwk.toRSAKey().toPublicKey();
+		return lti13KeyDao.createKey(jwkSetUri, pkid, algorithm, publicKey);
+	}
+	
+	@Override
+	public JwtToolBundle getAndVerifyClientAssertion(String clientAssertion) {
+		String issuer = null;
+		String subject = null;
+		LTI13ExternalToolSigningKeyResolver signingResolver = null;
+		try {
+			SignedJWT signedJWT = SignedJWT.parse(clientAssertion);
+			issuer = signedJWT.getJWTClaimsSet().getIssuer();
+			subject = signedJWT.getJWTClaimsSet().getSubject();
+			signingResolver = new LTI13ExternalToolSigningKeyResolver(issuer, subject);
+		} catch (ParseException e) {
+			log.debug("Cannot parse a client assertion: {}", clientAssertion, e);
+			log.error("Cannot parse a client assertion", e);
+			throw new UnsupportedJwtException("");
+		}
+
+		try {	
+			Jws<Claims> jws = Jwts.parser()
+				.keyLocator(signingResolver)
+				.build()
+				.parseSignedClaims(clientAssertion);
+			log.debug("Token: {}", jws);
+			return new JwtToolBundle(jws, signingResolver.getTool());
+		} catch (SignatureException | IllegalArgumentException e) {
+			// if a tool was found with several possible keys, loop them
+			if(signingResolver.getTool() != null && signingResolver.getTool().getPublicKeyTypeEnum() == PublicKeyType.URL) {
+				return verifyAlternativeKeys(clientAssertion, signingResolver);
+			}
+			log.error("Cannot parse signed assertion from issuer: {} and sub: {}", issuer, subject, e);
+		} catch (ExpiredJwtException | MalformedJwtException e) {
+			log.error("", e);
+		}
+		return null;
+	}
+	
+	private JwtToolBundle verifyAlternativeKeys(String clientassertion, LTI13ExternalToolSigningKeyResolver signingResolver) {
+		// loop the cached keys
+		if(signingResolver.hasFoundMultipleKeys()) {
+			List<LTI13Key> keys = signingResolver.getFoundKeys();
+			for(LTI13Key key:keys) {
+				JwtToolBundle verifiedBundle = getAndVerify(clientassertion, key.getPublicKey(), signingResolver.getTool());
+				if(verifiedBundle != null) {
+					return verifiedBundle;
+				}
+			}
+		}
+		
+		try {
+			// failed, update the cached key
+			String jwkSetUrl = signingResolver.getTool().getPublicKeyUrl();
+			JWKSet publicKeys = loadJWKSet(jwkSetUrl);
+			for(JWK jwk:publicKeys.getKeys()) {
+				PublicKey publicKey = jwk.toRSAKey().toPublicKey();
+				JwtToolBundle verifiedBundle = getAndVerify(clientassertion, publicKey, signingResolver.getTool());
+				if(verifiedBundle != null) {
+					// cache the new key
+					cacheKey(jwkSetUrl, jwk);
+					return verifiedBundle;
+				}
+			}
+		} catch (Exception e) {
+			log.error("", e);
+		}
+		return null;
+	}
+	
+	private JwtToolBundle getAndVerify(String clientassertion, PublicKey publicKey, LTI13Tool tool) {
+		try {
+			Jws<Claims> jwt = Jwts.parser()
+				.verifyWith(publicKey)
+				.build()
+				.parseSignedClaims(clientassertion);
+			log.debug("Token: {}", jwt);
+			return new JwtToolBundle(jwt, tool);
+		} catch (SignatureException | IllegalArgumentException e) {
+			log.debug("Signature issue by looping potential key: {}", publicKey, e);
+			return null;
+		}
+	}
+
+	@Override
+	public OAuth2AccessToken getAccessToken(LTI13Platform tool, List<String> scopes) {
+		AccessTokenKey tokenKey = new AccessTokenKey(tool, scopes);
+		if(accessTokensCache.containsKey(tokenKey)) {
+			AccessTokenTimed obj = accessTokensCache.get(tokenKey);
+			if(obj == null || obj.hasExpired()) {
+				accessTokensCache.remove(tokenKey);
+			} else {
+				return obj.getAccessToken();
+			}
+		}
+
+		String clientId = tool.getClientId();
+		String tokenUrl = tool.getTokenUri();
+
+		OAuth20Service service = new ServiceBuilder(clientId)
+		        .callback(lti13Module.getPlatformAuthorizationUri())
+		        .defaultScope("openid")
+		        .responseType(LTI13Constants.OAuth.ID_TOKEN)
+		        .build(new OIDCApi(this));
+		
+		OAuthRequest request = new OAuthRequest(Verb.POST, tokenUrl);
+		request.addHeader("Content-Type", "application/x-www-form-urlencoded");
+		
+		request.addQuerystringParameter(LTI13Constants.OAuth.GRANT_TYPE, LTI13Constants.OAuth.CLIENT_CREDENTIALS);
+		request.addQuerystringParameter(LTI13Constants.OAuth.CLIENT_ASSERTION_TYPE, LTI13Constants.OAuth.CLIENT_ASSERTION_TYPE_BEARER);
+	
+		String scope = String.join(" ", scopes);
+		request.addQuerystringParameter("scope", scope);
+		
+		Date expirationDate = DateUtils.addMinutes(new Date(), 60);
+		
+		JwtBuilder builder = Jwts.builder()
+			.header()
+				.type( LTI13Constants.Keys.JWT)
+				.add(LTI13Constants.Keys.ALGORITHM, "RS256")
+				.keyId(tool.getKeyId())
+			.and()
+			.issuedAt(new Date())
+			.expiration(expirationDate)
+			.issuer(lti13Module.getPlatformIss())
+			.audience()
+				.add(tokenUrl)
+			.and()
+			.subject(clientId);
+
+		Key key = CryptoUtil.string2PrivateKey(tool.getPrivateKey());
+		
+		String assertion = builder
+				.signWith(key)
+				.compact();
+
+		request.addQuerystringParameter(LTI13Constants.OAuth.CLIENT_ASSERTION, assertion);
+		
+		try {
+			Response response = service.execute(request);
+			OAuth2AccessToken token = service.getApi().getAccessTokenExtractor().extract(response);
+			if(token != null && token.getExpiresIn() != null) {
+				AccessTokenTimed cachedToken = new AccessTokenTimed(token);
+				accessTokensCache.put(tokenKey, cachedToken, token.getExpiresIn().intValue());
+			}
+			return token;
+		} catch (Exception e) {
+			log.error("", e);
+			return null;
+		}
+	}
+	
+	@Override
+	public Result getResult(String userId, Identity assessedId, LTI13Context ltiContext) {
+		RepositoryEntry entry = ltiContext.getEntry();
+		String subIdent = ltiContext.getSubIdent();
+		ICourse course = CourseFactory.loadCourse(entry);
+		CourseNode courseNode = course.getRunStructure().getNode(subIdent);
+		if(courseNode instanceof BasicLTICourseNode ltiNode) {
+			UserCourseEnvironment userCourseEnv = getUserCourseEnvironment(assessedId, course);
+			ScoreEvaluation eval = courseAssessmentService.getAssessmentEvaluation(courseNode, userCourseEnv);
+			Float score = getScoreFromEvalutation(eval, entry, ltiNode);
+			Float maxScore = getMaxScoreFromNode(entry, ltiNode);
+			return LTI13JsonUtil.createResult(userId, score, maxScore, ltiContext);
+		}
+		return null;
+	}
+	
+	@Override
+	public List<Result> getResults(LTI13Context ltiContext, int firstResult, int maxResults) {
+		RepositoryEntry entry = ltiContext.getEntry();
+		String subIdent = ltiContext.getSubIdent();
+		ICourse course = CourseFactory.loadCourse(entry);
+		CourseNode courseNode = course.getRunStructure().getNode(subIdent);
+		
+		List<Result> results = new ArrayList<>();
+		if(courseNode instanceof BasicLTICourseNode ltiNode) {
+			Float maxScore = getMaxScoreFromNode(entry, ltiNode);
+			
+			List<AssessmentEntryWithUserId> assessmentEntries = lti13AssessmentEntryDao.getAssessmentEntriesWithUserIds(ltiContext, firstResult, maxResults);
+			for(AssessmentEntryWithUserId assessmentEntry:assessmentEntries) {
+				Float score = getScoreFromEvalutation(assessmentEntry, entry, ltiNode);
+				Result result = LTI13JsonUtil.createResult(assessmentEntry.getUserId(), score, maxScore, ltiContext);
+				results.add(result);
+			}
+		}
+		return results;
+	}
+	
+	@Override
+	public LineItem getLineItem(LTI13Context ltiContext) {
+		final RepositoryEntry entry = ltiContext.getEntry();
+		final String subIdent = ltiContext.getSubIdent();
+		final ICourse course = CourseFactory.loadCourse(entry);
+		CourseNode courseNode = course.getRunStructure().getNode(subIdent);
+		
+		LineItem lineItem = new LineItem();
+		lineItem.setId(subIdent);
+		if(StringHelper.containsNonWhitespace(courseNode.getShortTitle())) {
+			lineItem.setLabel(courseNode.getShortTitle());
+		} else {
+			lineItem.setLabel(courseNode.getLongTitle());
+		}
+		
+		if(courseNode instanceof BasicLTICourseNode ltiNode) {
+			Float maxScore = getMaxScoreFromNode(entry, ltiNode);
+			if(maxScore != null) {
+				lineItem.setScoreMaximum(maxScore.doubleValue());
+			}
+		}
+		lineItem.setResourceId(subIdent);
+		RepositoryEntryLifecycle lifeCycle = entry.getLifecycle();
+		if(lifeCycle != null) {
+			lineItem.setStartDateTime(lifeCycle.getValidFrom());
+			lineItem.setEndDateTime(lifeCycle.getValidTo());
+		}
+		return lineItem;
+	}
+	
+	private Float getMaxScoreFromNode(RepositoryEntry repositoryEntry, BasicLTICourseNode ltiNode) {
+		Float maxScore = null;
+		AssessmentConfig assessmentConfig = courseAssessmentService.getAssessmentConfig(repositoryEntry, ltiNode);
+		if(assessmentConfig.getScoreMode() == Mode.setByNode) {
+			maxScore = assessmentConfig.getMaxScore();
+			if(maxScore != null && maxScore.floatValue() > 0.0f) {
+				float scale = ltiNode.getScalingFactor(repositoryEntry);
+				maxScore = Float.valueOf(maxScore.floatValue() / scale);
+			}
+		}
+		return maxScore;
+	}
+	
+	private Float getScoreFromEvalutation(AssessmentEntryWithUserId eval, RepositoryEntry repositoryEntry, BasicLTICourseNode ltiNode) {
+		Float score = null;
+		if(eval != null && eval.getAssessmentEntry() != null && eval.getAssessmentEntry().getScore() != null) {
+			BigDecimal scaledScore = eval.getAssessmentEntry().getScore();
+			if(scaledScore != null && scaledScore.doubleValue() > 0.0d) {
+				float scale = ltiNode.getScalingFactor(repositoryEntry);
+				score = Float.valueOf(scaledScore.floatValue() / scale);
+			} else if(scaledScore != null) {
+				score = Float.valueOf(0.0f);
+			}
+		}
+		return score;
+	}
+	
+	private Float getScoreFromEvalutation(ScoreEvaluation eval,  RepositoryEntry repositoryEntry, BasicLTICourseNode ltiNode) {
+		Float score = null;
+		if(eval != null && eval.getScore() != null) {
+			float scaledScore = eval.getScore();
+			if(scaledScore > 0.0f) {
+				float scale = ltiNode.getScalingFactor(repositoryEntry);
+				scaledScore = scaledScore / scale;
+			}
+			score = Float.valueOf(scaledScore);
+		}
+		return score;
+	}
+		
+	private UserCourseEnvironment getUserCourseEnvironment(Identity identity, ICourse course) {
+		IdentityEnvironment identityEnvironment = new IdentityEnvironment();
+		identityEnvironment.setIdentity(identity);
+		return new UserCourseEnvironmentImpl(identityEnvironment, course.getCourseEnvironment());
+	}
+	
+	@Override
+	public List<LTI13ContentItem> getContentItems(LTI13Context context) {
+		if(context == null || context.getKey() == null
+				|| context.getDeployment() == null || context.getDeployment().getKey() == null) {
+			return new ArrayList<>(1);
+		}
+		return lti13ContentItemDao.loadItemByContext(context);
+	}
+
+	@Override
+	public LTI13ContentItem getContentItemByKey(Long key) {
+		return lti13ContentItemDao.loadItemByKey(key);
+	}
+	
+	@Override
+	public List<LTI13ContentItem> reorderContentItems(List<LTI13ContentItem> items, List<Long> preferedOrder, int position) {
+		if(preferedOrder == null || preferedOrder.isEmpty() || items == null || items.size() <= 1) {
+			return items;
+		}
+		
+		Map<Long, LTI13ContentItem> contentItemsMap = items.stream()
+				.collect(Collectors.toMap(LTI13ContentItem::getKey, Function.identity()));
+		List<LTI13ContentItem> orderedItems = new ArrayList<>();
+		for(Long key:preferedOrder) {
+			LTI13ContentItem item = contentItemsMap.get(key);
+			if(item != null) {
+				orderedItems.add(item);
+				contentItemsMap.remove(key);
+			}
+		}
+		
+		List<LTI13ContentItem> lastItems = new ArrayList<>(contentItemsMap.values());
+		try {
+			Collections.sort(lastItems, (i1, i2) -> {
+				return i1.getKey().compareTo(i2.getKey());
+			});
+		} catch (Exception e) {
+			log.error("", e);
+		}
+		
+		if(position < 0 || position >= orderedItems.size()) {
+			orderedItems.addAll(lastItems);
+		} else {
+			orderedItems.addAll(position, lastItems);
+		}
+		return orderedItems;
+	}
+
+	@Override
+	public LTI13ContentItem updateContentItem(LTI13ContentItem item) {
+		return lti13ContentItemDao.updateItem(item);
+	}
+	
+	@Override
+	public void deleteContentItem(LTI13ContentItem item) {
+		if(item == null || item.getKey() == null) return;
+		
+		LTI13ContentItem reloadedItem = lti13ContentItemDao.loadItemByKey(item.getKey());
+		if(reloadedItem != null) {
+			lti13ContentItemDao.deleteItem(reloadedItem);
+		}
+	}
+
+	@Override
+	public List<LTI13ContentItem> createContentItems(Claims body, LTI13ToolDeployment deployment, LTI13Context ltiContext) {
+		List<LTI13ContentItem> items = new ArrayList<>();
+		List<?> contentItemsList = body.get(LTI13Constants.Claims.DL_CONTENT_ITEMS.url(), List.class);
+		if(contentItemsList != null) {
+			LTI13Tool tool = deployment.getTool();
+			for(int i=0; i<contentItemsList.size(); i++) {
+				@SuppressWarnings("unchecked")
+				Map<Object,Object> contentItemsObj = (Map<Object,Object>)contentItemsList.get(i);
+				LTI13ContentItem item = createContentItems(contentItemsObj, tool, deployment, ltiContext);
+				if(item != null) {
+					items.add(item);
+				}
+			}
+			dbInstance.commit();
+		}
+		return items;
+	}
+	
+	private final LTI13ContentItem createContentItems(Map<Object,Object> contentItemsObj,
+			LTI13Tool tool, LTI13ToolDeployment deployment, LTI13Context ltiContext) {
+		LTI13ContentItem item = null;
+		LTI13ContentItemTypesEnum type = LTI13ContentItemTypesEnum.secureValueOf(contentItemsObj.get("type"));
+		if(type != null) {
+			item = lti13ContentItemDao.createItem(type, tool, deployment, ltiContext);
+			switch(type) {
+				case ltiResourceLink:
+					lti13ContentItemClaimParser.parseLtiResourceLink(item, contentItemsObj);
+					break;
+				case link:
+					lti13ContentItemClaimParser.parseLink(item, contentItemsObj);
+					break;
+				case image:
+					lti13ContentItemClaimParser.parseImage(item, contentItemsObj);
+					break;
+				case file:
+					lti13ContentItemClaimParser.parseFile(item, contentItemsObj);
+					break;
+				case html:
+					lti13ContentItemClaimParser.parseHtml(item, contentItemsObj);
+					break;
+				default: break ;
+			}
+			lti13ContentItemDao.persistItem(item);
+		}
+		return item;
+	}
+}

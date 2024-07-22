@@ -1,0 +1,40 @@
+<div id="$r.getCId()" class="o_course_run">
+	
+#if ($r.available("assessment"))
+	$r.render("assessment")
+#end
+
+#if ($r.available("highScore"))
+	$r.render("highScore")
+#end
+
+#if ($r.isNotEmpty($childViewNames))
+	#set ($i = 0)
+	<div class="o_toc o_block_large">
+	<fieldset>
+	<legend>$r.translate("table.of.contents")</legend>
+		<div class="row">
+			#foreach($childViewName in $childViewNames)
+				## display in two rows when screen is larger than 992px and two columns layout selected
+				<div class="o_row col-sm-12 #if ($layoutType == 2) col-md-6 #end">
+					$r.render($childViewName)
+				</div>
+				#set ($i = $i + 1)
+				#if($i%2 == 0)
+					</div><div class="row">
+				#end
+			#end
+		</div>
+	</fieldset>
+	</div>
+#end
+
+<script> 
+jQuery(function() {
+	## Add event JS event listeners for click and keydown events on all the gotonodes links to jump to top
+	jQuery('.o_course_run .o_toc a.o_gotoNode').each(function(n,m) {
+		jQuery(m).on('keydown click', function(){ o_scrollTop(); });
+	});
+});
+</script>
+</div>

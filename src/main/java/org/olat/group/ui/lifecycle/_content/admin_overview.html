@@ -1,0 +1,12 @@
+<fieldset>
+	<legend>$r.translate("admin.title")</legend>
+	<p><span class="o_hint">$r.translate("admin.description") $r.contextHelpAdditionalInfo("manual_admin/administration/Automatic_Group_Lifecycle/")</span></p>
+	$r.render("process")
+</fieldset>
+$r.render("types")
+<a id="inactive"></a>
+$r.render("inactivation")
+<a id="soft"></a>
+$r.render("soft.delete")
+<a id="delete"></a>
+$r.render("hard.delete")

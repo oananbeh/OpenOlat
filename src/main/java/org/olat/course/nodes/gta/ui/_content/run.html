@@ -1,0 +1,428 @@
+#if($r.available("userShortDescription"))
+<div class="o_user_infos row">
+	<div class="o_user_portrait">$r.render("portrait")</div>
+	<div class="o_user_infos_inner">
+		$r.render("userShortDescription")
+	</div>
+</div>
+#end
+
+<div class="clearfix">
+	$r.render("contextualSubscription")
+</div>
+
+#if($noGroupError)
+<div class="o_error" role="alert">$r.translate("error.no.group")</div>
+#end
+#if($groupWarning)
+<div class="o_warning" role="alert">$r.translate("warning.group.task")</div>
+#end
+
+#if($r.available("open.group"))
+<div class="o_block">
+	<div class="pull-right">$r.render("open.group")</div>
+	<p>$r.translate("selected.group", $r.escapeHtml($groupName))</p>
+	
+	#if($r.available("change.group"))
+		<p>$r.translate("change.group.description") $r.render("change.group")</p>
+	#end
+</div>
+#end
+
+<div id="o_proc_${r.getCId()}" class="o_process">
+#if($assignmentEnabled)
+<div id="o_step_assignement" class="o_step $assignmentCssClass o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_assignement) onclick="$r.javaScriptCommand("hide","step","assignment")" #else onclick="$r.javaScriptCommand("show","step","assignment")" #end>
+			<span class="o_process_status_badge $assignmentCssStatus">$assignmentStatus</span>
+			<h4 class="o_title">$r.translate("run.assignment.title")</h4>
+			#if($r.isNotEmpty($assignmentDueDate))
+				<div id="o_step_assignement_duedate" class="o_meta" data-remaining-time="$assignmentRemainingTime"><i class="o_icon o_icon-fw o_icon_timelimit"> </i> $assignmentDueDate</div>
+			#end
+			#if($r.isNotEmpty($assignmentDate))
+				<div class="o_meta"><i class="o_icon o_icon-fw o_icon_status_done"> </i> $assignmentDate</div>
+			#end
+			
+			#if($r.isTrue($assignmentClosed) && $r.isFalse($assignmentClosedWithAssignment))
+				<div class="o_meta o_expired_warning"><i class="o_icon o_icon-fw o_icon_description"> </i> $r.translate("error.assignment.closed.without.assignment")</div>
+			#end
+			
+			#if($assignmentDueDateMsg)
+				<div class="o_meta">$r.escapeHtml($assignmentDueDateMsg)</div>
+			#end
+		</div>
+		<div id="o_step_assignement_content" class="o_content collapse #if($collapse_assignement) in #end" aria-expanded="$collapse_assignement" role="region">
+			#if($assignmentClosed)
+				<div class="o_error">$r.translate("error.assignment.closed")</div>
+			#end
+			#if($r.available("availableTasks"))
+				#if($r.isTrue($assignmentOptional))
+					<div class="o_warning">$r.translate("run.assignment.optional")</div>
+				#end
+				#if($groupWarning)
+					<div class="o_warning" role="alert">$r.translate("warning.group.pick.task", $r.escapeHtml($groupName))</div>
+				#end
+				$r.render("availableTasks")
+			#elseif($r.available("myAssignedTask"))
+				$r.render("myAssignedTask")
+				#if($r.visible("participant.reset.button"))
+				<div class="o_button_group">
+					$r.render("participant.reset.button")
+				</div>
+				#end
+			#elseif($r.visible("participant.reset.button"))
+			<div class="o_button_group">
+				$r.render("participant.reset.button")
+			</div>
+			#elseif($r.isTrue($assignmentOptional) && $r.isFalse($assignmentClosed))
+				<div class="o_warning">$r.translate("run.assignment.optional")</div>
+				#if($r.visible("run.accept.optional"))
+				<div class="o_button_group">
+					$r.render("run.accept.optional")
+				</div>
+				#end
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_assignement)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","assignment")" data-toggle="collapse" aria-expanded="$collapse_assignement" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","assignment")" data-toggle="collapse" aria-expanded="$collapse_assignement" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+
+#if($submitEnabled)
+<div class="o_step $submitCssClass o_step_submit o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_submit) onclick="$r.javaScriptCommand("hide","step","submit")" #else onclick="$r.javaScriptCommand("show","step","submit")" #end>
+			<span class="o_process_status_badge $submitCssStatus">$submitStatus</span>
+			<h4 class="o_title">$r.translate("run.submit")</h4>
+			#if($r.isNotEmpty($submitDueDate))
+				<div id="o_step_submit_duedate" class="o_meta #if($r.isTrue($submitLate)) o_process_status_late #end" data-remaining-time="$submitRemainingTime" data-late-remaining-time="$lateSubmitRemainingTime"><i class="o_icon o_icon-fw o_icon_timelimit"> </i> $submitDueDate</div>
+			#end
+			
+			#if($r.isNotEmpty($collectionDate))
+				<div class="o_meta"><i class="o_icon o_icon-fw o_icon_description"> </i> $collectionDate</div>
+			#elseif($r.isNotNull($submissionDate))
+				<div class="o_meta $submissionDate.cssClass"><i class="o_icon o_icon-fw $submissionDate.iconCssClass"> </i> $submissionDate.message</div>
+			#end
+			
+			#if($submitDueDateMsg)
+				<div class="o_meta">$r.escapeHtml($submitDueDateMsg)</div>
+			#end
+		</div>
+		<div id="o_step_submit_content" class="o_content collapse #if($collapse_submit) in #end" aria-expanded="$collapse_submit"  role="region">
+			#if($r.available("submitDocs"))
+				<div class="o_note">$r.translate("run.submit.individual.description.${sumbitWay}")</div>
+
+				<h5>$r.translate("submit.documents.title")</h5>
+				<p>$r.translate("submit.documents.desc")</p>
+				$r.render("submitDocs")
+				
+				<h5>$r.translate("submit.submit.title")</h5>
+				<p>$r.translate("submit.submit.desc")</p>
+				#if($groupWarning)
+					<div class="o_warning" role="alert">$r.translate("warning.group.submit", $r.escapeHtml($groupName))</div>
+				#end
+				<div class="o_button_group">
+					$r.render("run.submit.button")
+				</div>
+			#elseif($r.available("submittedDocs"))
+				$r.render("submittedDocs")
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_submit)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","submit")" data-toggle="collapse" aria-expanded="$collapse_submit" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","submit")" data-toggle="collapse" aria-expanded="$collapse_submit" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+
+#if($peerReviewEnabled)
+<div class="o_step $peerReviewAwardedCssClass o_step_peerreview_awarded o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_peerReviewAwarded) onclick="$r.javaScriptCommand("hide","step","peerReviewAwarded")" #else onclick="$r.javaScriptCommand("show","step","peerReviewAwarded")" #end>
+			<span class="o_process_status_badge $peerReviewAwardedCssStatus">$peerReviewAwardedStatus</span>
+			<h4 class="o_title">$r.translate("run.peerreviews")</h4>
+			#if($r.isNotEmpty($peerReviewDueDate))
+				<div id="o_step_peerreview_duedate" class="o_meta" data-remaining-time="$peerReviewRemainingTime"><i class="o_icon o_icon-fw o_icon_timelimit"> </i> $peerReviewDueDate</div>
+			#end
+			#if($peerReviewDueDateMsg)
+				<div class="o_meta">$r.escapeHtml($peerReviewDueDateMsg)</div>
+			#end
+		</div>
+		<div id="o_step_peerReviewAwarded_content" class="o_content collapse #if($collapse_peerReviewAwarded) in #end" aria-expanded="$collapse_peerReviewAwarded" role="region">
+			#if($r.isNotEmpty($peerReviewsMessage))
+				<p>$peerReviewsMessage</p>
+			#end
+			#if($r.available("peerReviewsAwarded"))
+				$r.render("peerReviewsAwarded")
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_peerReviewAwarded)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","peerReviewAwarded")" data-toggle="collapse" aria-expanded="$collapse_peerReviewAwarded" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","peerReviewAwarded")" data-toggle="collapse" aria-expanded="$collapse_peerReviewAwarded" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+
+<div class="o_step $peerReviewReceivedCssClass o_step_peerreview_received o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_peerReviewReceived) onclick="$r.javaScriptCommand("hide","step","peerReviewReceived")" #else onclick="$r.javaScriptCommand("show","step","peerReviewReceived")" #end>
+			<span class="o_process_status_badge $peerReviewReceivedCssStatus">$peerReviewReceivedStatus</span>
+			<h4 class="o_title">$r.translate("run.peerreviews.received")</h4>
+		</div>
+		<div id="o_step_peerReviewsReceived_content" class="o_content collapse #if($collapse_peerReviewReceived) in #end" aria-expanded="$collapse_peerReviewReceived" role="region">
+			#if($r.isNotEmpty($peerReviewsMessage))
+				<p>$peerReviewsMessage</p>
+			#end
+			#if($r.available("peerReviewsReceived"))
+				$r.render("peerReviewsReceived")
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_peerReviewReceived)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","peerReviewReceived")" data-toggle="collapse" aria-expanded="$collapse_peerReviewReceived" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","peerReviewReceived")" data-toggle="collapse" aria-expanded="$collapse_peerReviewReceived" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+
+#if($reviewAndCorrectionEnabled)
+<div class="o_step $reviewCssClass o_step_review o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_reviewAndCorrection) onclick="$r.javaScriptCommand("hide","step","reviewAndCorrection")" #else onclick="$r.javaScriptCommand("show","step","reviewAndCorrection")" #end>
+			<span class="o_process_status_badge $reviewCssStatus">$reviewStatus</span>
+			<h4 class="o_title">$r.translate("run.review")</h4>
+		</div>
+		<div id="o_step_review_content" class="o_content collapse #if($collapse_reviewAndCorrection) in #end" aria-expanded="$collapse_reviewAndCorrection" role="region">
+			#if($r.isNotEmpty($reviewMessage))
+				<p>$reviewMessage</p>
+			#end
+			#if($r.isNotEmpty($correctionMessage))
+				<div class="o_note">
+					<h5>$r.translate("run.corrections.comment")</strong> <small>$r.escapeHtml($correctionMessageInfos)</small></h5>
+					<p>$r.xssScan($correctionMessage)</p>
+				</div> 
+			#end
+			#if($r.available("corrections"))
+				$r.render("corrections")
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_reviewAndCorrection)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","reviewAndCorrection")" data-toggle="collapse" aria-expanded="$collapse_reviewAndCorrection" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","reviewAndCorrection")" data-toggle="collapse" aria-expanded="$collapse_reviewAndCorrection" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+
+#if($revisionEnabled && !$skipRevisions)
+<div class="o_step $revisionCssClass o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_revision) onclick="$r.javaScriptCommand("hide","step","revision")" #else onclick="$r.javaScriptCommand("show","step","revision")" #end>
+			<span class="o_process_status_badge $revisionCssStatus">$revisionStatus</span>
+			<h4 class="o_title">$r.translate("run.revision")</h4>
+			#if($r.isNotEmpty($revisionDueDate))
+				<div id="o_step_revision_duedate" class="o_meta"  data-remaining-time="$revisionRemainingTime"><i class="o_icon o_icon-fw o_icon_timelimit"> </i> $revisionDueDate</div>
+			#end
+			
+			#if($r.isNotEmpty($collectionRevisionDate))
+				<div class="o_meta"><i class="o_icon o_icon-fw o_icon_description"> </i> $collectionRevisionDate</div>
+			#elseif($r.isNotEmpty($submissionRevisionDate))
+				<div class="o_meta"><i class="o_icon o_icon-fw o_icon_status_done"> </i> $submissionRevisionDate</div>
+			#end
+		</div>
+		<div id="o_step_revision_content" class="o_content collapse #if($collapse_revision) in #end" aria-expanded="$collapse_revision" role="region">
+			#if($r.available("revisionDocs"))
+				$r.render("revisionDocs")
+			#end
+			#if($revisionMessage && !$revisionMessage.isEmpty())
+				<p>$revisionMessage</p>
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_revision)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","revision")" data-toggle="collapse" aria-expanded="$collapse_revision" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","revision")" data-toggle="collapse" aria-expanded="$collapse_revision" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+
+#if($solutionEnabled)
+<div class="o_step $solutionCssClass o_step_solution o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_solution) onclick="$r.javaScriptCommand("hide","step","solution")" #else onclick="$r.javaScriptCommand("show","step","solution")" #end>
+			<span class="o_process_status_badge $solutionCssStatus">$solutionStatus</span>
+			<h4 class="o_title">$r.translate("run.solution")</h4>
+			#if($r.isNotEmpty($solutionAvailableDate))
+				<div class="o_meta"><i class="o_icon o_icon-fw o_icon_timelimit"> </i> $solutionAvailableDate</div>
+			#end
+			#if($solutionAvailableDateMsg)
+				<div class="o_meta">$r.escapeHtml($solutionAvailableDateMsg)</div>
+			#end
+		</div>
+		<div id="o_step_solution_content" class="o_content collapse #if($collapse_solution) in #end" aria-expanded="$collapse_solution" role="region">
+			#if($r.available("solutions"))
+				$r.render("solutions")
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_solution)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","solution")" data-toggle="collapse" aria-expanded="$collapse_solution" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_collaps"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","solution")" data-toggle="collapse" aria-expanded="$collapse_solution" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg o_icon_details_expand"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+	
+#if($gradingEnabled)
+<div class="o_step o_step_grading $gradingCssClass o_expand_ctrl">
+	<div class="o_bar"></div>
+	<div class="o_step_block">
+		<div class="o_header" #if($collapse_grading) onclick="$r.javaScriptCommand("hide","step","grading")" #else onclick="$r.javaScriptCommand("show","step","grading")" #end>
+			<span class="o_process_status_badge $gradingCssStatus">$gradingStatus</span>
+			<h4 class="o_title">$r.translate("run.grading")</h4>
+		</div>
+		<div id="o_step_grading_content" class="o_content collapse #if($collapse_grading) in #end" aria-expanded="$collapse_grading" role="region">
+			#if($r.available("grading"))
+				$r.render("grading")
+			#end
+		</div>
+	</div>
+	<div class="o_button_group">
+	#if($collapse_grading)
+		<button href="javascript:;" onclick="$r.javaScriptCommand("hide","step","grading")" data-toggle="collapse" aria-expanded="$collapse_grading" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg #if($collapse_grading) o_icon_details_collaps #else o_icon_details_expand #end"> </i><span></span>
+		</button>
+	#else
+		<button href="javascript:;" onclick="$r.javaScriptCommand("show","step","grading")" data-toggle="collapse" aria-expanded="$collapse_grading" class="btn btn-default o_button_details">
+			<i class="o_icon o_icon_lg #if($collapse_grading) o_icon_details_collaps #else o_icon_details_expand #end"> </i><span></span>
+		</button>
+	#end
+	</div>
+</div>
+#end
+
+</div> ## end process
+
+#if ($r.available("highScore"))
+	$r.render("highScore")
+#end
+#if ($changelogconfig)
+	#if($userLog || $groupLog)
+	<div class="o_box">
+	    #o_togglebox_start("o_course_run_log" $r.translate("log.title"))
+		#if($groupLog)
+	    <pre class="small">$groupLog</pre>
+	    #end
+	    #if($userLog)
+	    <pre class="small">$userLog</pre>
+	    #end
+	    #o_togglebox_end()
+	</div>
+	#end
+#end
+
+<script>
+"use strict";
+jQuery(function() {
+	if(window.o_gtaCountDowns) {
+		for(var i=window.o_gtaCountDowns.length; i-->0; ) {
+			window.o_gtaCountDowns[i].cancel();
+		}
+	}
+	window.o_gtaCountDowns = new Array();
+	
+	function displayRemainingTime(wrapperId, hourCssClass, minuteCssClass, remaining) {
+		var hours = Math.floor(remaining / (60 * 60 * 1000));
+		var minutes = Math.floor((remaining - (hours * 60 * 60 * 1000)) / (60 * 1000));
+		jQuery("#" + wrapperId + " ." + hourCssClass).text("" + hours);
+		jQuery("#" + wrapperId + " ." + minuteCssClass).text("" + minutes);
+	}
+	
+	function pollRemainingTime(el, hourCssClass, minuteCssClass, dataAttribute) {
+		var numOfCounter = jQuery("." + minuteCssClass, el).length;
+		if(numOfCounter > 0) {
+	    	var availableTime = parseInt(el.getAttribute(dataAttribute));
+	    	if(availableTime > 0) {
+				var startTime = Math.floor(performance.now());
+				var wrapperId = el.getAttribute("id");
+				var periodic = jQuery.periodic({period: 1000, decay:1.0, max_period: availableTime + 1000 }, function() {
+					var remaining = availableTime - (Math.floor(performance.now()) - startTime);
+					if(jQuery("#o_proc_${r.getCId()}").length == 0) {
+						periodic.cancel();
+					} else if(remaining >= 0) {
+						displayRemainingTime(wrapperId, hourCssClass, minuteCssClass, remaining);
+					} else {
+						$r.javaScriptCommand("reload","ignore-validating-error","oo-ignore-validating-error")
+						periodic.cancel();
+					}
+				});
+				window.o_gtaCountDowns.push(periodic);
+	    	}
+		}
+	}
+	
+	jQuery(".o_meta").each(function(index, el) {
+		pollRemainingTime(el, "o_hours", "o_minutes", "data-remaining-time");
+		pollRemainingTime(el, "o_hours_late", "o_minutes_late", "data-late-remaining-time");	
+	});
+});
+</script>

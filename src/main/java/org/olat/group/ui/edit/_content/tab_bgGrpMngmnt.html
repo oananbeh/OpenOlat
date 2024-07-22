@@ -1,0 +1,49 @@
+<fieldset class="o_sel_group_members_visibility">
+  	<legend>
+  		$r.contextHelpWithWrapper("manual_user/groups/Group_Administration/#members")
+  		$r.translate("fieldset.legend.displaymembers")</legend>
+  	$r.render("displayMembers")
+</fieldset>
+<fieldset>
+  	<legend>
+  		$r.translate("fieldset.legend.allow.leaving")</legend>
+  	$r.render("configMembers")
+</fieldset>
+<fieldset class="o_sel_group_members_mgmt">
+	<legend>
+		$r.translate("group.edit.tab.members")
+	</legend>
+	#if($isOverbooked)
+		<div class="o_warning_with_icon">
+			$infoWarningText
+		</div>
+	#elseif($infoWarningText)
+		<div class="o_info_with_icon">
+			$infoWarningText
+		</div>
+	#end
+	
+	#if($r.visible("override.member") || $r.visible("unoverride.member"))
+	<div class="o_warning">
+		$r.translate("override.member.hint")
+		<div class="o_button_group">
+		#if($r.visible("override.member"))
+			$r.render("override.member")
+		#elseif($r.visible("unoverride.member"))
+			$r.render("unoverride.member")
+		#end
+		</div>
+	</div>
+	#end
+	<div class="o_button_group o_button_group_right o_sel_group_members_buttons">
+		#if($r.visible("addMembers") && $r.visible("addmore"))
+		<div class="btn-group">
+			$r.render("addMembers")
+			$r.render("addmore")
+		</div>
+		#elseif($r.visible("addMembers"))
+			$r.render("addMembers")
+		#end
+	</div>
+	$r.render("members")
+</fieldset>
